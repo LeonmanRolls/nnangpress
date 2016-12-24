@@ -11,3 +11,15 @@ structure which may get reasonably complicated.
 
 -
 
+## The routes vector
+
+-
+
+## General
+
+- Components should be as self-contained as possible, essentially reject the 'waterfall' data model
+
+## Broadcast system
+
+- Components should subscrive to edit events that affect them. For example a component that
+can have it's text edited should subscribe to the edit mode event

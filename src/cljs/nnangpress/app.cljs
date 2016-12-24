@@ -4,6 +4,8 @@
             [clojure.spec :as s]
             ))
 
+(enable-console-print!)
+
 (comment
  (.log js/console "hi there")
   (println "hi")
@@ -18,64 +20,71 @@
 
 (s/def ::route (s/keys :req [::route-name ::bg-img ::nav-hint ::widgets ::children]))
 
-(def routes-vector {::route-name "/"
-                    ::bg-img "home_page.jpg"
-                    ::nav-hint ["Architects"]
-                    ::widgets []
-                    ::children [{::route-name "/for-you"
-                                 ::bg-img "home_page.jpg"
-                                 ::nav-hint ["For you"]
-                                 ::widgets []
-                                 ::children [{::route-name "/for-you"
-                                              ::bg-img "home_page.jpg"
-                                              ::nav-hint ["For you"]
-                                              ::widgets []
-                                              ::children []}
-                                             {::route-name "/for-you"
-                                              ::bg-img "home_page.jpg"
-                                              ::nav-hint ["For you"]
-                                              ::widgets []
-                                              ::children []}]}
-                                {::route-name "/for-architects"
-                                 ::bg-img "home_page.jpg"
-                                 ::nav-hint ["For Architects"]
-                                 ::widgets []
-                                 ::children [{::route-name "/for-you"
-                                              ::bg-img "home_page.jpg"
-                                              ::nav-hint ["For you"]
-                                              ::widgets []
-                                              ::children []}]}
-                                {::route-name "/from-us"
-                                 ::bg-img "home_page.jpg"
-                                 ::nav-hint ["From us"]
-                                 ::widgets []
-                                 ::children [{::route-name "/for-you"
-                                              ::bg-img "home_page.jpg"
-                                              ::nav-hint ["For you"]
-                                              ::widgets []
-                                              ::children []}]}]})
+(def routes-map {::route-name "/"
+                 ::bg-img "home_page.jpg"
+                 ::nav-hint ["Architectss"]
+                 ::widgets []
+                 ::children [{::route-name "/for-you"
+                              ::bg-img "home_page.jpg"
+                              ::nav-hint ["For you"]
+                              ::widgets []
+                              ::children [{::route-name "/for-you"
+                                           ::bg-img "home_page.jpg"
+                                           ::nav-hint ["For you"]
+                                           ::widgets []
+                                           ::children []}
+                                          {::route-name "/for-you"
+                                           ::bg-img "home_page.jpg"
+                                           ::nav-hint ["For you"]
+                                           ::widgets []
+                                           ::children []}]}
+                             {::route-name "/for-architects"
+                              ::bg-img "home_page.jpg"
+                              ::nav-hint ["For Architects"]
+                              ::widgets []
+                              ::children [{::route-name "/for-you"
+                                           ::bg-img "home_page.jpg"
+                                           ::nav-hint ["For you"]
+                                           ::widgets []
+                                           ::children []}]}
+                             {::route-name "/from-us"
+                              ::bg-img "home_page.jpg"
+                              ::nav-hint ["From us"]
+                              ::widgets []
+                              ::children [{::route-name "/for-you"
+                                           ::bg-img "home_page.jpg"
+                                           ::nav-hint ["For you"]
+                                           ::widgets []
+                                           ::children []}]}]})
 
+(def monolith (atom {::logo-text ["Solarii"]
+                     ::routes-map routes-map}))
 
+(defn logo-text []
+  (om/ref-cursor (::logo-text (om/root-cursor monolith))))
 
-(def monolith (atom {:routes-vector []}))
+(defn logo-hint []
+  (om/ref-cursor (-> (om/root-cursor monolith) ::routes-map ::nav-hint)))
 
 (defn nav-hint [data owner]
   (reify
-    om/IRenderState
-    (render-state [this state]
-      (dom/div #js {}
+    om/IRender
+    (render [_]
+      (let [logo-hint-c (om/observe owner (logo-hint))]
+       (dom/div #js {}
                (dom/div #js {}
-                        (dom/div #js {} "architects"))))))
+                        (dom/div #js {} (first logo-hint-c))))))))
 
 (defn nav-menu-logo
   [data owner]
   (reify
     om/IRender
     (render [_]
-      (dom/h1 #js {:className "logo"}
-              "Solari"))))
+      (let [logo-text-c (om/observe owner (logo-text))]
+       (dom/h1 #js {:className "logo"}
+              (first logo-text-c))))))
 
-(defn main-nav-view [data owner]
+(defn main-nav-view [{:keys [routes-map] :as data} owner]
   (reify
     om/IRender
     (render [this]
@@ -86,6 +95,8 @@
                         (om/build nav-menu-logo {})
 
                         (om/build nav-hint {})
+
+                        (println (type routes-map))
 
                         #_(dom/ul #js {}
                                 (om/build nav-menu-item-left (:routes-vector data)
@@ -113,7 +124,7 @@
     om/IRender
     (render [this]
       (dom/h1 nil (:text data))
-      (om/build main-nav-view {})
+      (om/build main-nav-view data)
       )))
 
 (defn init []
