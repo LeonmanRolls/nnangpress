@@ -1,0 +1,13 @@
+#Welcome to nnangpress
+
+- Make sure boot is using clojure version 1.8.0
+
+#Application architecture
+
+-All the data is in a single atom
+
+-Reference cursors are used to create an api to simplify management of this 'monolith' data
+structure which may get reasonably complicated.
+
+-
+
