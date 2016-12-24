@@ -1,35 +1,61 @@
 (ns nnangpress.app
   (:require [om.core :as om :include-macros true]
-            [om.dom :as dom :include-macros true]))
+            [om.dom :as dom :include-macros true]
+            [clojure.spec :as s]
+            ))
 
-(def routes-vector (Route. "/" "home_page.jpg" ["Architects"]  []
-                            [(Route. "/for-you" "from_us.jpg" ["for you"] []
-                                     [(Route. "/all-projects" "from_uss.jpg" ["all projects"] []
-                                              [(Route. "/sub-sub-social" "home_page.jpg" ["sub sub route"] [] [] 1 false)]  1 false)
+(comment
+ (.log js/console "hi there")
+  (println "hi")
 
-                                      (Route. "/residential" "home_page.jpg" ["residential"] [] [] 2 false)
+  )
 
-                                      (Route. "/multi-residential" "home_page.jpg" ["multi residential"] [] [] 3 false)
+(s/def ::route-name string?)
+(s/def ::bg-img string?)
+(s/def ::nav-hint vector?)
+(s/def ::widgets vector?)
+(s/def ::children (s/coll-of ::route))
 
-                                      (Route. "/commercial" "home_page.jpg" ["commerical"] [] [] 4 false)
+(s/def ::route (s/keys :req [::route-name ::bg-img ::nav-hint ::widgets ::children]))
 
-                                      (Route. "/our-process" "home_page.jpg" ["our process"] [] [] 5 false)
+(def routes-vector {::route-name "/"
+                    ::bg-img "home_page.jpg"
+                    ::nav-hint ["Architects"]
+                    ::widgets []
+                    ::children [{::route-name "/for-you"
+                                 ::bg-img "home_page.jpg"
+                                 ::nav-hint ["For you"]
+                                 ::widgets []
+                                 ::children [{::route-name "/for-you"
+                                              ::bg-img "home_page.jpg"
+                                              ::nav-hint ["For you"]
+                                              ::widgets []
+                                              ::children []}
+                                             {::route-name "/for-you"
+                                              ::bg-img "home_page.jpg"
+                                              ::nav-hint ["For you"]
+                                              ::widgets []
+                                              ::children []}]}
+                                {::route-name "/for-architects"
+                                 ::bg-img "home_page.jpg"
+                                 ::nav-hint ["For Architects"]
+                                 ::widgets []
+                                 ::children [{::route-name "/for-you"
+                                              ::bg-img "home_page.jpg"
+                                              ::nav-hint ["For you"]
+                                              ::widgets []
+                                              ::children []}]}
+                                {::route-name "/from-us"
+                                 ::bg-img "home_page.jpg"
+                                 ::nav-hint ["From us"]
+                                 ::widgets []
+                                 ::children [{::route-name "/for-you"
+                                              ::bg-img "home_page.jpg"
+                                              ::nav-hint ["For you"]
+                                              ::widgets []
+                                              ::children []}]}]})
 
-                                      (Route. "/faq" "home_page.jpg" ["faq"] [] [] 6 false)
 
-                                      (Route. "/your-team" "home_page.jpg" ["your team"] [] [] 7 false)
-
-                                      (Route. "/contact" "home_page.jpg" ["faq"] [] [] 8 false)] 1 false)
-
-                             (Route. "/for-architects" "home_page.jpg" ["for architects"] []
-                                     [(Route. "/your-career" "home_page.jpg" ["your career"] [] [] 1 false)
-
-                                      (Route. "/meet-the-team" "home_page.jpg" ["meet the team"] [] [] 2 false)
-
-                                      (Route. "/jobs" "home_page.jpg" ["jobs"] [] [] 3 false)] 2 false)
-
-                             (Route. "/from-us" "home_page.jpg" ["from us"] []
-                                     [(Route. "/solari-social" "home_page.jpg" ["solari social"] [] [] 1 false)] 3 false)] 1 false))
 
 (def monolith (atom {:routes-vector []}))
 

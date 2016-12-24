@@ -1,0 +1,31 @@
+(ns nnangpress.app
+  (:require [om.core :as om :include-macros true]
+            [om.dom :as dom :include-macros true]))
+ (.log js/console "hi there") 
+(.log js/console "hi there")
+  (println "hi")
+(in-ns 'boot.user)
+(.log js/console "hi")
+(ns nnangpress.app
+  (:require [om.core :as om :include-macros true]
+            [om.dom :as dom :include-macros true]))
+monolith
+(def monolith (atom {:routes-vector []}))
+monolith
+(.log js/console "hi")
+(start-repl)
+(in-ns 'boot.user0
+)
+(in-ns 'boot.user)
+(start-repl)
+(.log js/console "hi")
+(in-ns 'nnangpress.app)
+monolit
+monolith
+  (s/cat :hi fn?)
+(ns nnangpress.app
+  (:require [om.core :as om :include-macros true]
+            [om.dom :as dom :include-macros true]
+            [clojure.spec :as s]
+            ))
+  (s/cat :hi fn?)
