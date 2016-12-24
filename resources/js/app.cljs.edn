@@ -1,0 +1,3 @@
+{:require  [nnangpress.app]
+ :init-fns [nnangpress.app/init]
+ :compiler-options {:asset-path "js/app.out"}}
