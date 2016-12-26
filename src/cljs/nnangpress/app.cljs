@@ -2,7 +2,7 @@
   (:import
     [goog.history Html5History EventType])
   (:require-macros  [cljs.core.async.macros :refer  [go go-loop]])
-  (:require [om.core :as om :include-macros true]
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
             [om.dom :as dom :include-macros true]
             [clojure.spec :as s]
             [cljs.core.async :as cas :refer [>! <! put! chan pub sub]]
@@ -58,6 +58,23 @@
 (def monolith (atom {::logo-text ["Solari"]
                      ::routes-map routes-map}))
 
+;pub sub
+(def routing-chan-in (chan))
+(def routing-pub (pub routing-chan-in :msg-type))
+
+(comment
+
+  (def routing-chan-out (chan))
+  (sub routing-pub :route-change routing-chan-out)
+
+  (go-loop []
+           (let [{:keys [text]} (<! routing-chan-out)]
+             (println text)
+             (recur)))
+
+  (sub our-pub :greeting output-chan)
+  (put! input-chan {:msg-type :greeting :text "hellooo"}))
+
 ;Routing
 (defn get-token  []
     (str js/window.location.pathname js/window.location.search))
@@ -70,20 +87,13 @@
     (.setUseFragment false)))
 
 (defn handle-url-change  [e]
-    ;; log the event object to console for inspection
-    (js/console.log e)
-    ;; and let's see the token
-    (js/console.log  (str "Navigating: "  (get-token)))
-    ;; we are checking if this event is due to user action,
-    ;; such as click a link, a back button, etc.
-    ;; as opposed to programmatically setting the URL with the API
-    (when-not  (.-isNavigation e)
-          ;; in this case, we're setting it
-          (js/console.log "Token set programmatically")
-          ;; let's scroll to the top to simulate a navigation
-          (js/window.scrollTo 0 0))
-    ;; dispatch on the token
-    #_(secretary/dispatch!  (get-token)))
+  (js/console.log  (str "Navigating: "  (get-token)))
+  (when-not  (.-isNavigation e)
+    (js/console.log "Token set programmatically")
+    (js/window.scrollTo 0 0))
+  ;; dispatch on the token
+  (put! routing-chan-in {:msg-type :route-change :text (get-token)})
+  #_(secretary/dispatch!  (get-token)))
 
 (defonce history (doto (make-history)
                    (goog.events/listen EventType.NAVIGATE #(handle-url-change %))
@@ -98,10 +108,6 @@
     (nav! route-name)))
 
 
-;pub sub
-(def routing-chan-in (chan))
-(def routing-pub (pub routing-chan-in :msg-type))
-(def routing-chan-out (chan))
 
 
 
@@ -109,21 +115,6 @@
 
 
 
-(def input-chan (chan))
-(def our-pub (pub input-chan :msg-type))
-(def output-chan  (chan))
-
-(comment
-
-  (sub our-pub :greeting output-chan)
-  (put! input-chan {:msg-type :greeting :text "hellooo"})
-
-  (go-loop  []
-           (let  [{:keys  [text]}  (<! output-chan)]
-             (println text)
-             (recur)))
-
-  )
 
 (defn logo-text []
   (om/ref-cursor (::logo-text (om/root-cursor monolith))))
@@ -158,17 +149,31 @@
        :str-beautify (fn [s]
                        (->
                          (subs s 1)
-                         (clojure.string/replace #"-" " ")))})
+                         (clojure.string/replace #"-" " ")))
+       :curr-route "/for-you"
+       })
+
+    om/IWillMount
+    (will-mount [this]
+      (let [routing-chan-out (chan)]
+        (sub routing-pub :route-change routing-chan-out)
+        (go-loop []
+                 (let [{:keys [text]} (<! routing-chan-out)]
+                   (println text)
+                   (set-state! owner :curr-route text)
+                   (recur)))
+        )
+      )
 
     om/IRenderState
-    (render-state [_ {:keys [depth str-beautify] :as state}]
+    (render-state [_ {:keys [depth str-beautify curr-route] :as state}]
       (cond
         (= "/" route-name)
         (apply dom/ul #js {}
                (om/build-all nav-menu children))
 
         (not (empty? children))
-        (dom/li #js {:className "nav-li"
+        (dom/li #js {:className (str "nav-li " (when (= curr-route route-name) "active"))
                      :onClick (partial js-link route-name)}
                 (str-beautify route-name)
                 (apply dom/ul #js {:className "nav-ul"}

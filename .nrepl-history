@@ -63,3 +63,4 @@ monolith
 (get-token)
 (defn get-token  []
     (str js/window.location.pathname js/window.location.search))
+(str nil "hi")

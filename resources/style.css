@@ -107,3 +107,6 @@ ul {
   width: 160px;
 }
 
+.active {
+  color: red;
+}
