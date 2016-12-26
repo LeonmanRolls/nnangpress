@@ -6,19 +6,13 @@
 
 (enable-console-print!)
 
-(comment
- (.log js/console "hi there")
-  (println "hi")
-
-  )
-
 (s/def ::route-name string?)
 (s/def ::bg-img string?)
 (s/def ::nav-hint vector?)
 (s/def ::widgets vector?)
 (s/def ::children (s/coll-of ::route))
 
-(s/def ::route (s/keys :req [::route-name ::bg-img ::nav-hint ::widgets ::children]))
+(s/def ::route (s/keys :req-un [::route-name ::bg-img ::nav-hint ::widgets ::children]))
 
 (def routes-map {::route-name "/"
                  ::bg-img "home_page.jpg"
@@ -28,32 +22,32 @@
                               ::bg-img "home_page.jpg"
                               ::nav-hint ["For you"]
                               ::widgets []
-                              ::children [{::route-name "/for-you"
+                              ::children [{::route-name "/for-you-one"
                                            ::bg-img "home_page.jpg"
-                                           ::nav-hint ["For you"]
+                                           ::nav-hint ["For you one"]
                                            ::widgets []
                                            ::children []}
-                                          {::route-name "/for-you"
+                                          {::route-name "/for-you-two"
                                            ::bg-img "home_page.jpg"
-                                           ::nav-hint ["For you"]
+                                           ::nav-hint ["For you two"]
                                            ::widgets []
                                            ::children []}]}
                              {::route-name "/for-architects"
                               ::bg-img "home_page.jpg"
                               ::nav-hint ["For Architects"]
                               ::widgets []
-                              ::children [{::route-name "/for-you"
+                              ::children [{::route-name "/for-archi-one"
                                            ::bg-img "home_page.jpg"
-                                           ::nav-hint ["For you"]
+                                           ::nav-hint ["For archi one"]
                                            ::widgets []
                                            ::children []}]}
                              {::route-name "/from-us"
                               ::bg-img "home_page.jpg"
                               ::nav-hint ["From us"]
                               ::widgets []
-                              ::children [{::route-name "/for-you"
+                              ::children [{::route-name "/from-us-one"
                                            ::bg-img "home_page.jpg"
-                                           ::nav-hint ["For you"]
+                                           ::nav-hint ["For you one"]
                                            ::widgets []
                                            ::children []}]}]})
 
@@ -70,21 +64,84 @@
   (reify
     om/IRender
     (render [_]
-      (let [logo-hint-c (om/observe owner (logo-hint))]
-       (dom/div #js {}
-               (dom/div #js {}
-                        (dom/div #js {} (first logo-hint-c))))))))
+      (let [logo-hint-obs (om/observe owner (logo-hint))]
+        (dom/div #js {}
+                 (dom/div #js {}
+                          (dom/div #js {} (first logo-hint-obs))))))))
 
 (defn nav-menu-logo
   [data owner]
   (reify
     om/IRender
     (render [_]
-      (let [logo-text-c (om/observe owner (logo-text))]
-       (dom/h1 #js {:className "logo"}
-              (first logo-text-c))))))
+      (let [logo-text-obs (om/observe owner (logo-text))]
+        (dom/h1 #js {:className "logo"}
+                (first logo-text-obs))))))
 
-(defn main-nav-view [{:keys [routes-map] :as data} owner]
+(defn nav-menu-item-left
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+
+      )))
+
+(defn nav-menu [{:keys [::route-name ::background ::widgets ::children] :as all}
+                owner]
+  (reify
+    om/IInitState
+    (init-state  [_]
+      {:depth 0})
+
+    om/IRenderState
+    (render-state [_ {:keys [depth] :as state}]
+      (println children)
+      (println (= "/" route-name))
+
+      (cond
+        (= "/" route-name) (apply dom/ul #js {}
+                                   (om/build-all nav-menu children)
+                                   )
+
+        (not (empty? children)) (dom/div nil
+                                  (dom/li nil route-name)
+                                  (apply dom/ul #js {:style #js {:margin-left "100px"}}
+                                         (om/build-all nav-menu children))
+                                           )
+
+        :else (dom/li nil
+                      route-name
+
+                      )
+        )
+
+      #_(dom/li #js {:style (css/css-object (css/nav-li-home-new offset))}
+
+                (dom/button {:type "button" :class "close"
+                             :onClick (fn [x] (dt/delete-route route-name))}
+                            (dom/span nil "X"))
+
+                (dom/div #js{:contentEditable true
+                             :onInput (fn [x]
+                                        (dt/text-update
+                                          (-> x .-target .-innerText) all))
+                             :onClick (fn [x]
+                                        (do
+                                          (dt/new-update-route
+                                            (di/get-full-route route-name))))}
+                         (subs route-name 1))
+
+                (dom/ul #js {:style (css/css-object
+                                      (css/nav-ul-sub live-route?))}
+
+                        (om/build-all nav-menu-item-left children
+                                      {:init-state {:left-offset (inc offset)}})
+                        (om/build add-sub-route data)))
+      )
+    )
+  )
+
+(defn main-nav-view [{:keys [::routes-map] :as data} owner]
   (reify
     om/IRender
     (render [this]
@@ -96,11 +153,10 @@
 
                         (om/build nav-hint {})
 
-                        (println (type routes-map))
+                        (om/build nav-menu routes-map)
 
-                        #_(dom/ul #js {}
-                                (om/build nav-menu-item-left (:routes-vector data)
-                                          {:state {:left-offset 0}}))
+                        #_(apply dom/ul nil
+                                 (om/build-all nav-menu-item-left (::routes-map data)))
 
                         #_(dom/div #js {:id "social-container" :style #js {:textAlign "center"}}
                                    (dom/div nil

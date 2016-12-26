@@ -23,3 +23,7 @@ structure which may get reasonably complicated.
 
 - Components should subscrive to edit events that affect them. For example a component that
 can have it's text edited should subscribe to the edit mode event
+
+## Reference Cursors
+
+- Don't get observers and ordinary ref-curosrs mixed up
