@@ -62,19 +62,6 @@
 (def routing-chan-in (chan))
 (def routing-pub (pub routing-chan-in :msg-type))
 
-(comment
-
-  (def routing-chan-out (chan))
-  (sub routing-pub :route-change routing-chan-out)
-
-  (go-loop []
-           (let [{:keys [text]} (<! routing-chan-out)]
-             (println text)
-             (recur)))
-
-  (sub our-pub :greeting output-chan)
-  (put! input-chan {:msg-type :greeting :text "hellooo"}))
-
 ;Routing
 (defn get-token  []
     (str js/window.location.pathname js/window.location.search))
@@ -87,13 +74,11 @@
     (.setUseFragment false)))
 
 (defn handle-url-change  [e]
-  (js/console.log  (str "Navigating: "  (get-token)))
-  (when-not  (.-isNavigation e)
-    (js/console.log "Token set programmatically")
+  #_(js/console.log  (str "Navigating: "  (get-token)))
+  (when-not (.-isNavigation e)
+    #_(js/console.log "Token set programmatically")
     (js/window.scrollTo 0 0))
-  ;; dispatch on the token
-  (put! routing-chan-in {:msg-type :route-change :text (get-token)})
-  #_(secretary/dispatch!  (get-token)))
+  (put! routing-chan-in {:msg-type :route-change :route (get-token)}))
 
 (defonce history (doto (make-history)
                    (goog.events/listen EventType.NAVIGATE #(handle-url-change %))
@@ -106,14 +91,6 @@
   (do
     (.preventDefault e)
     (nav! route-name)))
-
-
-
-
-
-
-
-
 
 
 (defn logo-text []
@@ -150,20 +127,16 @@
                        (->
                          (subs s 1)
                          (clojure.string/replace #"-" " ")))
-       :curr-route "/for-you"
-       })
+       :curr-route "/"})
 
     om/IWillMount
     (will-mount [this]
       (let [routing-chan-out (chan)]
         (sub routing-pub :route-change routing-chan-out)
         (go-loop []
-                 (let [{:keys [text]} (<! routing-chan-out)]
-                   (println text)
-                   (set-state! owner :curr-route text)
-                   (recur)))
-        )
-      )
+                 (let [{:keys [route]} (<! routing-chan-out)]
+                   (set-state! owner :curr-route route)
+                   (recur)))))
 
     om/IRenderState
     (render-state [_ {:keys [depth str-beautify curr-route] :as state}]
@@ -173,14 +146,17 @@
                (om/build-all nav-menu children))
 
         (not (empty? children))
-        (dom/li #js {:className (str "nav-li " (when (= curr-route route-name) "active"))
+        (dom/li #js {:className (str "nav-li " (when (= curr-route route-name) "active-li"))
                      :onClick (partial js-link route-name)}
-                (str-beautify route-name)
-                (apply dom/ul #js {:className "nav-ul"}
-                       (om/build-all nav-menu children)))
+                (dom/div #js {:className (str (when (= curr-route route-name) "active-text"))}
+                         (str-beautify route-name))
+                (when
+                  (= curr-route route-name)
+                 (apply dom/ul #js {:className "nav-ul"}
+                       (om/build-all nav-menu children))))
 
         :else
-        (dom/li #js {:className "nav-li"}
+        (dom/li #js {:className "sub-nav-li"}
                 (str-beautify route-name))))))
 
 (defn main-nav-view [{:keys [::routes-map] :as data} owner]

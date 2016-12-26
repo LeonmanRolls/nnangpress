@@ -10,7 +10,7 @@
 }
 
 html,body {
-  background: #2ecc71;
+  background: black;
   margin: 0px;
   height: 100%;
   font-family: SourceSansPro;
@@ -100,13 +100,38 @@ ul {
   margin-right: -1px;
 }
 
+.sub-nav-li {
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 80%;
+  position: relative;
+  background-color: rgba(29,29,27,0.4);
+  display: block;
+  text-align: center;
+  color: #fff;
+  text-decoration: none;
+  padding: 18px;
+  outline: none;
+  margin-left: 4px;
+  margin-right: -1px;
+  border-bottom: 1px solid white
+}
+
 .nav-ul {
   position: absolute;
   top: 0;
   left: 160px;
   width: 160px;
+  border-top: 1px solid white;
+  margin-top: -1px;
+  border-right: 1px solid white;
 }
 
-.active {
-  color: red;
+.active-li {
+  border-top: 1px solid white;
+  border-bottom: 1px solid white;
+}
+
+.active-text {
+  color: #c0392b;
 }
