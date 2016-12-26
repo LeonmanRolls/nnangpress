@@ -69,10 +69,10 @@
   (om/ref-cursor (-> (om/root-cursor monolith) ::routes-map ::nav-hint)))
 
 ;Routing
-(defn get-token  []
+(defn get-token []
     (str js/window.location.pathname js/window.location.search))
 
-(defn make-history  []
+(defn make-history []
   (doto  (Html5History.)
     (.setPathPrefix  (str js/window.location.protocol
                           "//"
@@ -113,11 +113,9 @@
   (reify
     om/IRender
     (render [_]
-      (let [logo-text-obs (om/observe owner (logo-text))
-            route-name (om/observe owner (current-route))]
+      (let [logo-text-obs (om/observe owner (logo-text))]
         (dom/h1 #js {:className "logo"
-                     :onClick (partial js-link route-name)
-                     }
+                     :onClick (partial js-link "/")}
                 (first logo-text-obs))))))
 
 (defn nav-menu
