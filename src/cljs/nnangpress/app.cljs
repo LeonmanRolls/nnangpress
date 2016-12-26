@@ -16,7 +16,7 @@
 
 (def routes-map {::route-name "/"
                  ::bg-img "home_page.jpg"
-                 ::nav-hint ["Architectss"]
+                 ::nav-hint ["Architects"]
                  ::widgets []
                  ::children [{::route-name "/for-you"
                               ::bg-img "home_page.jpg"
@@ -65,9 +65,8 @@
     om/IRender
     (render [_]
       (let [logo-hint-obs (om/observe owner (logo-hint))]
-        (dom/div #js {}
-                 (dom/div #js {}
-                          (dom/div #js {} (first logo-hint-obs))))))))
+        (dom/div #js {:className "nav-hint-outer"}
+                 (dom/div #js {:className "nav-hint-inner"} (first logo-hint-obs)))))))
 
 (defn nav-menu-logo
   [data owner]
@@ -95,19 +94,21 @@
 
     om/IRenderState
     (render-state [_ {:keys [depth] :as state}]
-      (cond
-        (= "/" route-name) (apply dom/ul #js {}
-                                   (om/build-all nav-menu children))
+      (dom/div #js {}
+               (cond
+                 (= "/" route-name)
+                 (apply dom/ul #js {}
+                        (om/build-all nav-menu children))
 
-        (not (empty? children)) (dom/div nil
-                                         (dom/li nil route-name)
-                                         (apply dom/ul #js {:style #js {:margin-left "100px"}}
-                                                (om/build-all nav-menu children)))
+                 (not (empty? children))
+                 (dom/div nil
+                          (dom/li nil route-name)
+                          (apply dom/ul #js {:style #js {:margin-left "100px"}}
+                                 (om/build-all nav-menu children)))
 
-        :else (dom/li nil route-name))
-      )
-    )
-  )
+                 :else
+                 (dom/li nil route-name))
+               ))))
 
 (defn main-nav-view [{:keys [::routes-map] :as data} owner]
   (reify
@@ -115,11 +116,12 @@
     (render [this]
       (dom/div #js {:id "the-nav" :className "main-nav"}
 
-               (dom/div #js {}
+               (dom/div #js {:className "nav-aux"}
+                        (om/build nav-hint {}))
+
+               (dom/div #js {:className "nav-menu"}
 
                         (om/build nav-menu-logo {})
-
-                        (om/build nav-hint {})
 
                         (om/build nav-menu routes-map)
 
