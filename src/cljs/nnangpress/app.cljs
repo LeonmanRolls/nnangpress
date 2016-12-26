@@ -1,8 +1,7 @@
 (ns nnangpress.app
   (:require [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
-            [clojure.spec :as s]
-            ))
+            [clojure.spec :as s]))
 
 (enable-console-print!)
 
@@ -13,6 +12,26 @@
 (s/def ::children (s/coll-of ::route))
 
 (s/def ::route (s/keys :req-un [::route-name ::bg-img ::nav-hint ::widgets ::children]))
+
+(comment
+  {::route-name "/for-architects"
+   ::bg-img "home_page.jpg"
+   ::nav-hint ["For Architects"]
+   ::widgets []
+   ::children [{::route-name "/for-archi-one"
+                ::bg-img "home_page.jpg"
+                ::nav-hint ["For archi one"]
+                ::widgets []
+                ::children []}]}
+  {::route-name "/from-us"
+   ::bg-img "home_page.jpg"
+   ::nav-hint ["From us"]
+   ::widgets []
+   ::children [{::route-name "/from-us-one"
+                ::bg-img "home_page.jpg"
+                ::nav-hint ["For you one"]
+                ::widgets []
+                ::children []}]})
 
 (def routes-map {::route-name "/"
                  ::bg-img "home_page.jpg"
@@ -30,24 +49,6 @@
                                           {::route-name "/for-you-two"
                                            ::bg-img "home_page.jpg"
                                            ::nav-hint ["For you two"]
-                                           ::widgets []
-                                           ::children []}]}
-                             {::route-name "/for-architects"
-                              ::bg-img "home_page.jpg"
-                              ::nav-hint ["For Architects"]
-                              ::widgets []
-                              ::children [{::route-name "/for-archi-one"
-                                           ::bg-img "home_page.jpg"
-                                           ::nav-hint ["For archi one"]
-                                           ::widgets []
-                                           ::children []}]}
-                             {::route-name "/from-us"
-                              ::bg-img "home_page.jpg"
-                              ::nav-hint ["From us"]
-                              ::widgets []
-                              ::children [{::route-name "/from-us-one"
-                                           ::bg-img "home_page.jpg"
-                                           ::nav-hint ["For you one"]
                                            ::widgets []
                                            ::children []}]}]})
 
@@ -85,30 +86,34 @@
 
       )))
 
-(defn nav-menu [{:keys [::route-name ::background ::widgets ::children] :as all}
-                owner]
+(defn nav-menu
+  [{:keys [::route-name ::background ::widgets ::children] :as all} owner]
+
   (reify
     om/IInitState
     (init-state  [_]
-      {:depth 0})
+      {:depth 0
+       :str-beautify (fn [s]
+                       (->
+                         (subs s 1)
+                         (clojure.string/replace #"-" " ")))})
 
     om/IRenderState
-    (render-state [_ {:keys [depth] :as state}]
-      (dom/div #js {}
-               (cond
-                 (= "/" route-name)
-                 (apply dom/ul #js {}
-                        (om/build-all nav-menu children))
+    (render-state [_ {:keys [depth str-beautify] :as state}]
+      (cond
+        (= "/" route-name)
+        (apply dom/ul #js {}
+               (om/build-all nav-menu children))
 
-                 (not (empty? children))
-                 (dom/div nil
-                          (dom/li nil route-name)
-                          (apply dom/ul #js {:style #js {:margin-left "100px"}}
-                                 (om/build-all nav-menu children)))
+        (not (empty? children))
+        (dom/li #js {:className "nav-li"}
+                (str-beautify route-name)
+                (apply dom/ul #js {:className "nav-ul"}
+                       (om/build-all nav-menu children)))
 
-                 :else
-                 (dom/li nil route-name))
-               ))))
+        :else
+        (dom/li #js {:className "nav-li"}
+                (str-beautify route-name))))))
 
 (defn main-nav-view [{:keys [::routes-map] :as data} owner]
   (reify

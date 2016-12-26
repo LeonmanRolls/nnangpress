@@ -14,6 +14,13 @@ html,body {
   margin: 0px;
   height: 100%;
   font-family: SourceSansPro;
+  color: white;
+}
+
+ul {
+  list-style: none;
+  list-style-image: none;
+  padding-left: 0px;
 }
 
 .main-nav {
@@ -79,5 +86,24 @@ html,body {
   margin-right: auto;
 }
 
+.nav-li {
+  position: relative;
+  display: block;
+  text-align: center;
+  font-weight: 600;
+  font-size: 90%;
+  text-decoration: none;
+  padding: 16px;
+  outline: none;
+  text-transform: lowercase;
+  margin-left: -2px;
+  margin-right: -1px;
+}
 
+.nav-ul {
+  position: absolute;
+  top: 0;
+  left: 160px;
+  width: 160px;
+}
 
