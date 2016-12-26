@@ -55,12 +55,18 @@
                                            ::widgets []
                                            ::children []}]}]})
 
-(def monolith (atom {::logo-text ["Solari"]
+(def monolith (atom {::current-route ["/"]
+                     ::logo-text ["Solari"]
                      ::routes-map routes-map}))
 
-;pub sub
-(def routing-chan-in (chan))
-(def routing-pub (pub routing-chan-in :msg-type))
+(defn current-route []
+  (om/ref-cursor (::current-route (om/root-cursor monolith))))
+
+(defn logo-text []
+  (om/ref-cursor (::logo-text (om/root-cursor monolith))))
+
+(defn logo-hint []
+  (om/ref-cursor (-> (om/root-cursor monolith) ::routes-map ::nav-hint)))
 
 ;Routing
 (defn get-token  []
@@ -73,12 +79,12 @@
                           js/window.location.host))
     (.setUseFragment false)))
 
-(defn handle-url-change  [e]
-  #_(js/console.log  (str "Navigating: "  (get-token)))
-  (when-not (.-isNavigation e)
-    #_(js/console.log "Token set programmatically")
-    (js/window.scrollTo 0 0))
-  (put! routing-chan-in {:msg-type :route-change :route (get-token)}))
+(defn handle-url-change [e]
+  (js/console.log (str "Navigating: " (get-token)))
+  #_(when-not (.-isNavigation e)
+      #_(js/console.log "Token set programmatically")
+      (js/window.scrollTo 0 0))
+  (om/update! (current-route) [(get-token)]))
 
 (defonce history (doto (make-history)
                    (goog.events/listen EventType.NAVIGATE #(handle-url-change %))
@@ -93,11 +99,6 @@
     (nav! route-name)))
 
 
-(defn logo-text []
-  (om/ref-cursor (::logo-text (om/root-cursor monolith))))
-
-(defn logo-hint []
-  (om/ref-cursor (-> (om/root-cursor monolith) ::routes-map ::nav-hint)))
 
 (defn nav-hint [data owner]
   (reify
@@ -112,8 +113,11 @@
   (reify
     om/IRender
     (render [_]
-      (let [logo-text-obs (om/observe owner (logo-text))]
-        (dom/h1 #js {:className "logo"}
+      (let [logo-text-obs (om/observe owner (logo-text))
+            route-name (om/observe owner (current-route))]
+        (dom/h1 #js {:className "logo"
+                     :onClick (partial js-link route-name)
+                     }
                 (first logo-text-obs))))))
 
 (defn nav-menu
@@ -126,38 +130,30 @@
        :str-beautify (fn [s]
                        (->
                          (subs s 1)
-                         (clojure.string/replace #"-" " ")))
-       :curr-route "/"})
-
-    om/IWillMount
-    (will-mount [this]
-      (let [routing-chan-out (chan)]
-        (sub routing-pub :route-change routing-chan-out)
-        (go-loop []
-                 (let [{:keys [route]} (<! routing-chan-out)]
-                   (set-state! owner :curr-route route)
-                   (recur)))))
+                         (clojure.string/replace #"-" " ")))})
 
     om/IRenderState
-    (render-state [_ {:keys [depth str-beautify curr-route] :as state}]
-      (cond
-        (= "/" route-name)
-        (apply dom/ul #js {}
-               (om/build-all nav-menu children))
+    (render-state [_ {:keys [depth str-beautify] :as state}]
+      (let [curr-route (first (om/observe owner (current-route)))
+            active? (= curr-route route-name)]
 
-        (not (empty? children))
-        (dom/li #js {:className (str "nav-li " (when (= curr-route route-name) "active-li"))
-                     :onClick (partial js-link route-name)}
-                (dom/div #js {:className (str (when (= curr-route route-name) "active-text"))}
-                         (str-beautify route-name))
-                (when
-                  (= curr-route route-name)
-                 (apply dom/ul #js {:className "nav-ul"}
-                       (om/build-all nav-menu children))))
+        (cond
+          (= "/" route-name)
+          (apply dom/ul #js {}
+                 (om/build-all nav-menu children))
 
-        :else
-        (dom/li #js {:className "sub-nav-li"}
-                (str-beautify route-name))))))
+          (not (empty? children))
+          (dom/li #js {:className (str "nav-li " (when active? "active-li"))
+                       :onClick (partial js-link route-name)}
+                  (dom/div #js {:className (str (when active? "active-text"))}
+                           (str-beautify route-name))
+                  (when active?
+                    (apply dom/ul #js {:className "nav-ul"}
+                           (om/build-all nav-menu children))))
+
+          :else
+          (dom/li #js {:className "sub-nav-li"}
+                  (str-beautify route-name)))))))
 
 (defn main-nav-view [{:keys [::routes-map] :as data} owner]
   (reify
@@ -199,8 +195,7 @@
     om/IRender
     (render [this]
       (dom/h1 nil (:text data))
-      (om/build main-nav-view data)
-      )))
+      (om/build main-nav-view data))))
 
 (defn init []
   (om/root widget monolith
