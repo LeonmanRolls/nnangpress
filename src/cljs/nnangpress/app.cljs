@@ -1,7 +1,12 @@
 (ns nnangpress.app
+  (:import
+    [goog.history Html5History EventType])
+  (:require-macros  [cljs.core.async.macros :refer  [go go-loop]])
   (:require [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
-            [clojure.spec :as s]))
+            [clojure.spec :as s]
+            [cljs.core.async :as cas :refer [>! <! put! chan pub sub]]
+            [goog.events :as ev]))
 
 (enable-console-print!)
 
@@ -12,26 +17,6 @@
 (s/def ::children (s/coll-of ::route))
 
 (s/def ::route (s/keys :req-un [::route-name ::bg-img ::nav-hint ::widgets ::children]))
-
-(comment
-  {::route-name "/for-architects"
-   ::bg-img "home_page.jpg"
-   ::nav-hint ["For Architects"]
-   ::widgets []
-   ::children [{::route-name "/for-archi-one"
-                ::bg-img "home_page.jpg"
-                ::nav-hint ["For archi one"]
-                ::widgets []
-                ::children []}]}
-  {::route-name "/from-us"
-   ::bg-img "home_page.jpg"
-   ::nav-hint ["From us"]
-   ::widgets []
-   ::children [{::route-name "/from-us-one"
-                ::bg-img "home_page.jpg"
-                ::nav-hint ["For you one"]
-                ::widgets []
-                ::children []}]})
 
 (def routes-map {::route-name "/"
                  ::bg-img "home_page.jpg"
@@ -50,10 +35,95 @@
                                            ::bg-img "home_page.jpg"
                                            ::nav-hint ["For you two"]
                                            ::widgets []
+                                           ::children []}]}
+                             {::route-name "/for-architects"
+                              ::bg-img "home_page.jpg"
+                              ::nav-hint ["For Architects"]
+                              ::widgets []
+                              ::children [{::route-name "/for-archi-one"
+                                           ::bg-img "home_page.jpg"
+                                           ::nav-hint ["For archi one"]
+                                           ::widgets []
+                                           ::children []}]}
+                             {::route-name "/from-us"
+                              ::bg-img "home_page.jpg"
+                              ::nav-hint ["From us"]
+                              ::widgets []
+                              ::children [{::route-name "/from-us-one"
+                                           ::bg-img "home_page.jpg"
+                                           ::nav-hint ["For you one"]
+                                           ::widgets []
                                            ::children []}]}]})
 
 (def monolith (atom {::logo-text ["Solari"]
                      ::routes-map routes-map}))
+
+;Routing
+(defn get-token  []
+    (str js/window.location.pathname js/window.location.search))
+
+(defn make-history  []
+  (doto  (Html5History.)
+    (.setPathPrefix  (str js/window.location.protocol
+                          "//"
+                          js/window.location.host))
+    (.setUseFragment false)))
+
+(defn handle-url-change  [e]
+    ;; log the event object to console for inspection
+    (js/console.log e)
+    ;; and let's see the token
+    (js/console.log  (str "Navigating: "  (get-token)))
+    ;; we are checking if this event is due to user action,
+    ;; such as click a link, a back button, etc.
+    ;; as opposed to programmatically setting the URL with the API
+    (when-not  (.-isNavigation e)
+          ;; in this case, we're setting it
+          (js/console.log "Token set programmatically")
+          ;; let's scroll to the top to simulate a navigation
+          (js/window.scrollTo 0 0))
+    ;; dispatch on the token
+    #_(secretary/dispatch!  (get-token)))
+
+(defonce history (doto (make-history)
+                   (goog.events/listen EventType.NAVIGATE #(handle-url-change %))
+                   (.setEnabled true)))
+
+(defn nav! [token]
+  (.setToken history token))
+
+(defn js-link [route-name e]
+  (do
+    (.preventDefault e)
+    (nav! route-name)))
+
+
+;pub sub
+(def routing-chan-in (chan))
+(def routing-pub (pub routing-chan-in :msg-type))
+(def routing-chan-out (chan))
+
+
+
+
+
+
+
+(def input-chan (chan))
+(def our-pub (pub input-chan :msg-type))
+(def output-chan  (chan))
+
+(comment
+
+  (sub our-pub :greeting output-chan)
+  (put! input-chan {:msg-type :greeting :text "hellooo"})
+
+  (go-loop  []
+           (let  [{:keys  [text]}  (<! output-chan)]
+             (println text)
+             (recur)))
+
+  )
 
 (defn logo-text []
   (om/ref-cursor (::logo-text (om/root-cursor monolith))))
@@ -78,14 +148,6 @@
         (dom/h1 #js {:className "logo"}
                 (first logo-text-obs))))))
 
-(defn nav-menu-item-left
-  [data owner]
-  (reify
-    om/IRender
-    (render [_]
-
-      )))
-
 (defn nav-menu
   [{:keys [::route-name ::background ::widgets ::children] :as all} owner]
 
@@ -106,7 +168,8 @@
                (om/build-all nav-menu children))
 
         (not (empty? children))
-        (dom/li #js {:className "nav-li"}
+        (dom/li #js {:className "nav-li"
+                     :onClick (partial js-link route-name)}
                 (str-beautify route-name)
                 (apply dom/ul #js {:className "nav-ul"}
                        (om/build-all nav-menu children)))

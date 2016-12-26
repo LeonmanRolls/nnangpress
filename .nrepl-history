@@ -29,3 +29,37 @@ monolith
             [clojure.spec :as s]
             ))
   (s/cat :hi fn?)
+(.log js/console "hi there")
+(start-repl)
+(.log js/console "hi there")
+(put! input-chan {:msg-type :greeting :text "hello"})
+(ns nnangpress.app
+  (:require-macros  [cljs.core.async.macros :refer  [go go-loop]])
+  (:require [om.core :as om :include-macros true]
+            [om.dom :as dom :include-macros true]
+            [clojure.spec :as s]
+            [cljs.core.async :as cas :refer [>! <! put! chan pub sub]]))
+(put! input-chan {:msg-type :greeting :text "hello"})
+(def output-chan  (chan))
+  (sub our-pub :greeting output-chan)
+(go-loop  []
+             (let  [{:keys  [text]}  (<! output-chan)]
+                   (println text)
+                   (recur)))
+(put! input-chan {:msg-type :greeting :text "hello"})
+(def input-chan (chan))
+(def our-pub (pub input-chan :msg-type))
+(def output-chan  (chan))
+  (sub our-pub :greeting output-chan)
+(put! input-chan {:msg-type :greeting :text "hello"})
+  (go-loop  []
+             (let  [{:keys  [text]}  (<! output-chan)]
+                   (println text)
+                   (recur)))
+(put! input-chan {:msg-type :greeting :text "hello"})
+(put! input-chan {:msg-type :greeting :text "hellooo"})
+(defn get-token  []
+    (str js/window.location.pathname js/window.location.search))
+(get-token)
+(defn get-token  []
+    (str js/window.location.pathname js/window.location.search))

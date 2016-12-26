@@ -24,6 +24,10 @@ structure which may get reasonably complicated.
 - Components should subscrive to edit events that affect them. For example a component that
 can have it's text edited should subscribe to the edit mode event
 
+### Routing
+
+- Any component that cares about the current route should subscribe to routing events
+
 ## Reference Cursors
 
 - Don't get observers and ordinary ref-curosrs mixed up
