@@ -1,0 +1,50 @@
+@font-face {
+   font-family: SourceSansPro;
+   src: url(/fonts/SourceSansPro-Regular.otf);
+}
+
+@font-face {
+   font-family: SourceSansPro;
+   src: url(/fonts/SourceSansPro-Bold.otf);
+   font-weight: bold;
+}
+
+html,body {
+  background: red;
+  margin: 0px;
+  height: 100%;
+  font-family: SourceSansPro;
+}
+
+.main-nav {
+  width: 160px;
+  display: block;
+  opacity: 1;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  width: 160px;
+  height: 100%;
+  padding: 0 0 16px;
+  background-color: #1d1d1b;
+  border-right-width: 1px;
+  border-right-style: solid;
+  border-right-color: #fff;
+}
+
+.logo {
+  margin-top: 25px;
+  margin-bottom: 25px;
+  padding: 0;
+  letter-spacing: 5px;
+  font-size: 300%;
+  font-weight: 700;
+  text-transform: lowercase;
+  text-align: center;
+  color: #fff;
+  cursor: pointer;
+}
+
+
+

@@ -51,7 +51,7 @@
                                            ::widgets []
                                            ::children []}]}]})
 
-(def monolith (atom {::logo-text ["Solarii"]
+(def monolith (atom {::logo-text ["Solari"]
                      ::routes-map routes-map}))
 
 (defn logo-text []
@@ -95,48 +95,16 @@
 
     om/IRenderState
     (render-state [_ {:keys [depth] :as state}]
-      (println children)
-      (println (= "/" route-name))
-
       (cond
         (= "/" route-name) (apply dom/ul #js {}
-                                   (om/build-all nav-menu children)
-                                   )
+                                   (om/build-all nav-menu children))
 
         (not (empty? children)) (dom/div nil
-                                  (dom/li nil route-name)
-                                  (apply dom/ul #js {:style #js {:margin-left "100px"}}
-                                         (om/build-all nav-menu children))
-                                           )
+                                         (dom/li nil route-name)
+                                         (apply dom/ul #js {:style #js {:margin-left "100px"}}
+                                                (om/build-all nav-menu children)))
 
-        :else (dom/li nil
-                      route-name
-
-                      )
-        )
-
-      #_(dom/li #js {:style (css/css-object (css/nav-li-home-new offset))}
-
-                (dom/button {:type "button" :class "close"
-                             :onClick (fn [x] (dt/delete-route route-name))}
-                            (dom/span nil "X"))
-
-                (dom/div #js{:contentEditable true
-                             :onInput (fn [x]
-                                        (dt/text-update
-                                          (-> x .-target .-innerText) all))
-                             :onClick (fn [x]
-                                        (do
-                                          (dt/new-update-route
-                                            (di/get-full-route route-name))))}
-                         (subs route-name 1))
-
-                (dom/ul #js {:style (css/css-object
-                                      (css/nav-ul-sub live-route?))}
-
-                        (om/build-all nav-menu-item-left children
-                                      {:init-state {:left-offset (inc offset)}})
-                        (om/build add-sub-route data)))
+        :else (dom/li nil route-name))
       )
     )
   )
@@ -145,7 +113,7 @@
   (reify
     om/IRender
     (render [this]
-      (dom/div #js {:className "" :id "the-nav"}
+      (dom/div #js {:id "the-nav" :className "main-nav"}
 
                (dom/div #js {}
 
