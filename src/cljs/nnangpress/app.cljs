@@ -188,15 +188,21 @@
 
 (defn main-view [data owner]
   (reify
+    om/IDidMount
+    (did-mount [_]
+     (js/Medium. #js {:element (.getElementById js/document  "medium")
+                      :mode js/Medium.inlineMode
+                      :maxLength 25
+                      :placeholder "Your title"})
+
+
+      )
+
     om/IRender
     (render [_]
       (dom/div #js {:className "main-view"}
 
-
-
-               (dom/h1 nil "hi there")
-
-
+               (dom/h1 #js {:id "medium"} "hi there")
 
                ))))
 
