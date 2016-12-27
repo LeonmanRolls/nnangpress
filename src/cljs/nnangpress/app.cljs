@@ -1,12 +1,13 @@
 (ns nnangpress.app
-  (:import
-    [goog.history Html5History EventType])
-  (:require-macros  [cljs.core.async.macros :refer  [go go-loop]])
+  (:import [goog.history Html5History EventType])
+  (:require-macros [cljs.core.async.macros :refer  [go go-loop]])
   (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
             [om.dom :as dom :include-macros true]
             [clojure.spec :as s]
             [cljs.core.async :as cas :refer [>! <! put! chan pub sub]]
-            [goog.events :as ev]))
+            [goog.events :as ev]
+            [goog.dom :as gdom]
+            [clojure.walk :as wlk]))
 
 (enable-console-print!)
 
@@ -21,7 +22,9 @@
 (def routes-map {::route-name "/"
                  ::bg-img "home_page.jpg"
                  ::nav-hint ["Architects"]
-                 ::widgets []
+                 ::widgets [{:widget-uid 001
+                             :widget-name "Standard text widget"
+                             :inner-html ["<p> Hi there </p>"]}]
                  ::children [{::route-name "/for-you"
                               ::bg-img "home_page.jpg"
                               ::nav-hint ["For you"]
@@ -186,35 +189,56 @@
                                  (dom/footer #js {:id "main-footer" :className "footer cf" :style (css/css-object css/main-footer)}
                                              "Website by Nang")))))))
 
-(defn main-view [data owner]
+(defmulti widget (fn [data owner] (:widget-uid data)))
+
+(defmethod widget 001 [data owner]
   (reify
+    om/IInitState
+    (init-state [_])
+
     om/IDidMount
     (did-mount [_]
-     (js/Medium. #js {:element (.getElementById js/document  "medium")
-                      :mode js/Medium.inlineMode
-                      :maxLength 25
-                      :placeholder "Your title"})
-
-
-      )
+      (js/Medium. #js {:element (.getElementById js/document  "medium")
+                       :mode js/Medium.richMode
+                       :placeholder "Your title"
+                       :modifiers #js {:q (fn [event element]
+                                            (println element)
+                                            (.dir js/console (gdom/getElement "medium")))}}))
 
     om/IRender
     (render [_]
-      (dom/div #js {:className "main-view"}
+      (dom/div #js {:id "medium"
+                    :dangerouslySetInnerHTML #js {:__html (first (:inner-html data))}}))))
 
-               (dom/h1 #js {:id "medium"} "hi there")
-
-               ))))
-
-(defn widget [data owner]
+(defn main-view [data owner]
   (reify
     om/IRender
-    (render [this]
+    (render [_]
+      (apply dom/div #js {:className "main-view"}
+             (om/build-all widget data)))))
+
+(defn master [{:keys [::routes-map ::current-route] :as data} owner]
+  (reify
+    om/IInitState
+    (init-state [_]
+      {:flatten-routes (fn [routes-map]
+                         (tree-seq
+                           #(contains? % ::children)
+                           #(::children %)
+                           routes-map))})
+
+    om/IRenderState
+    (render-state [_ {:keys [flatten-routes] :as state}]
       (dom/div nil
-               (om/build main-view data)
+               (om/build main-view (->>
+                                     (flatten-routes routes-map)
+                                     (filter
+                                       #(= (first current-route) (::route-name %)))
+                                     first
+                                     (::widgets)))
                (om/build main-nav-view data)))))
 
 (defn init []
-  (om/root widget monolith
+  (om/root master monolith
            {:target (. js/document (getElementById "container"))}))
 

@@ -38,5 +38,8 @@ can have it's text edited should subscribe to the edit mode event
 
 - Widgets should have their own data type and associated components
 
+# Controls
+
+- Ctrl + q to save text
 
 

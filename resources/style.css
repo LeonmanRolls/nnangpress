@@ -137,9 +137,12 @@ ul {
 }
 
 .main-view {
-  text-align: center;
+  text-align: left;
   height: 100%;
   margin-left: 320px;
   margin-top: 100px;
+  margin-right: 160px;
+  line-height: 2;
+  letter-spacing: 0.1em;
 }
 
