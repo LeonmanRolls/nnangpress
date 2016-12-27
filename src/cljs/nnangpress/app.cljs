@@ -168,8 +168,6 @@
 
                         (om/build nav-menu routes-map)
 
-                        #_(apply dom/ul nil
-                                 (om/build-all nav-menu-item-left (::routes-map data)))
 
                         #_(dom/div #js {:id "social-container" :style #js {:textAlign "center"}}
                                    (dom/div nil
@@ -188,12 +186,27 @@
                                  (dom/footer #js {:id "main-footer" :className "footer cf" :style (css/css-object css/main-footer)}
                                              "Website by Nang")))))))
 
+(defn main-view [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/div #js {:className "main-view"}
+
+
+
+               (dom/h1 nil "hi there")
+
+
+
+               ))))
+
 (defn widget [data owner]
   (reify
     om/IRender
     (render [this]
-      (dom/h1 nil (:text data))
-      (om/build main-nav-view data))))
+      (dom/div nil
+               (om/build main-view data)
+               (om/build main-nav-view data)))))
 
 (defn init []
   (om/root widget monolith

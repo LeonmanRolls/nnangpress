@@ -10,7 +10,7 @@
 }
 
 html,body {
-  background: black;
+  background: green;
   margin: 0px;
   height: 100%;
   font-family: SourceSansPro;
@@ -135,3 +135,11 @@ ul {
 .active-text {
   color: #c0392b;
 }
+
+.main-view {
+  text-align: center;
+  height: 100%;
+  margin-left: 320px;
+  margin-top: 100px;
+}
+
