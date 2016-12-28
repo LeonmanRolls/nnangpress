@@ -11,6 +11,17 @@
 
 (enable-console-print!)
 
+;Utils
+(defn tree-seq-path [branch? children root & [node-fn]]
+  (let [node-fn (or node-fn identity)
+        walk (fn walk  [path node]
+               (let [new-path (conj path (node-fn node))]
+                 (lazy-seq
+                   (cons new-path
+                         (when (branch? node)
+                           (mapcat (partial walk new-path) (children node)))))))]
+    (walk [] root)))
+
 (s/def ::route-name string?)
 (s/def ::bg-img string?)
 (s/def ::nav-hint vector?)
@@ -100,18 +111,63 @@
     (.setUseFragment false)))
 
 (defn handle-url-change [e]
-  (js/console.log (str "Navigating: " (get-token)))
+  #_(js/console.log (str "Navigating: " (get-token)))
+  #_(let [paths (tree-seq-path
+                #(contains? % ::children)
+                #(::children %)
+                routes-map
+                #(::route-name %))
+        active-path  (first (filter (fn [x] (= (last x) (get-token))) paths))
+        new-path (if
+                   (= 1 (count active-path))
+                   "/"
+                   (->>
+                     active-path
+                     (drop 1)
+                     clojure.string/join))
+        ]
+
+    (println "new-path: " new-path)
+    (when (not (empty? new-path))
+    (om/update! (current-route) [new-path])
+      )
+
+    )
   #_(when-not (.-isNavigation e)
       #_(js/console.log "Token set programmatically")
-      (js/window.scrollTo 0 0))
-  (om/update! (current-route) [(get-token)]))
+      (js/window.scrollTo 0 0)))
 
 (defonce history (doto (make-history)
                    (goog.events/listen EventType.NAVIGATE #(handle-url-change %))
                    (.setEnabled true)))
 
 (defn nav! [token]
-  (.setToken history token))
+  (let [paths (tree-seq-path
+                #(contains? % ::children)
+                #(::children %)
+                routes-map
+                #(::route-name %))
+        active-path  (first (filter (fn [x] (= (last x) token)) paths))
+        new-path (if
+                   (= 1 (count active-path))
+                   "/"
+                   (->>
+                     active-path
+                     (drop 1)
+                     clojure.string/join))
+        ]
+
+    (println "new-path: " new-path)
+    (when (not (empty? new-path))
+      (om/update! (current-route) [new-path])
+      )
+
+    #_(println "nav: " token)
+    #_(.setToken history token)
+    (.setToken history new-path)
+    )
+
+  )
 
 (defn js-link [route-name e]
   (do
@@ -162,16 +218,19 @@
                  (om/build-all nav-menu children))
 
           (not (empty? children))
-          (dom/li #js {:className (str "nav-li " (when active? "active-li"))
-                       :onClick (partial js-link route-name)}
-                  (dom/div #js {:className (str (when active? "active-text"))}
-                           (str-beautify route-name))
-                  (when active?
-                    (apply dom/ul #js {:className "nav-ul"}
-                           (om/build-all nav-menu children))))
+          (dom/div #js {:style #js {:position "relative"}}
+                   (dom/li #js {:className (str "nav-li " (when active? "active-li"))
+                                :onClick (partial js-link route-name)}
+                           (dom/div #js {:className (str (when active? "active-text"))}
+                                    (str-beautify route-name))
+                           )
+                   (when active?
+                     (apply dom/ul #js {:className "nav-ul"}
+                            (om/build-all nav-menu children))))
 
           :else
-          (dom/li #js {:className "sub-nav-li"}
+          (dom/li #js {:className "sub-nav-li"
+                       :onClick (partial js-link route-name)}
                   (str-beautify route-name)))))))
 
 (defn main-nav-view [{:keys [::routes-map] :as data} owner]
@@ -244,25 +303,26 @@
   (reify
     om/IInitState
     (init-state [_]
-      {:flatten-routes (fn [routes-map]
-                         (tree-seq
-                           #(contains? % ::children)
-                           #(::children %)
-                           routes-map))
+      (let [splitter (fn [x] (last (clojure.string/split x #"/")))]
+        {:flatten-routes (fn [routes-map]
+                           (tree-seq
+                             #(contains? % ::children)
+                             #(::children %)
+                             routes-map))
 
-       :set-bg-img (fn [bg-img]
-                     (set!
-                       (-> js/document .-body .-background)
-                       (str "/img/backgrounds/" bg-img)))
+         :set-bg-img (fn [bg-img]
+                       (set!
+                         (-> js/document .-body .-background)
+                         (str "/img/backgrounds/" bg-img)))
 
-       :get-active-route (fn [flat-routes current-route]
-                           (->>
-                             flat-routes
-                             (filter
-                               #(=
-                                 (first current-route)
-                                 (::route-name %)))
-                             first))})
+         :get-active-route (fn [flat-routes current-route]
+                             (->>
+                               flat-routes
+                               (filter
+                                 #(=
+                                   (splitter (first current-route))
+                                   (splitter (::route-name %))))
+                               first))}))
 
     om/IRenderState
     (render-state [_ {:keys [flatten-routes set-bg-img get-active-route] :as state}]
