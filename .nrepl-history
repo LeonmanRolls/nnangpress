@@ -64,3 +64,46 @@ monolith
 (defn get-token  []
     (str js/window.location.pathname js/window.location.search))
 (str nil "hi")
+l
+(start-repl)
+(random-uuid)
+(type (random-uuid))
+(.toString (random-uuid))
+l
+(dom/getElement "html")
+(gdom/getElement "html")
+(in-ns 'nangpress.app)
+(gdom/getElement "html")
+(ns nnangpress.app
+  (:import [goog.history Html5History EventType])
+  (:require-macros [cljs.core.async.macros :refer  [go go-loop]])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [clojure.spec :as s]
+            [cljs.core.async :as cas :refer [>! <! put! chan pub sub]]
+            [goog.events :as ev]
+            [goog.dom :as gdom]
+            [clojure.walk :as wlk]))
+(gdom/getElement "html")
+(gdom/getElementByTagName "html")
+(gdom/TagName. "html")
+(-> js/document .-documentElement)
+(.dir js/console (-> js/document .-documentElement))
+(.dir js/console (-> js/document .-documentElement .-style))
+(.dir js/console (-> js/document .-documentElement .-style .-background))
+(set!
+                       (-> js/document .-documentElement .-style .-background)
+                       "url(/img/backgrounds/home_page.jpg) no-repeat center center fixed;"
+                       )
+(set!
+                       (-> js/document .-documentElement .-style .-background)
+                       "url(/img/backgrounds/home_page.jpg) no-repeat center center fixed;"
+                       )
+(set!
+                       (-> js/document .-body .-style .-background)
+                       "url(/img/backgrounds/home_page.jpg) no-repeat center center fixed;"
+                       )
+(println (-> js/document .-body .-background))
+(.dir js/console (-> js/document .-body .-background))
+                     (.dir js/console (-> js/document .-body .-style .-background))
+                     (.dir js/console (-> js/document .-body .-style ))

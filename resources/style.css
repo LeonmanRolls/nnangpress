@@ -10,11 +10,17 @@
 }
 
 html,body {
-  background: green;
   margin: 0px;
   height: 100%;
   font-family: SourceSansPro;
   color: white;
+}
+
+body {
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
 }
 
 ul {

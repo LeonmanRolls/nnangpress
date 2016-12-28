@@ -22,43 +22,57 @@
 (def routes-map {::route-name "/"
                  ::bg-img "home_page.jpg"
                  ::nav-hint ["Architects"]
+                 ::nav-hint-style #js {:color "black"}
                  ::widgets [{:widget-uid 001
                              :widget-name "Standard text widget"
                              :inner-html ["<p> Hi there </p>"]}]
                  ::children [{::route-name "/for-you"
                               ::bg-img "home_page.jpg"
                               ::nav-hint ["For you"]
+                              ::nav-hint-style #js {:color "black"}
                               ::widgets []
                               ::children [{::route-name "/for-you-one"
                                            ::bg-img "home_page.jpg"
                                            ::nav-hint ["For you one"]
+                                           ::nav-hint-style #js {:color "black"}
                                            ::widgets []
                                            ::children []}
                                           {::route-name "/for-you-two"
                                            ::bg-img "home_page.jpg"
                                            ::nav-hint ["For you two"]
+                                           ::nav-hint-style #js {:color "black"}
                                            ::widgets []
                                            ::children []}]}
                              {::route-name "/for-architects"
-                              ::bg-img "home_page.jpg"
+                              ::bg-img "from_us.jpg"
                               ::nav-hint ["For Architects"]
+                              ::nav-hint-style #js {:color "blue"}
                               ::widgets []
                               ::children [{::route-name "/for-archi-one"
                                            ::bg-img "home_page.jpg"
                                            ::nav-hint ["For archi one"]
+                                           ::nav-hint-style #js {:color "black"}
                                            ::widgets []
                                            ::children []}]}
                              {::route-name "/from-us"
                               ::bg-img "home_page.jpg"
                               ::nav-hint ["From us"]
+                              ::nav-hint-style #js {:color "black"}
                               ::widgets []
                               ::children [{::route-name "/from-us-one"
                                            ::bg-img "home_page.jpg"
                                            ::nav-hint ["For you one"]
+                                           ::nav-hint-style #js {:color "black"}
                                            ::widgets []
                                            ::children []}]}]})
 
-(def monolith (atom {::current-route ["/"]
+(def monolith (atom {::active-route {::route-name "/from-us"
+                                     ::bg-img "home_page.jpg"
+                                     ::nav-hint ["From us"]
+                                     ::nav-hint-style #js {:color "black"}
+                                     ::widgets []
+                                     ::children []}
+                     ::current-route ["/"]
                      ::logo-text ["Solari"]
                      ::routes-map routes-map}))
 
@@ -70,6 +84,9 @@
 
 (defn logo-hint []
   (om/ref-cursor (-> (om/root-cursor monolith) ::routes-map ::nav-hint)))
+
+(defn active-route []
+  (om/ref-cursor (-> (om/root-cursor monolith) ::active-route)))
 
 ;Routing
 (defn get-token []
@@ -101,15 +118,16 @@
     (.preventDefault e)
     (nav! route-name)))
 
-
-
 (defn nav-hint [data owner]
   (reify
     om/IRender
     (render [_]
-      (let [logo-hint-obs (om/observe owner (logo-hint))]
+      (let [{:keys [::nav-hint ::nav-hint-style]} (om/observe owner (active-route))]
         (dom/div #js {:className "nav-hint-outer"}
-                 (dom/div #js {:className "nav-hint-inner"} (first logo-hint-obs)))))))
+                 (dom/div #js {:className "nav-hint-inner"
+                               :style nav-hint-style
+                               }
+                          (first nav-hint)))))))
 
 (defn nav-menu-logo
   [data owner]
@@ -194,20 +212,25 @@
 (defmethod widget 001 [data owner]
   (reify
     om/IInitState
-    (init-state [_])
+    (init-state [_]
+      {:uuid (random-uuid)})
 
     om/IDidMount
     (did-mount [_]
-      (js/Medium. #js {:element (.getElementById js/document  "medium")
+      (let [uuid (.toString (om/get-state owner :uuid)) ]
+       (js/Medium. #js {:element (.getElementById js/document uuid)
                        :mode js/Medium.richMode
-                       :placeholder "Your title"
+                       :placeholder "Your Text here"
                        :modifiers #js {:q (fn [event element]
-                                            (println element)
-                                            (.dir js/console (gdom/getElement "medium")))}}))
+                                            (om/update!
+                                              data
+                                              :inner-html
+                                              [(.-innerHTML (gdom/getElement uuid))]))}})))
 
-    om/IRender
-    (render [_]
-      (dom/div #js {:id "medium"
+    om/IRenderState
+    (render-state [_ {:keys [uuid] :as state}]
+      (dom/div #js {:id (.toString uuid)
+                    :style #js {:color "black"}
                     :dangerouslySetInnerHTML #js {:__html (first (:inner-html data))}}))))
 
 (defn main-view [data owner]
@@ -217,7 +240,7 @@
       (apply dom/div #js {:className "main-view"}
              (om/build-all widget data)))))
 
-(defn master [{:keys [::routes-map ::current-route] :as data} owner]
+(defn master [{:keys [::routes-map ::current-route ::active-route] :as data} owner]
   (reify
     om/IInitState
     (init-state [_]
@@ -225,18 +248,26 @@
                          (tree-seq
                            #(contains? % ::children)
                            #(::children %)
-                           routes-map))})
+                           routes-map))
+       :set-bg-img (fn [bg-img]
+                     (set!
+                       (-> js/document .-body .-background)
+                       (str "/img/backgrounds/" bg-img)))})
 
     om/IRenderState
-    (render-state [_ {:keys [flatten-routes] :as state}]
-      (dom/div nil
-               (om/build main-view (->>
-                                     (flatten-routes routes-map)
-                                     (filter
-                                       #(= (first current-route) (::route-name %)))
-                                     first
-                                     (::widgets)))
-               (om/build main-nav-view data)))))
+    (render-state [_ {:keys [flatten-routes set-bg-img] :as state}]
+      (let [{:keys [::bg-img ::widgets] :as fresh-active-route} (->>
+                                                                  (flatten-routes routes-map)
+                                                                  (filter
+                                                                    #(=
+                                                                      (first current-route)
+                                                                      (::route-name %)))
+                                                                  first)]
+        (om/update! active-route @fresh-active-route)
+        (set-bg-img bg-img)
+        (dom/div nil
+                 (om/build main-view widgets)
+                 (om/build main-nav-view data))))))
 
 (defn init []
   (om/root master monolith

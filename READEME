@@ -26,9 +26,10 @@ can have it's text edited should subscribe to the edit mode event
 
 ### Routing
 
-- Any component that cares about the current route should subscribe to routing events
-
 - Based on http://www.lispcast.com/mastering-client-side-routing-with-secretary-and-goog-history
+
+- Each route has a vector of widgets. Master component will build correct widgets for the
+current route. Current route of the app is part of application state.
 
 ## Reference Cursors
 
