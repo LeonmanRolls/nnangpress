@@ -249,20 +249,27 @@
                            #(contains? % ::children)
                            #(::children %)
                            routes-map))
+
        :set-bg-img (fn [bg-img]
                      (set!
                        (-> js/document .-body .-background)
-                       (str "/img/backgrounds/" bg-img)))})
+                       (str "/img/backgrounds/" bg-img)))
+
+       :get-active-route (fn [flat-routes current-route]
+                           (->>
+                             flat-routes
+                             (filter
+                               #(=
+                                 (first current-route)
+                                 (::route-name %)))
+                             first))})
 
     om/IRenderState
-    (render-state [_ {:keys [flatten-routes set-bg-img] :as state}]
-      (let [{:keys [::bg-img ::widgets] :as fresh-active-route} (->>
+    (render-state [_ {:keys [flatten-routes set-bg-img get-active-route] :as state}]
+      (let [{:keys [::bg-img ::widgets] :as fresh-active-route} (get-active-route
                                                                   (flatten-routes routes-map)
-                                                                  (filter
-                                                                    #(=
-                                                                      (first current-route)
-                                                                      (::route-name %)))
-                                                                  first)]
+                                                                  current-route)]
+
         (om/update! active-route @fresh-active-route)
         (set-bg-img bg-img)
         (dom/div nil
