@@ -110,32 +110,7 @@
                           js/window.location.host))
     (.setUseFragment false)))
 
-(defn handle-url-change [e]
-  #_(js/console.log (str "Navigating: " (get-token)))
-  #_(let [paths (tree-seq-path
-                #(contains? % ::children)
-                #(::children %)
-                routes-map
-                #(::route-name %))
-        active-path  (first (filter (fn [x] (= (last x) (get-token))) paths))
-        new-path (if
-                   (= 1 (count active-path))
-                   "/"
-                   (->>
-                     active-path
-                     (drop 1)
-                     clojure.string/join))
-        ]
-
-    (println "new-path: " new-path)
-    (when (not (empty? new-path))
-    (om/update! (current-route) [new-path])
-      )
-
-    )
-  #_(when-not (.-isNavigation e)
-      #_(js/console.log "Token set programmatically")
-      (js/window.scrollTo 0 0)))
+(defn handle-url-change [e])
 
 (defonce history (doto (make-history)
                    (goog.events/listen EventType.NAVIGATE #(handle-url-change %))
@@ -154,20 +129,11 @@
                    (->>
                      active-path
                      (drop 1)
-                     clojure.string/join))
-        ]
+                     clojure.string/join))]
 
-    (println "new-path: " new-path)
     (when (not (empty? new-path))
-      (om/update! (current-route) [new-path])
-      )
-
-    #_(println "nav: " token)
-    #_(.setToken history token)
-    (.setToken history new-path)
-    )
-
-  )
+      (om/update! (current-route) [new-path]))
+    (.setToken history new-path)))
 
 (defn js-link [route-name e]
   (do
@@ -210,7 +176,7 @@
     om/IRenderState
     (render-state [_ {:keys [depth str-beautify] :as state}]
       (let [curr-route (first (om/observe owner (current-route)))
-            active? (= curr-route route-name)]
+            active? (not= -1 (.indexOf curr-route route-name))]
 
         (cond
           (= "/" route-name)
@@ -222,14 +188,13 @@
                    (dom/li #js {:className (str "nav-li " (when active? "active-li"))
                                 :onClick (partial js-link route-name)}
                            (dom/div #js {:className (str (when active? "active-text"))}
-                                    (str-beautify route-name))
-                           )
+                                    (str-beautify route-name)))
                    (when active?
                      (apply dom/ul #js {:className "nav-ul"}
                             (om/build-all nav-menu children))))
 
           :else
-          (dom/li #js {:className "sub-nav-li"
+          (dom/li #js {:className (str "sub-nav-li " (when active? "active-text"))
                        :onClick (partial js-link route-name)}
                   (str-beautify route-name)))))))
 
