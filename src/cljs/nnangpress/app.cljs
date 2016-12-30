@@ -43,7 +43,7 @@
                               ::bg-img "home_page.jpg"
                               ::grey-bg? true
                               ::nav-hint ["For you"]
-                              ::nav-hint-style #js {:color "black"}
+                              ::nav-hint-style #js {:color "white"}
                               ::widgets []
                               ::children [{::route-name "/all-projects"
                                            ::bg-img "#333"
@@ -73,73 +73,73 @@
                                            ::bg-img "from_uss.jpg"
                                            ::grey-bg? true
                                            ::nav-hint ["Our Process"]
-                                           ::nav-hint-style #js {:color "black"}
+                                           ::nav-hint-style #js {:color "white"}
                                            ::widgets []
                                            ::children []}
                                           {::route-name "/faqs"
                                            ::bg-img "from_uss.jpg"
                                            ::grey-bg? true
                                            ::nav-hint ["Faqs"]
-                                           ::nav-hint-style #js {:color "black"}
+                                           ::nav-hint-style #js {:color "white"}
                                            ::widgets []
                                            ::children []}
                                           {::route-name "/your-team"
                                            ::bg-img "from_uss.jpg"
                                            ::grey-bg? true
                                            ::nav-hint ["Your Team"]
-                                           ::nav-hint-style #js {:color "black"}
+                                           ::nav-hint-style #js {:color "white"}
                                            ::widgets []
                                            ::children []}]}
                              {::route-name "/for-architects"
                               ::bg-img "for_architects.jpg"
                               ::grey-bg? true
                               ::nav-hint ["For Architects"]
-                              ::nav-hint-style #js {:color "blue"}
+                              ::nav-hint-style #js {:color "white"}
                               ::widgets []
                               ::children [{::route-name "/your-career"
                                            ::bg-img "your_career.jpg"
                                            ::grey-bg? true
                                            ::nav-hint ["Your career"]
-                                           ::nav-hint-style #js {:color "black"}
+                                           ::nav-hint-style #js {:color "white"}
                                            ::widgets []
                                            ::children []}
                                           {::route-name "/meet-the-team"
                                            ::bg-img "#333"
                                            ::nav-hint ["Meet the team"]
-                                           ::nav-hint-style #js {:color "black"}
+                                           ::nav-hint-style #js {:color "white"}
                                            ::widgets []
                                            ::children []}
                                           {::route-name "/jobs"
                                            ::bg-img "for_architects.jpg"
                                            ::grey-bg? true
                                            ::nav-hint ["jobs"]
-                                           ::nav-hint-style #js {:color "black"}
+                                           ::nav-hint-style #js {:color "white"}
                                            ::widgets []
                                            ::children []}]}
                              {::route-name "/from-us"
                               ::bg-img "from_us.jpg"
                               ::grey-bg? true
                               ::nav-hint ["From us"]
-                              ::nav-hint-style #js {:color "black"}
+                              ::nav-hint-style #js {:color "white"}
                               ::widgets []
                               ::children [{::route-name "/solari-social"
                                            ::bg-img "from_us.jpg"
                                            ::grey-bg? true
                                            ::nav-hint ["#solarisocial"]
-                                           ::nav-hint-style #js {:color "black"}
+                                           ::nav-hint-style #js {:color "white"}
                                            ::widgets []
                                            ::children []}]}
                              {::route-name "/contact"
                               ::bg-img "from_uss.jpg"
                               ::grey-bg? true
                               ::nav-hint ["Contact"]
-                              ::nav-hint-style #js {:color "black"}
+                              ::nav-hint-style #js {:color "white"}
                               ::widgets []
                               ::children [{::route-name "/info"
                                            ::bg-img "from_uss.jpg"
                                            ::grey-bg? true
                                            ::nav-hint ["Info"]
-                                           ::nav-hint-style #js {:color "black"}
+                                           ::nav-hint-style #js {:color "white"}
                                            ::widgets []
                                            ::children []}]}]})
 
