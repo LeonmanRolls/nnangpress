@@ -7,11 +7,10 @@
             [cljs.core.async :as cas :refer [>! <! put! chan pub sub]]
             [goog.events :as ev]
             [goog.dom :as gdom]
-            [clojure.walk :as wlk]))
+            [cljsjs.jquery :as jq]))
 
 (enable-console-print!)
 
-;Utils
 (defn tree-seq-path [branch? children root & [node-fn]]
   (let [node-fn (or node-fn identity)
         walk (fn walk  [path node]
@@ -21,6 +20,9 @@
                          (when (branch? node)
                            (mapcat (partial walk new-path) (children node)))))))]
     (walk [] root)))
+
+(defn string-contains? [x y]
+  (not= -1 (.indexOf x y)))
 
 (s/def ::route-name string?)
 (s/def ::bg-img string?)
@@ -39,40 +41,104 @@
                              :inner-html ["<p> Hi there </p>"]}]
                  ::children [{::route-name "/for-you"
                               ::bg-img "home_page.jpg"
+                              ::grey-bg? true
                               ::nav-hint ["For you"]
                               ::nav-hint-style #js {:color "black"}
                               ::widgets []
-                              ::children [{::route-name "/for-you-one"
-                                           ::bg-img "home_page.jpg"
-                                           ::nav-hint ["For you one"]
+                              ::children [{::route-name "/all-projects"
+                                           ::bg-img "#333"
+                                           ::nav-hint ["All Projects"]
+                                           ::nav-hint-style #js {:color "white"}
+                                           ::widgets []
+                                           ::children []}
+                                          {::route-name "/residential"
+                                           ::bg-img "#333"
+                                           ::nav-hint ["Residential"]
+                                           ::nav-hint-style #js {:color "white"}
+                                           ::widgets []
+                                           ::children []}
+                                          {::route-name "/multi-unit"
+                                           ::bg-img "#333"
+                                           ::nav-hint ["Multi Unit"]
+                                           ::nav-hint-style #js {:color "white"}
+                                           ::widgets []
+                                           ::children []}
+                                          {::route-name "/commercial"
+                                           ::bg-img "#333"
+                                           ::nav-hint ["Commercial"]
+                                           ::nav-hint-style #js {:color "white"}
+                                           ::widgets []
+                                           ::children []}
+                                          {::route-name "/our-process"
+                                           ::bg-img "from_uss.jpg"
+                                           ::grey-bg? true
+                                           ::nav-hint ["Our Process"]
                                            ::nav-hint-style #js {:color "black"}
                                            ::widgets []
                                            ::children []}
-                                          {::route-name "/for-you-two"
-                                           ::bg-img "home_page.jpg"
-                                           ::nav-hint ["For you two"]
+                                          {::route-name "/faqs"
+                                           ::bg-img "from_uss.jpg"
+                                           ::grey-bg? true
+                                           ::nav-hint ["Faqs"]
+                                           ::nav-hint-style #js {:color "black"}
+                                           ::widgets []
+                                           ::children []}
+                                          {::route-name "/your-team"
+                                           ::bg-img "from_uss.jpg"
+                                           ::grey-bg? true
+                                           ::nav-hint ["Your Team"]
                                            ::nav-hint-style #js {:color "black"}
                                            ::widgets []
                                            ::children []}]}
                              {::route-name "/for-architects"
-                              ::bg-img "from_us.jpg"
+                              ::bg-img "for_architects.jpg"
+                              ::grey-bg? true
                               ::nav-hint ["For Architects"]
                               ::nav-hint-style #js {:color "blue"}
                               ::widgets []
-                              ::children [{::route-name "/for-archi-one"
-                                           ::bg-img "home_page.jpg"
-                                           ::nav-hint ["For archi one"]
+                              ::children [{::route-name "/your-career"
+                                           ::bg-img "your_career.jpg"
+                                           ::grey-bg? true
+                                           ::nav-hint ["Your career"]
+                                           ::nav-hint-style #js {:color "black"}
+                                           ::widgets []
+                                           ::children []}
+                                          {::route-name "/meet-the-team"
+                                           ::bg-img "#333"
+                                           ::nav-hint ["Meet the team"]
+                                           ::nav-hint-style #js {:color "black"}
+                                           ::widgets []
+                                           ::children []}
+                                          {::route-name "/jobs"
+                                           ::bg-img "for_architects.jpg"
+                                           ::grey-bg? true
+                                           ::nav-hint ["jobs"]
                                            ::nav-hint-style #js {:color "black"}
                                            ::widgets []
                                            ::children []}]}
                              {::route-name "/from-us"
-                              ::bg-img "home_page.jpg"
+                              ::bg-img "from_us.jpg"
+                              ::grey-bg? true
                               ::nav-hint ["From us"]
                               ::nav-hint-style #js {:color "black"}
                               ::widgets []
-                              ::children [{::route-name "/from-us-one"
-                                           ::bg-img "home_page.jpg"
-                                           ::nav-hint ["For you one"]
+                              ::children [{::route-name "/solari-social"
+                                           ::bg-img "from_us.jpg"
+                                           ::grey-bg? true
+                                           ::nav-hint ["#solarisocial"]
+                                           ::nav-hint-style #js {:color "black"}
+                                           ::widgets []
+                                           ::children []}]}
+                             {::route-name "/contact"
+                              ::bg-img "from_uss.jpg"
+                              ::grey-bg? true
+                              ::nav-hint ["Contact"]
+                              ::nav-hint-style #js {:color "black"}
+                              ::widgets []
+                              ::children [{::route-name "/info"
+                                           ::bg-img "from_uss.jpg"
+                                           ::grey-bg? true
+                                           ::nav-hint ["Info"]
                                            ::nav-hint-style #js {:color "black"}
                                            ::widgets []
                                            ::children []}]}]})
@@ -176,7 +242,7 @@
     om/IRenderState
     (render-state [_ {:keys [depth str-beautify] :as state}]
       (let [curr-route (first (om/observe owner (current-route)))
-            active? (not= -1 (.indexOf curr-route route-name))]
+            active? (string-contains? curr-route route-name)]
 
         (cond
           (= "/" route-name)
@@ -276,9 +342,19 @@
                              routes-map))
 
          :set-bg-img (fn [bg-img]
-                       (set!
-                         (-> js/document .-body .-background)
-                         (str "/img/backgrounds/" bg-img)))
+                       (cond
+                         (string-contains? bg-img "#")
+                         (do
+                           (set! (-> js/document .-body .-background) "")
+                           (set!
+                             (-> js/document .-body .-style .-backgroundColor)
+                             bg-img))
+                         (string-contains? bg-img "linear")
+                         (set! (-> js/document .-body .-background) bg-img)
+                         :file
+                         (set!
+                           (-> js/document .-body .-background)
+                           (str "/img/backgrounds/" bg-img))))
 
          :get-active-route (fn [flat-routes current-route]
                              (->>
@@ -297,6 +373,10 @@
 
         (om/update! active-route @fresh-active-route)
         (set-bg-img bg-img)
+        (if
+          (::grey-bg? fresh-active-route)
+          (-> (js/$ "body" ) (.addClass "grey-out"))
+          (-> (js/$ "body" ) (.removeClass "grey-out")))
         (dom/div nil
                  (om/build main-view widgets)
                  (om/build main-nav-view data))))))
