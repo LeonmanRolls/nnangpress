@@ -10,8 +10,7 @@
                   [weasel                    "0.7.0"      :scope "test"]
                   [org.clojure/clojurescript "1.9.293"]
                   [org.omcljs/om "0.8.6"]
-                  [org.clojure/core.async "0.2.395"]
-                  [cljsjs/jquery "2.2.4-0"]])
+                  [org.clojure/core.async "0.2.395"]])
 
 (require
  '[adzerk.boot-cljs      :refer [cljs]]

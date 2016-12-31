@@ -156,3 +156,24 @@ ul {
   letter-spacing: 0.1em;
 }
 
+//Megafolio Start ---------------------------------------------------------------------------------
+.container{
+  max-width:1260px;
+  min-width:240px;
+  width:auto;
+  margin:auto;
+  padding:0px 30px;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  overflow: hidden;
+}
+
+.megafolio-container{
+  width:100%;
+  position:relative;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+//Megafolio End -----------------------------------------------------------------------------------

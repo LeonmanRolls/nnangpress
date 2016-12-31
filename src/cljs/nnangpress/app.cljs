@@ -6,8 +6,7 @@
             [clojure.spec :as s]
             [cljs.core.async :as cas :refer [>! <! put! chan pub sub]]
             [goog.events :as ev]
-            [goog.dom :as gdom]
-            [cljsjs.jquery :as jq]))
+            [goog.dom :as gdom]))
 
 (enable-console-print!)
 
@@ -308,14 +307,19 @@
     om/IDidMount
     (did-mount [_]
       (let [uuid (.toString (om/get-state owner :uuid)) ]
-       (js/Medium. #js {:element (.getElementById js/document uuid)
-                       :mode js/Medium.richMode
-                       :placeholder "Your Text here"
-                       :modifiers #js {:q (fn [event element]
-                                            (om/update!
-                                              data
-                                              :inner-html
-                                              [(.-innerHTML (gdom/getElement uuid))]))}})))
+        (-> (js/$ js/document)
+            (.ready (fn [_]
+                      (println "medium ready")
+                      (js/Medium. #js {:element (.getElementById js/document uuid)
+                                       :mode js/Medium.richMode
+                                       :placeholder "Your Text here"
+                                       :modifiers #js {:q (fn [event element]
+                                                            (om/update!
+                                                              data
+                                                              :inner-html
+                                                              [(.-innerHTML (gdom/getElement uuid))]))}})
+                      )))
+        ))
 
     om/IRenderState
     (render-state [_ {:keys [uuid] :as state}]
@@ -323,12 +327,67 @@
                     :style #js {:color "black"}
                     :dangerouslySetInnerHTML #js {:__html (first (:inner-html data))}}))))
 
+(defn megafolio-widget-img
+  [{:keys [id className data-src data-width data-height] :as data} owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/div #js {:id id
+                    :className className
+                    :data-src data-src
+                    :data-width data-width
+                    :data-height data-height}))))
+
+(defn megafolio-widget [data owner]
+  (reify
+    om/IInitState
+    (init-state [_]
+      {:uuid (random-uuid)})
+
+    om/IDidMount
+    (did-mount [_]
+      (let [uuid (.toString (om/get-state owner :uuid))]
+        (->
+          (js/$ ".megafolio-container")
+          (.megafoliopro #js {}))))
+
+    om/IRenderState
+    (render-state [_ {:keys [] :as state}]
+      (dom/div #js {:className "container"}
+               (apply dom/div #js {:className "megafolio-container"}
+                      (om/build-all megafolio-widget-img [
+                                                          {:id "entry-1"
+                                                           :className "mega-entry"
+                                                           :data-src "http://solariarchitects.com/img/wadestown/wadestown-00.jpg"
+                                                           :data-width "320"
+                                                           :data-height "400"}
+
+                                                          {:id "entry-2"
+                                                           :className "mega-entry"
+                                                           :data-src "http://solariarchitects.com/img/wadestown/wadestown-00.jpg"
+                                                           :data-width "320"
+                                                           :data-height "400"}
+
+                                                          {:id "entry-3"
+                                                           :className "mega-entry"
+                                                           :data-src "http://solariarchitects.com/img/wadestown/wadestown-00.jpg"
+                                                           :data-width "320"
+                                                           :data-height "400"}
+
+                                                          ])
+                      )))))
+
 (defn main-view [data owner]
   (reify
     om/IRender
     (render [_]
-      (apply dom/div #js {:className "main-view"}
-             (om/build-all widget data)))))
+      (dom/div nil
+               (apply dom/div #js {:className "main-view"}
+                      (om/build-all widget data))
+
+               )
+
+      )))
 
 (defn master [{:keys [::routes-map ::current-route ::active-route] :as data} owner]
   (reify
@@ -378,10 +437,11 @@
           (-> (js/$ "body" ) (.addClass "grey-out"))
           (-> (js/$ "body" ) (.removeClass "grey-out")))
         (dom/div nil
+                 (om/build megafolio-widget {})
                  (om/build main-view widgets)
                  (om/build main-nav-view data))))))
 
 (defn init []
   (om/root master monolith
-           {:target (. js/document (getElementById "container"))}))
+           {:target (. js/document (getElementById "super-container"))}))
 
