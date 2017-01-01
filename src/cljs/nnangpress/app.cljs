@@ -10,6 +10,24 @@
 
 (enable-console-print!)
 
+(comment
+  (defmethod widget 000 [data owner]
+    (reify
+      om/IInitState
+      (init-state [_]
+        {:uuid (random-uuid)})
+
+      om/IDidMount
+      (did-mount [_]
+        )
+
+      om/IRenderState
+      (render-state [_ {:keys [uuid] :as state}]
+        (dom/div nil "Skeleton Widget")
+        )))
+  )
+
+
 (defn tree-seq-path [branch? children root & [node-fn]]
   (let [node-fn (or node-fn identity)
         walk (fn walk  [path node]
@@ -37,7 +55,8 @@
                  ::nav-hint-style #js {:color "black"}
                  ::widgets [{:widget-uid 001
                              :widget-name "Standard text widget"
-                             :inner-html ["<p> Hi there </p>"]}]
+                             :inner-html ["<p> Hi there </p>"]}
+                            ]
                  ::children [{::route-name "/for-you"
                               ::bg-img "home_page.jpg"
                               ::grey-bg? true
@@ -48,46 +67,251 @@
                                            ::bg-img "#333"
                                            ::nav-hint ["All Projects"]
                                            ::nav-hint-style #js {:color "white"}
-                                           ::widgets []
+                                           ::widgets [
+                                                      {:widget-uid 001
+                                                       :widget-name "Standard text widget"
+                                                       :inner-html ["<p> Hi there </p>"]}
+                                                      {:widget-uid 002
+                                                       :widget-name "Grid"
+                                                       :imgs [
+                                                              {:widget-uid 001
+                                                               :widget-name "Standard text widget"
+                                                               :inner-html ["<p> Hi there </p>"]}
+                                                              {:id "entry-1"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/wadestown/wadestown-00.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+                                                              {:id "entry-2"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/lyall/lyall-00.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+                                                              {:id "entry-3"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/catline/catline-00.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+
+                                                              {:id "entry-4"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/plimmerton/plimmerton-00.jpg "
+                                                               :data-width "320"
+                                                               :data-height "400"}
+                                                              {:id "entry-5"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/vedado/vedado-00.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+                                                              {:id "entry-6"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/sharella/sharella-00.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+
+                                                              {:id "entry-8"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/pascal/pascal-00.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+                                                              {:id "entry-9"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/sugarloaf/sugarloaf-00.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+                                                              {:id "entry-10"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/detroit/detroit-00.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+
+                                                              {:id "entry-11"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/oasis/oasis-00.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+                                                              {:id "entry-12"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/tinakori/tinakori-00.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+                                                              {:id "entry-13"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/firemans/firemans-00.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+
+                                                              {:id "entry-14"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/roxburgh/roxburgh-00.png"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+                                                              {:id "entry-15"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/leehouse/1.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+                                                              ]}]
                                            ::children []}
                                           {::route-name "/residential"
                                            ::bg-img "#333"
                                            ::nav-hint ["Residential"]
                                            ::nav-hint-style #js {:color "white"}
-                                           ::widgets []
+                                           ::widgets [{:widget-uid 001
+                                                       :widget-name "Standard text widget"
+                                                       :inner-html ["<p> Hi there </p>"]}
+                                                      {:widget-uid 002
+                                                       :widget-name "Grid"
+                                                       :imgs [
+
+                                                              {:id "entry-1"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/wadestown/wadestown-00.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+                                                              {:id "entry-2"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/lyall/lyall-00.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+                                                              {:id "entry-3"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/catline/catline-00.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+                                                              {:id "entry-4"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/plimmerton/plimmerton-00.jpg "
+                                                               :data-width "320"
+                                                               :data-height "400"}
+                                                              {:id "entry-15"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/leehouse/1.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+                                                              ]}]
                                            ::children []}
                                           {::route-name "/multi-unit"
                                            ::bg-img "#333"
                                            ::nav-hint ["Multi Unit"]
                                            ::nav-hint-style #js {:color "white"}
-                                           ::widgets []
+                                           ::widgets [{:widget-uid 001
+                                                       :widget-name "Standard text widget"
+                                                       :inner-html ["<p> Hi there </p>"]}
+                                                      {:widget-uid 002
+                                                       :widget-name "Grid"
+                                                       :imgs [
+                                                              {:id "entry-5"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/vedado/vedado-00.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+                                                              {:id "entry-6"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/sharella/sharella-00.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+                                                              {:id "entry-8"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/pascal/pascal-00.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+                                                              {:id "entry-9"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/sugarloaf/sugarloaf-00.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+                                                              {:id "entry-10"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/detroit/detroit-00.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+                                                              {:id "entry-13"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/firemans/firemans-00.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+                                                              {:id "entry-14"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/roxburgh/roxburgh-00.png"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+                                                              ]}]
                                            ::children []}
                                           {::route-name "/commercial"
                                            ::bg-img "#333"
                                            ::nav-hint ["Commercial"]
                                            ::nav-hint-style #js {:color "white"}
-                                           ::widgets []
+                                           ::widgets [
+                                                      {:widget-uid 001
+                                                       :widget-name "Standard text widget"
+                                                       :inner-html ["<p> Hi there </p>"]}
+                                                      {:widget-uid 002
+                                                       :widget-name "Grid"
+                                                       :imgs [
+                                                              {:id "entry-11"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/oasis/oasis-00.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+                                                              {:id "entry-12"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/tinakori/tinakori-00.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+                                                              {:id "entry-13"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/firemans/firemans-00.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+                                                              ]}]
                                            ::children []}
                                           {::route-name "/our-process"
                                            ::bg-img "from_uss.jpg"
                                            ::grey-bg? true
                                            ::nav-hint ["Our Process"]
                                            ::nav-hint-style #js {:color "white"}
-                                           ::widgets []
+                                           ::widgets [{:widget-uid 001
+                                                       :widget-name "Standard text widget"
+                                                       :inner-html ["<p> Hi there </p>"]}
+                                                      {:widget-uid 003
+                                                       :widget-name "Standard text widget"
+                                                       :inner-html ["<p> Hi there </p>"]}
+                                                      {:widget-uid 003
+                                                       :widget-name "Standard text widget"
+                                                       :inner-html ["<p> Hi there </p>"]}
+                                                      {:widget-uid 003
+                                                       :widget-name "Standard text widget"
+                                                       :inner-html ["<p> Hi there </p>"]}]
                                            ::children []}
                                           {::route-name "/faqs"
                                            ::bg-img "from_uss.jpg"
                                            ::grey-bg? true
                                            ::nav-hint ["Faqs"]
                                            ::nav-hint-style #js {:color "white"}
-                                           ::widgets []
+                                           ::widgets [{:widget-uid 001
+                                                       :widget-name "Standard text widget"
+                                                       :inner-html ["<p> Hi there </p>"]}
+                                                      {:widget-uid 004
+                                                       :widget-name "Accordion"
+                                                       :text [{:title {:widget-uid 001
+                                                                       :widget-name "Standard text widget"
+                                                                       :inner-html ["<p> Hi there </p>"]}
+                                                               :sub {:widget-uid 001
+                                                                     :widget-name "Standard text widget"
+                                                                     :inner-html ["<p> Hi there </p>"]}}
+
+                                                              ]}
+                                                      ]
                                            ::children []}
                                           {::route-name "/your-team"
                                            ::bg-img "from_uss.jpg"
                                            ::grey-bg? true
                                            ::nav-hint ["Your Team"]
                                            ::nav-hint-style #js {:color "white"}
-                                           ::widgets []
+                                           ::widgets [{:widget-uid 001
+                                                       :widget-name "Standard text widget"
+                                                       :inner-html ["<p> Hi there </p>"]}]
                                            ::children []}]}
                              {::route-name "/for-architects"
                               ::bg-img "for_architects.jpg"
@@ -307,19 +531,14 @@
     om/IDidMount
     (did-mount [_]
       (let [uuid (.toString (om/get-state owner :uuid)) ]
-        (-> (js/$ js/document)
-            (.ready (fn [_]
-                      (println "medium ready")
-                      (js/Medium. #js {:element (.getElementById js/document uuid)
-                                       :mode js/Medium.richMode
-                                       :placeholder "Your Text here"
-                                       :modifiers #js {:q (fn [event element]
-                                                            (om/update!
-                                                              data
-                                                              :inner-html
-                                                              [(.-innerHTML (gdom/getElement uuid))]))}})
-                      )))
-        ))
+        (js/Medium. #js {:element (.getElementById js/document uuid)
+                         :mode js/Medium.richMode
+                         :placeholder "Your Text here"
+                         :modifiers #js {:q (fn [event element]
+                                              (om/update!
+                                                data
+                                                :inner-html
+                                                [(.-innerHTML (gdom/getElement uuid))]))}})))
 
     om/IRenderState
     (render-state [_ {:keys [uuid] :as state}]
@@ -327,22 +546,20 @@
                     :style #js {:color "black"}
                     :dangerouslySetInnerHTML #js {:__html (first (:inner-html data))}}))))
 
-(defn megafolio-widget-img
-  [{:keys [id className data-src data-width data-height] :as data} owner]
-  (reify
-    om/IRender
-    (render [_]
-      (dom/div #js {:id id
-                    :className className
-                    :data-src data-src
-                    :data-width data-width
-                    :data-height data-height}))))
-
-(defn megafolio-widget [data owner]
+(defmethod widget 002 [{:keys [imgs] :as data} owner]
   (reify
     om/IInitState
     (init-state [_]
-      {:uuid (random-uuid)})
+      {:uuid (random-uuid)
+       :widget-img (fn [{:keys [id className data-src data-width data-height] :as data} owner]
+                     (reify
+                       om/IRender
+                       (render [_]
+                         (dom/div #js {:id id
+                                       :className className
+                                       :data-src data-src
+                                       :data-width data-width
+                                       :data-height data-height}))))})
 
     om/IDidMount
     (did-mount [_]
@@ -352,30 +569,67 @@
           (.megafoliopro #js {}))))
 
     om/IRenderState
-    (render-state [_ {:keys [] :as state}]
+    (render-state [_ {:keys [widget-img] :as state}]
       (dom/div #js {:className "container"}
                (apply dom/div #js {:className "megafolio-container"}
-                      (om/build-all megafolio-widget-img [
-                                                          {:id "entry-1"
-                                                           :className "mega-entry"
-                                                           :data-src "http://solariarchitects.com/img/wadestown/wadestown-00.jpg"
-                                                           :data-width "320"
-                                                           :data-height "400"}
+                      (om/build-all widget-img imgs ))))))
 
-                                                          {:id "entry-2"
-                                                           :className "mega-entry"
-                                                           :data-src "http://solariarchitects.com/img/wadestown/wadestown-00.jpg"
-                                                           :data-width "320"
-                                                           :data-height "400"}
+(defmethod widget 003 [data owner]
+  (reify
+    om/IInitState
+    (init-state [_]
+      {:uuid (random-uuid)})
 
-                                                          {:id "entry-3"
-                                                           :className "mega-entry"
-                                                           :data-src "http://solariarchitects.com/img/wadestown/wadestown-00.jpg"
-                                                           :data-width "320"
-                                                           :data-height "400"}
+    om/IDidMount
+    (did-mount [_]
+      (let [uuid (.toString (om/get-state owner :uuid)) ]
+        (js/Medium. #js {:element (.getElementById js/document uuid)
+                         :mode js/Medium.richMode
+                         :placeholder "Your Text here"
+                         :modifiers #js {:q (fn [event element]
+                                              (om/update!
+                                                data
+                                                :inner-html
+                                                [(.-innerHTML (gdom/getElement uuid))]))}})))
 
-                                                          ])
-                      )))))
+    om/IRenderState
+    (render-state [_ {:keys [uuid] :as state}]
+      (dom/div #js {:id (.toString uuid)
+                    :className "box-paragraph"
+                    :dangerouslySetInnerHTML #js {:__html (first (:inner-html data))}}))))
+
+(defmethod widget 004 [data owner]
+  (reify
+    om/IInitState
+    (init-state [_]
+      (let [uuid (str "a" (subs (.toString (random-uuid)) 0 5))]
+        {:uuid uuid
+         :accordion-sub
+         (fn [data owner]
+           (reify
+             om/IRender
+             (render [_]
+               (dom/div nil
+                        (dom/dt nil
+                                (dom/a #js {:href "#accordion1"
+                                            :aria-expanded "false"
+                                            :aria-controls "accordion1"
+                                            :className (str uuid " accordion-title accordionTitle js-accordionTrigger")}
+                                       "Title text"))
+                        (dom/dd #js {:className "accordion-content accordionItem is-collapsed"
+                                     :id "accordion1"
+                                     :aria-hidden "true"}
+                                (dom/p nil "Sub text"))))))}))
+
+    om/IDidMount
+    (did-mount [_]
+      (js/accordion (str "." (:uuid (om/get-state owner)))))
+
+    om/IRenderState
+    (render-state [_ {:keys [accordion-sub] :as state}]
+      (dom/div nil
+               (dom/div #js {:className "accordion"}
+                        (apply dom/dl nil (om/build-all accordion-sub [{} {}])))))))
 
 (defn main-view [data owner]
   (reify
@@ -383,11 +637,7 @@
     (render [_]
       (dom/div nil
                (apply dom/div #js {:className "main-view"}
-                      (om/build-all widget data))
-
-               )
-
-      )))
+                      (om/build-all widget data))))))
 
 (defn master [{:keys [::routes-map ::current-route ::active-route] :as data} owner]
   (reify
@@ -437,7 +687,6 @@
           (-> (js/$ "body" ) (.addClass "grey-out"))
           (-> (js/$ "body" ) (.removeClass "grey-out")))
         (dom/div nil
-                 (om/build megafolio-widget {})
                  (om/build main-view widgets)
                  (om/build main-nav-view data))))))
 
