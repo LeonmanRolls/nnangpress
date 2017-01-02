@@ -107,3 +107,6 @@ l
 (.dir js/console (-> js/document .-body .-background))
                      (.dir js/console (-> js/document .-body .-style .-background))
                      (.dir js/console (-> js/document .-body .-style ))
+(star-repl)
+(repl-start)
+(start-repl)

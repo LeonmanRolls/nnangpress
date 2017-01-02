@@ -74,9 +74,6 @@
                                                       {:widget-uid 002
                                                        :widget-name "Grid"
                                                        :imgs [
-                                                              {:widget-uid 001
-                                                               :widget-name "Standard text widget"
-                                                               :inner-html ["<p> Hi there </p>"]}
                                                               {:id "entry-1"
                                                                :className "mega-entry"
                                                                :data-src "http://solariarchitects.com/img/wadestown/wadestown-00.jpg"
@@ -520,8 +517,12 @@
                                  (dom/footer #js {:id "main-footer" :className "footer cf" :style (css/css-object css/main-footer)}
                                              "Website by Nang")))))))
 
+
+
+
 (defmulti widget (fn [data owner] (:widget-uid data)))
 
+;Medium text block
 (defmethod widget 001 [data owner]
   (reify
     om/IInitState
@@ -546,24 +547,32 @@
                     :style #js {:color "black"}
                     :dangerouslySetInnerHTML #js {:__html (first (:inner-html data))}}))))
 
+;Image grid
 (defmethod widget 002 [{:keys [imgs] :as data} owner]
   (reify
     om/IInitState
     (init-state [_]
-      {:uuid (random-uuid)
-       :widget-img (fn [{:keys [id className data-src data-width data-height] :as data} owner]
-                     (reify
-                       om/IRender
-                       (render [_]
-                         (dom/div #js {:id id
-                                       :className className
-                                       :data-src data-src
-                                       :data-width data-width
-                                       :data-height data-height}))))})
+      (let [uuid (.toString (random-uuid))]
+        {:uuid uuid
+         :widget-img (fn [{:keys [id className data-src data-width data-height] :as data}]
+                       (str
+                         "<div"
+                         " id=\"" id "\""
+                         " class=\"" className  "\""
+                         " data-src=\"" data-src  "\""
+                         " data-width=\"" data-width  "\""
+                         " data-height=\"" data-height  "\""
+                         "></div>"))}))
+
+    om/IDidUpdate
+    (did-update  [this prev-props prev-state]
+      (->
+        (js/$ ".megafolio-container")
+        (.megafoliopro #js {})))
 
     om/IDidMount
     (did-mount [_]
-      (let [uuid (.toString (om/get-state owner :uuid))]
+      (let [uuid (om/get-state owner :uuid)]
         (->
           (js/$ ".megafolio-container")
           (.megafoliopro #js {}))))
@@ -571,9 +580,11 @@
     om/IRenderState
     (render-state [_ {:keys [widget-img] :as state}]
       (dom/div #js {:className "container"}
-               (apply dom/div #js {:className "megafolio-container"}
-                      (om/build-all widget-img imgs ))))))
+               (dom/div #js {:className "megafolio-container"
+                             :dangerouslySetInnerHTML
+                             #js {:__html (apply str (map widget-img imgs))}})))))
 
+;Boxed medium text
 (defmethod widget 003 [data owner]
   (reify
     om/IInitState
@@ -598,6 +609,7 @@
                     :className "box-paragraph"
                     :dangerouslySetInnerHTML #js {:__html (first (:inner-html data))}}))))
 
+;Accordion
 (defmethod widget 004 [data owner]
   (reify
     om/IInitState
