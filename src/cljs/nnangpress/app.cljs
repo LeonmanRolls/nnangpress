@@ -938,3 +938,34 @@
   (om/root master monolith
            {:target (. js/document (getElementById "super-container"))}))
 
+(comment
+  (def defaultapp (-> js/firebase ))
+  (def defaultstorage (-> js/firebase .storage))
+  (def defaultDatabase (-> js/firebase .database))
+
+  (->
+    (js/firebase.auth)
+    (.onAuthStateChanged
+      (fn [user]
+        (println "User state changed")
+        (.dir js/console user))))
+
+  )
+
+(def uiConfig #js {:callbacks #js {:signInSuccess (fn [user credential redirectUrl]
+                                                      (println "sucessful sign in")
+                                                      (.dir js/console user)
+                                                      false
+                                                      )}
+                     :signInFlow "popup"
+                     :signInOptions (array
+                                      #js {:provider
+                                           js/firebase.auth.EmailAuthProvider.PROVIDER_ID})
+                     :tosUrl "https://google.com"
+                   :credentialHelper js/firebaseui.auth.CredentialHelper.NONE
+                     })
+
+(def ui (js/firebaseui.auth.AuthUI. (js/firebase.auth)))
+
+(.start ui "#firebase" uiConfig)
+

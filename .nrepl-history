@@ -110,3 +110,80 @@ l
 (star-repl)
 (repl-start)
 (start-repl)
+(ns nnangpress.app
+  (:import [goog.history Html5History EventType])
+  (:require-macros [cljs.core.async.macros :refer  [go go-loop]])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [clojure.spec :as s]
+            [cljs.core.async :as cas :refer [>! <! put! chan pub sub]]
+            [goog.events :as ev]
+            [goog.dom :as gdom]))
+(js/firebase)
+js/firebase
+(js/firebase)
+js/firebase
+  js/defaultAppConfig
+js/defaultAppConfig
+(-> js/firebase .storage)
+  (def defaultstorage (-> js/firebase .storage)) 
+defaultstorage
+  (def defaultDatabase (-> js/firebase .database)) 
+defaultDatabase
+l
+(js/firebase.auth)
+js/firebase.auth
+  (defn signInWithPopup []
+    (.open js/window "/widget" "Sign In" "width=985,height=735"))
+  (signInWithPopup)
+  (def ui (js/firebaseui.auth.AuthUi. (js/firebase.auth)))
+  (def ui (js/firebaseui.auth.AuthUI. (js/firebase.auth)))
+  (defn signInWithPopup []
+    (.open js/window "/widget" "Sign In" "width=985,height=735"))
+  (signInWithPopup)
+(->
+    js/document
+    (.getElementById "sign-in-with-popup")
+    (.addEventListener "click" signInWithPopup))
+(.log js/console "hi")
+(start-repl)
+(defn signInWithPopup []
+  (.open js/window "/widget" "Sign In" "width=985,height=735"))
+(defn initApp []
+  (->
+    js/document
+    (.getElementById "sign-in-with-popup")
+    (.addEventListener "click" signInWithPopup)))
+(initApp)
+l
+(.log js/console "hi")
+  (.start ui "#firebase" uiConfig)
+(def uiConfig #js {:callbacks #js {:signInSuccess (fn [user credential redirectUrl]
+                                                      (println "sucessful sign in")
+                                                      (.dir js/console user)
+                                                      false
+                                                      )}
+                     :signInFlow "popup"
+                     :signInOptions (array
+                                      #js {:provider
+                                           js/firebase.auth.EmailAuthProvider.PROVIDER_ID})
+                     :tosUrl "https://google.com"
+                     })
+  (def ui (js/firebaseui.auth.AuthUI. (js/firebase.auth)))
+  (.start ui "#firebase" uiConfig)
+(def uiConfig #js {:callbacks #js {:signInSuccess (fn [user credential redirectUrl]
+                                                      (println "sucessful sign in")
+                                                      (.dir js/console user)
+                                                      false
+                                                      )}
+                     :signInFlow "popup"
+                     :signInOptions (array
+                                      #js {:provider
+                                           js/firebase.auth.EmailAuthProvider.PROVIDER_ID})
+                     :tosUrl "https://google.com"
+                     })
+  (def ui (js/firebaseui.auth.AuthUI. (js/firebase.auth)))
+  (.start ui "#firebase" uiConfig)
+js/firebase.auth.EmailAuthProvider.PROVIDER_ID
+l
+js/firebase.auth.EmailAuthProvider.PROVIDER_ID

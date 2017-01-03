@@ -8,10 +8,29 @@
 
     <link rel="stylesheet" href="/css/medium.css">
     <link rel="stylesheet" type="text/css" href="/plugins/megafolio/css/settings.css" media="screen" />
+    <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/1.0.0/firebaseui.css" />
     <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
+
+    <button id="sign-in-with-popup">Sign In with Popup</button>
+    <div id="firebase">Firebase div</div>
+
     <div id="super-container"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/3.6.4/firebase.js"></script>
+    <script>
+    // Initialize Firebase
+    var config = {
+      apiKey: "AIzaSyA_LhuzpwrJT0_9aX3bT81dLq9gdDyqAcQ",
+      authDomain: "nnangpress.firebaseapp.com",
+      databaseURL: "https://nnangpress.firebaseio.com",
+      storageBucket: "nnangpress.appspot.com",
+      messagingSenderId: "660325527122"
+    };
+    firebase.initializeApp(config);
+    </script>
+    <script src="https://cdn.firebase.com/libs/firebaseui/1.0.0/firebaseui.js"></script>
 
     <script src="/js/accordion.js"></script>
     <script src="/js/rangy-core.js"></script>
