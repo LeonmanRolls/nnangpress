@@ -204,6 +204,24 @@ p {
   box-sizing: border-box;
   -webkit-box-sizing: border-box;
 }
+
+.gallery-text > div{
+  border: 2px solid #c0392b;
+  padding: 10px;
+  overflow: hidden;
+}
+
+.see-all-button {
+  color:white;
+  bottom:0px;
+  text-transform:uppercase;
+  border-top:2px solid #c0392b;
+  width:100%;
+  text-align:center;
+  position:absolute;
+  background-color:#1d1d1b;
+  left:0px;
+}
 //Megafolio End -----------------------------------------------------------------------------------
 
 //Accordion Start ---------------------------------------------------------------------------------

@@ -387,7 +387,8 @@
                                   :data-height "400"}
                                  {:id "entry-1-1"
                                   :className "mega-entry"
-                                  :text "Hi there"
+                                  :title "WE HAVE A LAUGH"
+                                  :text "Cue James in a bald cap, need I say more?"
                                   :data-width "320"
                                   :data-height "400"}
                                  {:id "entry-2"
@@ -397,7 +398,8 @@
                                   :data-height "400"}
                                  {:id "entry-2-1"
                                   :className "mega-entry"
-                                  :text "Hi there"
+                                  :title "WE HAVE A LIFE (that isn't work)"
+                                  :text "Whether you have a family of 4 small children, you coach the local badminton team or you’re into Comic-con you need to have YOUR own time to enjoy YOUR life. We respect and welcome that. Sure, there may be occasions where we all have to put in the extra mile but it’s not expected that you do it 52 weeks of the year just to get recognized OR be valued."
                                   :data-width "320"
                                   :data-height "400"}
                                  {:id "entry-3"
@@ -407,6 +409,7 @@
                                   :data-height "400"}
                                  {:id "entry-3-1"
                                   :className "mega-entry"
+                                  :title "title"
                                   :text "Hi there"
                                   :data-width "320"
                                   :data-height "400"}
@@ -418,6 +421,7 @@
                                   :data-height "400"}
                                  {:id "entry-4-1"
                                   :className "mega-entry"
+                                  :title "title"
                                   :text "Hi there"
                                   :data-width "320"
                                   :data-height "400"}
@@ -429,6 +433,7 @@
                                   :data-height "400"}
                                  {:id "entry-5-1"
                                   :className "mega-entry"
+                                  :title "title"
                                   :text "Hi there"
                                   :data-width "320"
                                   :data-height "400"}
@@ -439,6 +444,7 @@
                                   :data-height "400"}
                                  {:id "entry-6-1"
                                   :className "mega-entry"
+                                  :title "title"
                                   :text "Hi there"
                                   :data-width "320"
                                   :data-height "400"}
@@ -830,16 +836,24 @@
                          " data-width=\"" data-width  "\""
                          " data-height=\"" data-height  "\""
                          "></div>"))
-         :widget-text (fn [{:keys [id className data-src data-width data-height] :as data}]
-                       (str
-                         "<div"
-                         " id=\"" id "\""
-                         " class=\"" className  "\""
-                         " data-width=\"" data-width  "\""
-                         " data-height=\"" data-height  "\""
-                         ">Some text</div>"))
+         :widget-text (fn [{:keys [id className data-width data-height title text] :as data}]
+                        (str
+                          "<div"
+                          " id=\"" id "\""
+                          " class=\"gallery-text " className "\""
+                          " data-width=\"" data-width  "\""
+                          " data-height=\"" data-height  "\""
+                          ">"
+                          "<b>"
+                          title
+                          "</b>"
+                          "<p>"
+                          text
+                          "</p>"
+                          "<div class=\"see-all-button\">...see all</div>"
+                          "</div>"))
          :text-or-img (fn [widget-img widget-text data]
-                       (if (contains? data :text)
+                        (if (contains? data :text)
                           (widget-text data)
                           (widget-img data)))}))
 
@@ -858,26 +872,15 @@
 
     om/IRenderState
     (render-state [_ {:keys [widget-img widget-text text-or-img] :as state}]
-      (println "interleave" (map
-                              (partial
-                                text-or-img
-                                widget-img
-                                widget-text)
-                              imgs
-                              ))
       (dom/div #js {:className "container"}
                (dom/div #js {:className "megafolio-container"
                              :dangerouslySetInnerHTML
-                             #js {:__html (apply
-                                            str
-                                            (map
-                                              (partial
-                                                text-or-img
-                                                widget-img
-                                                widget-text)
-                                              imgs
-                                              )
-                                                 )}})))))
+                             #js {:__html (apply str (map
+                                                       (partial
+                                                         text-or-img
+                                                         widget-img
+                                                         widget-text)
+                                                       imgs))}})))))
 
 
 (defn master [{:keys [::routes-map ::current-route ::active-route] :as data} owner]
