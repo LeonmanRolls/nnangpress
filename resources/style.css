@@ -15,7 +15,8 @@ html,body {
   font-family: SourceSansPro;
   color: white;
   position: absolute;
-  width: 100%
+  width: 100%;
+  overflow: auto;
 }
 
 body {
@@ -23,6 +24,8 @@ body {
   -moz-background-size: cover;
   -o-background-size: cover;
   background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
 ul {
@@ -32,6 +35,10 @@ ul {
 }
 
 dl {
+  margin: 0px;
+}
+
+p {
   margin: 0px;
 }
 
@@ -168,6 +175,13 @@ dl {
   text-transform: uppercase;
   font-weight: 700;
   background-color: rgba(29,29,27,0.4);
+}
+
+.box-paragraph-clear {
+  color: white;
+  margin-top: 10px;
+  padding: 20px;
+  border: 2px solid #c0392b;
 }
 
 //Megafolio Start ---------------------------------------------------------------------------------
