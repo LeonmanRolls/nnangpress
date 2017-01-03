@@ -377,6 +377,77 @@
                          {:widget-uid 006
                           :widget-name "Standard image widget"
                           :img "http://solariarchitects.com/img/leaderboards/group_photo_everyday_zoomed.jpg"}
+                         {:widget-uid 007
+                          :widget-name "Grid"
+                          :imgs [
+                                 {:id "entry-1"
+                                  :className "mega-entry"
+                                  :data-src "http://solariarchitects.com/img/teampics/jsolari_everyday.jpg"
+                                  :data-width "320"
+                                  :data-height "400"}
+                                 {:id "entry-1-1"
+                                  :className "mega-entry"
+                                  :text "Hi there"
+                                  :data-width "320"
+                                  :data-height "400"}
+                                 {:id "entry-2"
+                                  :className "mega-entry"
+                                  :data-src "http://solariarchitects.com/img/teampics/csolari_everyday.jpg"
+                                  :data-width "320"
+                                  :data-height "400"}
+                                 {:id "entry-2-1"
+                                  :className "mega-entry"
+                                  :text "Hi there"
+                                  :data-width "320"
+                                  :data-height "400"}
+                                 {:id "entry-3"
+                                  :className "mega-entry"
+                                  :data-src "http://solariarchitects.com/img/teampics/mcane_everyday.jpg"
+                                  :data-width "320"
+                                  :data-height "400"}
+                                 {:id "entry-3-1"
+                                  :className "mega-entry"
+                                  :text "Hi there"
+                                  :data-width "320"
+                                  :data-height "400"}
+
+                                 {:id "entry-4"
+                                  :className "mega-entry"
+                                  :data-src "http://solariarchitects.com/img/teampics/mzyteka_everyday.jpg"
+                                  :data-width "320"
+                                  :data-height "400"}
+                                 {:id "entry-4-1"
+                                  :className "mega-entry"
+                                  :text "Hi there"
+                                  :data-width "320"
+                                  :data-height "400"}
+
+                                 {:id "entry-5"
+                                  :className "mega-entry"
+                                  :data-src "http://solariarchitects.com/img/teampics/maddis_everyday.jpg"
+                                  :data-width "320"
+                                  :data-height "400"}
+                                 {:id "entry-5-1"
+                                  :className "mega-entry"
+                                  :text "Hi there"
+                                  :data-width "320"
+                                  :data-height "400"}
+                                 {:id "entry-6"
+                                  :className "mega-entry"
+                                  :data-src "http://solariarchitects.com/img/teampics/mmarshall_everyday.jpg"
+                                  :data-width "320"
+                                  :data-height "400"}
+                                 {:id "entry-6-1"
+                                  :className "mega-entry"
+                                  :text "Hi there"
+                                  :data-width "320"
+                                  :data-height "400"}
+                                 {:id "entry-8"
+                                  :className "mega-entry"
+                                  :data-src "http://solariarchitects.com/img/teampics/Linda_Normal_Resized.jpg"
+                                  :data-width "320"
+                                  :data-height "400"}
+                                 ]}
                          ]
               ::children []}
              {::route-name "/jobs"
@@ -743,6 +814,71 @@
       (dom/div nil
                (apply dom/div #js {:className "main-view"}
                       (om/build-all widget data))))))
+
+(defmethod widget 007 [{:keys [imgs] :as data} owner]
+  (reify
+    om/IInitState
+    (init-state [_]
+      (let [uuid (.toString (random-uuid))]
+        {:uuid uuid
+         :widget-img (fn [{:keys [id className data-src data-width data-height] :as data}]
+                       (str
+                         "<div"
+                         " id=\"" id "\""
+                         " class=\"" className  "\""
+                         " data-src=\"" data-src  "\""
+                         " data-width=\"" data-width  "\""
+                         " data-height=\"" data-height  "\""
+                         "></div>"))
+         :widget-text (fn [{:keys [id className data-src data-width data-height] :as data}]
+                       (str
+                         "<div"
+                         " id=\"" id "\""
+                         " class=\"" className  "\""
+                         " data-width=\"" data-width  "\""
+                         " data-height=\"" data-height  "\""
+                         ">Some text</div>"))
+         :text-or-img (fn [widget-img widget-text data]
+                       (if (contains? data :text)
+                          (widget-text data)
+                          (widget-img data)))}))
+
+    om/IDidUpdate
+    (did-update  [this prev-props prev-state]
+      (->
+        (js/$ ".megafolio-container")
+        (.megafoliopro #js {})))
+
+    om/IDidMount
+    (did-mount [_]
+      (let [uuid (om/get-state owner :uuid)]
+        (->
+          (js/$ ".megafolio-container")
+          (.megafoliopro #js {}))))
+
+    om/IRenderState
+    (render-state [_ {:keys [widget-img widget-text text-or-img] :as state}]
+      (println "interleave" (map
+                              (partial
+                                text-or-img
+                                widget-img
+                                widget-text)
+                              imgs
+                              ))
+      (dom/div #js {:className "container"}
+               (dom/div #js {:className "megafolio-container"
+                             :dangerouslySetInnerHTML
+                             #js {:__html (apply
+                                            str
+                                            (map
+                                              (partial
+                                                text-or-img
+                                                widget-img
+                                                widget-text)
+                                              imgs
+                                              )
+                                                 )}})))))
+
 
 (defn master [{:keys [::routes-map ::current-route ::active-route] :as data} owner]
   (reify
