@@ -4,7 +4,7 @@
   (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
             [om.dom :as dom :include-macros true]
             [clojure.spec :as s]
-            [cljs.core.async :as cas :refer [>! <! put! chan pub sub]]
+            [cljs.core.async :as cas :refer [>! <! put! chan pub sub close!]]
             [cljs.reader :as rdr]
             [goog.events :as ev]
             [goog.dom :as gdom]))
@@ -24,6 +24,10 @@
         )))
   )
 
+(defn timeout  [ms]
+  (let  [c  (chan)]
+    (js/setTimeout  (fn  []  (close! c)) ms)
+    c))
 
 (defn tree-seq-path [branch? children root & [node-fn]]
   (let [node-fn (or node-fn identity)
@@ -510,16 +514,16 @@
 (def remote-monolith (atom {}))
 
 (defn current-route []
-  (om/ref-cursor (::current-route (om/root-cursor monolith))))
+  (om/ref-cursor (::current-route (om/root-cursor remote-monolith))))
 
 (defn logo-text []
-  (om/ref-cursor (::logo-text (om/root-cursor monolith))))
+  (om/ref-cursor (::logo-text (om/root-cursor remote-monolith))))
 
 (defn logo-hint []
-  (om/ref-cursor (-> (om/root-cursor monolith) ::routes-map ::nav-hint)))
+  (om/ref-cursor (-> (om/root-cursor remote-monolith) ::routes-map ::nav-hint)))
 
 (defn active-route []
-  (om/ref-cursor (-> (om/root-cursor monolith) ::active-route)))
+  (om/ref-cursor (-> (om/root-cursor remote-monolith) ::active-route)))
 
 ;Routing
 (defn get-token []
@@ -552,6 +556,10 @@
                      active-path
                      (drop 1)
                      clojure.string/join))]
+
+    (println "nav! " new-path)
+    (println "current-route " (current-route))
+    (println "current-route type " (type (current-route)) )
 
     (when (not (empty? new-path))
       (om/update! (current-route) [new-path]))
@@ -634,7 +642,6 @@
                         (om/build nav-menu-logo {})
 
                         (om/build nav-menu routes-map)
-
 
                         #_(dom/div #js {:id "social-container" :style #js {:textAlign "center"}}
                                    (dom/div nil
@@ -927,7 +934,7 @@
                                                                   (flatten-routes routes-map)
                                                                   current-route)]
 
-        (om/update! active-route fresh-active-route)
+        (om/update! active-route @fresh-active-route)
         (set-bg-img bg-img)
         (if
           (::grey-bg? fresh-active-route)
@@ -957,16 +964,23 @@
       (.ref (str "users/" uid))
       (.once "value")
       (.then (fn [snapshot]
-               (println (.-data (.val snapshot)) )
-               (println (type (rdr/read-string (.-data (.val snapshot)))))
-               (do
-                 (reset! remote-monolith (rdr/read-string (.-data (.val snapshot))))
-                 (om/root master monolith
+               (go
+                 #_(println (.-data (.val snapshot)) )
+                 (println (type (rdr/read-string (.-data (.val snapshot)))))
+                 (println
+                   (reset!
+                     remote-monolith
+                     (rdr/read-string (.-data (.val snapshot)))))
+                  (<!  (timeout 2000))
+                 (om/root master remote-monolith
                           {:target (. js/document (getElementById "super-container"))})
-                 #_(om/root master remote-monolith
-                          {:target (. js/document (getElementById "super-container"))})
-                 #_(om/root master (atom (rdr/read-string (.-data (.val snapshot))))
-                          {:target (. js/document (getElementById "super-container"))})
+                 #_(do
+                   #_(om/root master monolith
+                              {:target (. js/document (getElementById "super-container"))})
+
+                   #_(om/root master (atom (rdr/read-string (.-data (.val snapshot))))
+                              {:target (. js/document (getElementById "super-container"))})
+                   )
                  )
                )))))
 
@@ -1020,7 +1034,7 @@
     user-data-ref
     (.set #js {:username "wellwell"
                :email "leon.talbert@gmail.com"
-               :data (pr-str @monolith)
+               :data  (clj->js @monolith)
                }))
 
   (.start ui "#firebase" uiConfig)
