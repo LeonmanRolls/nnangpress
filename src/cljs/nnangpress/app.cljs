@@ -969,7 +969,6 @@
     user-data-ref
     (.set #js {:username "wellwell"
                :email "leon.talbert@gmail.com"
-               :data
                }))
 
   )
