@@ -939,6 +939,7 @@
            {:target (. js/document (getElementById "super-container"))}))
 
 (comment
+  (def uid "SGXvf26OEpeVDQ79XIH2V71fVnT2")
   (def defaultapp (-> js/firebase ))
   (def defaultstorage (-> js/firebase .storage))
   (def defaultDatabase (-> js/firebase .database))
@@ -949,6 +950,27 @@
       (fn [user]
         (println "User state changed")
         (.dir js/console user))))
+
+  (set! js/firebase.database.Refernce (fn [e]
+                                        (println "Database reference ")
+                                        (.dir js/console e)))
+  (def user-data-ref (->
+                       (js/firebase.database)
+                       (.ref (str "users/" uid))))
+
+  (->
+    user-data-ref
+    (.on
+      "value"
+      (fn [snapshot]
+        (println (.val snapshot)))))
+
+  (->
+    user-data-ref
+    (.set #js {:username "wellwell"
+               :email "leon.talbert@gmail.com"
+               :data
+               }))
 
   )
 
