@@ -11,24 +11,6 @@
 
 (enable-console-print!)
 
-(comment
-  (defmethod widget 000 [data owner]
-    (reify
-      om/IInitState
-      (init-state [_]
-        {:uuid (random-uuid)})
-
-      om/IRenderState
-      (render-state [_ {:keys [uuid] :as state}]
-        (dom/div nil "Skeleton Widget")
-        )))
-  )
-
-(defn timeout  [ms]
-  (let  [c  (chan)]
-    (js/setTimeout  (fn  []  (close! c)) ms)
-    c))
-
 (defn tree-seq-path [branch? children root & [node-fn]]
   (let [node-fn (or node-fn identity)
         walk (fn walk  [path node]
@@ -41,14 +23,6 @@
 
 (defn string-contains? [x y]
   (not= -1 (.indexOf x y)))
-
-(s/def ::route-name string?)
-(s/def ::bg-img string?)
-(s/def ::nav-hint vector?)
-(s/def ::widgets vector?)
-(s/def ::children (s/coll-of ::route))
-
-(s/def ::route (s/keys :req-un [::route-name ::bg-img ::nav-hint ::widgets ::children]))
 
 (def routes-map {::route-name "/"
                  ::bg-img "home_page.jpg"
@@ -513,6 +487,19 @@
 
 (def remote-monolith (atom {}))
 
+(add-watch remote-monolith :watcher
+           (fn  [key atom old-state new-state]
+             (let [uid "SGXvf26OEpeVDQ79XIH2V71fVnT2"
+                   user-data-ref (->
+                                   (js/firebase.database)
+                                   (.ref (str "users/" uid)))]
+               (prn "-- Atom Changed --")
+               (->
+                 user-data-ref
+                 (.set #js {:username "wellwell"
+                            :email "leon.talbert@gmail.com"
+                            :data  (pr-str @remote-monolith)})))))
+
 (defn current-route []
   (om/ref-cursor (::current-route (om/root-cursor remote-monolith))))
 
@@ -964,27 +951,22 @@
       (.ref (str "users/" uid))
       (.once "value")
       (.then (fn [snapshot]
-               (go
-                 #_(println (.-data (.val snapshot)) )
-                 (println (type (rdr/read-string (.-data (.val snapshot)))))
-                 (println
-                   (reset!
-                     remote-monolith
-                     (rdr/read-string (.-data (.val snapshot)))))
-                  (<!  (timeout 2000))
-                 (om/root master remote-monolith
-                          {:target (. js/document (getElementById "super-container"))})
-                 #_(do
-                   #_(om/root master monolith
-                              {:target (. js/document (getElementById "super-container"))})
-
-                   #_(om/root master (atom (rdr/read-string (.-data (.val snapshot))))
-                              {:target (. js/document (getElementById "super-container"))})
-                   )
-                 )
-               )))))
+               (reset! remote-monolith (rdr/read-string (.-data (.val snapshot))))
+               (om/root master remote-monolith
+                        {:target (. js/document (getElementById "super-container"))}))))))
 
 (comment
+
+  (defmethod widget 000 [data owner]
+    (reify
+      om/IInitState
+      (init-state [_]
+        {:uuid (random-uuid)})
+
+      om/IRenderState
+      (render-state [_ {:keys [uuid] :as state}]
+        (dom/div nil "Skeleton Widget"))))
+
   (def uid "SGXvf26OEpeVDQ79XIH2V71fVnT2")
   (def defaultapp (-> js/firebase ))
   (def defaultstorage (-> js/firebase .storage))
@@ -1034,7 +1016,7 @@
     user-data-ref
     (.set #js {:username "wellwell"
                :email "leon.talbert@gmail.com"
-               :data  (clj->js @monolith)
+               :data  (clj->js @remote-monolith)
                }))
 
   (.start ui "#firebase" uiConfig)

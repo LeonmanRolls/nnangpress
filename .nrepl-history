@@ -1,45 +1,3 @@
-            [goog.dom :as gdom]))
-(= 
-    (rdr/read-string (pr-str @monolith))
-    @monolith
-    )
-(def monolith (atom {::active-route {::route-name "/from-us"
-                                     ::bg-img "home_page.jpg"
-                                     ::nav-hint ["From us"]
-                                     ::nav-hint-style #js {:color "black"}
-                                     ::widgets []
-                                     ::children []}
-                     ::current-route ["/"]
-                     ::logo-text ["Solari"]
-                     ::routes-map routes-map}))
-(def routes-map {::route-name "/"
-                 ::bg-img "home_page.jpg"
-                 ::nav-hint ["Architects"]
-                 ::nav-hint-style #js {:color "black"}
-                 ::widgets [{:widget-uid 001
-                             :widget-name "Standard text widget"
-                             :inner-html ["<p> Hi there </p>"]}
-                            ]
-                 ::children [{::route-name "/for-you"
-                              ::bg-img "home_page.jpg"
-                              ::grey-bg? true
-                              ::nav-hint ["For you"]
-                              ::nav-hint-style #js {:color "white"}
-                              ::widgets []
-                              ::children [{::route-name "/all-projects"
-                                           ::bg-img "#333"
-                                           ::nav-hint ["All Projects"]
-                                           ::nav-hint-style #js {:color "white"}
-                                           ::widgets [
-                                                      {:widget-uid 001
-                                                       :widget-name "Standard text widget"
-                                                       :inner-html ["<p> Hi there </p>"]}
-                                                      {:widget-uid 002
-                                                       :widget-name "Grid"
-                                                       :imgs [
-                                                              {:id "entry-1"
-                                                               :className "mega-entry"
-                                                               :data-src "http://solariarchitects.com/img/wadestown/wadestown-00.jpg"
                                                                :data-width "320"
                                                                :data-height "400"}
                                                               {:id "entry-2"
@@ -497,4 +455,46 @@
     (.set #js {:username "wellwell"
                :email "leon.talbert@gmail.com"
                :data (pr-str @monolith)
+               }))
+l
+@monolith
+user-data-erf
+user-data-ref
+  (def uid "SGXvf26OEpeVDQ79XIH2V71fVnT2")
+  (def user-data-ref (->
+                       (js/firebase.database)
+                       (.ref (str "users/" uid))))
+(->
+    user-data-ref
+    (.set #js {:username "wellwell"
+               :email "leon.talbert@gmail.com"
+               :data  (clj->js @monolith)
+               }))
+(->
+    user-data-ref
+    (.set #js {:username "wellwell"
+               :email "leon.talbert@gmail.com"
+               :data  (pr-str @monolith)
+               }))
+(->
+    user-data-ref
+    (.set #js {:username "wellwell"
+               :email "leon.talbert@gmail.com"
+               :data  (pr-str @monolith)
+               }))
+(->
+    user-data-ref
+    (.set #js {:username "wellwell"
+               :email "leon.talbert@gmail.com"
+               :data  (pr-str @monolith)
+               }))
+  (def uid "SGXvf26OEpeVDQ79XIH2V71fVnT2")
+(def user-data-ref (->
+                       (js/firebase.database)
+                       (.ref (str "users/" uid))))
+(->
+    user-data-ref
+    (.set #js {:username "wellwell"
+               :email "leon.talbert@gmail.com"
+               :data  (pr-str @monolith)
                }))
