@@ -4,7 +4,8 @@
   (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
             [om.dom :as dom :include-macros true]
             [clojure.spec :as s]
-            [cljs.core.async :as cas :refer [>! <! put! chan pub sub]]
+            [cljs.core.async :as cas :refer [>! <! put! chan pub sub close!]]
+            [cljs.reader :as rdr]
             [goog.events :as ev]
             [goog.dom :as gdom]))
 
@@ -23,6 +24,10 @@
         )))
   )
 
+(defn timeout  [ms]
+  (let  [c  (chan)]
+    (js/setTimeout  (fn  []  (close! c)) ms)
+    c))
 
 (defn tree-seq-path [branch? children root & [node-fn]]
   (let [node-fn (or node-fn identity)
@@ -506,17 +511,19 @@
                      ::logo-text ["Solari"]
                      ::routes-map routes-map}))
 
+(def remote-monolith (atom {}))
+
 (defn current-route []
-  (om/ref-cursor (::current-route (om/root-cursor monolith))))
+  (om/ref-cursor (::current-route (om/root-cursor remote-monolith))))
 
 (defn logo-text []
-  (om/ref-cursor (::logo-text (om/root-cursor monolith))))
+  (om/ref-cursor (::logo-text (om/root-cursor remote-monolith))))
 
 (defn logo-hint []
-  (om/ref-cursor (-> (om/root-cursor monolith) ::routes-map ::nav-hint)))
+  (om/ref-cursor (-> (om/root-cursor remote-monolith) ::routes-map ::nav-hint)))
 
 (defn active-route []
-  (om/ref-cursor (-> (om/root-cursor monolith) ::active-route)))
+  (om/ref-cursor (-> (om/root-cursor remote-monolith) ::active-route)))
 
 ;Routing
 (defn get-token []
@@ -549,6 +556,10 @@
                      active-path
                      (drop 1)
                      clojure.string/join))]
+
+    (println "nav! " new-path)
+    (println "current-route " (current-route))
+    (println "current-route type " (type (current-route)) )
 
     (when (not (empty? new-path))
       (om/update! (current-route) [new-path]))
@@ -631,7 +642,6 @@
                         (om/build nav-menu-logo {})
 
                         (om/build nav-menu routes-map)
-
 
                         #_(dom/div #js {:id "social-container" :style #js {:textAlign "center"}}
                                    (dom/div nil
@@ -935,8 +945,44 @@
                  (om/build main-nav-view data))))))
 
 (defn init []
-  (om/root master monolith
-           {:target (. js/document (getElementById "super-container"))}))
+  (let [uid "SGXvf26OEpeVDQ79XIH2V71fVnT2"
+        uiconfig #js {:callbacks #js {:signInSuccess (fn [user credential redirectUrl]
+                                                       (println "sucessful sign in")
+                                                       (.dir js/console user)
+                                                       false)}
+                      :signInFlow "popup"
+                      :signInOptions (array #js {:provider js/firebase.auth.EmailAuthProvider.PROVIDER_ID})
+                      :tosUrl "https://google.com"
+                      :credentialHelper js/firebaseui.auth.CredentialHelper.NONE}
+        ui (js/firebaseui.auth.AuthUI. (js/firebase.auth))
+        user-data-ref (->
+                        (js/firebase.database)
+                        (.ref (str "users/" uid)))]
+
+    (->
+      (js/firebase.database)
+      (.ref (str "users/" uid))
+      (.once "value")
+      (.then (fn [snapshot]
+               (go
+                 #_(println (.-data (.val snapshot)) )
+                 (println (type (rdr/read-string (.-data (.val snapshot)))))
+                 (println
+                   (reset!
+                     remote-monolith
+                     (rdr/read-string (.-data (.val snapshot)))))
+                  (<!  (timeout 2000))
+                 (om/root master remote-monolith
+                          {:target (. js/document (getElementById "super-container"))})
+                 #_(do
+                   #_(om/root master monolith
+                              {:target (. js/document (getElementById "super-container"))})
+
+                   #_(om/root master (atom (rdr/read-string (.-data (.val snapshot))))
+                              {:target (. js/document (getElementById "super-container"))})
+                   )
+                 )
+               )))))
 
 (comment
   (def uid "SGXvf26OEpeVDQ79XIH2V71fVnT2")
@@ -954,10 +1000,6 @@
   (set! js/firebase.database.Refernce (fn [e]
                                         (println "Database reference ")
                                         (.dir js/console e)))
-  (def user-data-ref (->
-                       (js/firebase.database)
-                       (.ref (str "users/" uid))))
-
   (->
     user-data-ref
     (.on
@@ -965,28 +1007,41 @@
       (fn [snapshot]
         (println (.val snapshot)))))
 
+  (=
+   @monolith
+   @monolith
+    )
+
+  (=
+    (rdr/read-string (pr-str @monolith))
+    @monolith
+    )
+
+  (type (clj->js @monolith))
+  (= (clj->js @monolith) (js->clj (clj->js @monolith) :keywordize-keys true))
+  (= (clj->js @monolith) (clj->js @monolith))
+  (= @monolith @monolith)
+  (= @monolith (js->clj (clj->js @monolith) :keywordize-keys true))
+  (type @monolith)
+
+  (def uid "SGXvf26OEpeVDQ79XIH2V71fVnT2")
+
+  (def user-data-ref (->
+                       (js/firebase.database)
+                       (.ref (str "users/" uid))))
+
   (->
     user-data-ref
     (.set #js {:username "wellwell"
                :email "leon.talbert@gmail.com"
+               :data  (clj->js @monolith)
                }))
 
+  (.start ui "#firebase" uiConfig)
+
+  (use 'nangpress.app :reload-all)
+
+  (load-file "nangpress/app.cljs")
   )
 
-(def uiConfig #js {:callbacks #js {:signInSuccess (fn [user credential redirectUrl]
-                                                      (println "sucessful sign in")
-                                                      (.dir js/console user)
-                                                      false
-                                                      )}
-                     :signInFlow "popup"
-                     :signInOptions (array
-                                      #js {:provider
-                                           js/firebase.auth.EmailAuthProvider.PROVIDER_ID})
-                     :tosUrl "https://google.com"
-                   :credentialHelper js/firebaseui.auth.CredentialHelper.NONE
-                     })
-
-(def ui (js/firebaseui.auth.AuthUI. (js/firebase.auth)))
-
-(.start ui "#firebase" uiConfig)
 
