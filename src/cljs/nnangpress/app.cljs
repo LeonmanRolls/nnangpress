@@ -5,6 +5,7 @@
             [om.dom :as dom :include-macros true]
             [clojure.spec :as s]
             [cljs.core.async :as cas :refer [>! <! put! chan pub sub]]
+            [cljs.reader :as rdr]
             [goog.events :as ev]
             [goog.dom :as gdom]))
 
@@ -506,6 +507,8 @@
                      ::logo-text ["Solari"]
                      ::routes-map routes-map}))
 
+(def remote-monolith (atom {}))
+
 (defn current-route []
   (om/ref-cursor (::current-route (om/root-cursor monolith))))
 
@@ -924,7 +927,7 @@
                                                                   (flatten-routes routes-map)
                                                                   current-route)]
 
-        (om/update! active-route @fresh-active-route)
+        (om/update! active-route fresh-active-route)
         (set-bg-img bg-img)
         (if
           (::grey-bg? fresh-active-route)
@@ -935,8 +938,37 @@
                  (om/build main-nav-view data))))))
 
 (defn init []
-  (om/root master monolith
-           {:target (. js/document (getElementById "super-container"))}))
+  (let [uid "SGXvf26OEpeVDQ79XIH2V71fVnT2"
+        uiconfig #js {:callbacks #js {:signInSuccess (fn [user credential redirectUrl]
+                                                       (println "sucessful sign in")
+                                                       (.dir js/console user)
+                                                       false)}
+                      :signInFlow "popup"
+                      :signInOptions (array #js {:provider js/firebase.auth.EmailAuthProvider.PROVIDER_ID})
+                      :tosUrl "https://google.com"
+                      :credentialHelper js/firebaseui.auth.CredentialHelper.NONE}
+        ui (js/firebaseui.auth.AuthUI. (js/firebase.auth))
+        user-data-ref (->
+                        (js/firebase.database)
+                        (.ref (str "users/" uid)))]
+
+    (->
+      (js/firebase.database)
+      (.ref (str "users/" uid))
+      (.once "value")
+      (.then (fn [snapshot]
+               (println (.-data (.val snapshot)) )
+               (println (type (rdr/read-string (.-data (.val snapshot)))))
+               (do
+                 (reset! remote-monolith (rdr/read-string (.-data (.val snapshot))))
+                 (om/root master monolith
+                          {:target (. js/document (getElementById "super-container"))})
+                 #_(om/root master remote-monolith
+                          {:target (. js/document (getElementById "super-container"))})
+                 #_(om/root master (atom (rdr/read-string (.-data (.val snapshot))))
+                          {:target (. js/document (getElementById "super-container"))})
+                 )
+               )))))
 
 (comment
   (def uid "SGXvf26OEpeVDQ79XIH2V71fVnT2")
@@ -954,10 +986,6 @@
   (set! js/firebase.database.Refernce (fn [e]
                                         (println "Database reference ")
                                         (.dir js/console e)))
-  (def user-data-ref (->
-                       (js/firebase.database)
-                       (.ref (str "users/" uid))))
-
   (->
     user-data-ref
     (.on
@@ -965,29 +993,41 @@
       (fn [snapshot]
         (println (.val snapshot)))))
 
+  (=
+   @monolith
+   @monolith
+    )
+
+  (=
+    (rdr/read-string (pr-str @monolith))
+    @monolith
+    )
+
+  (type (clj->js @monolith))
+  (= (clj->js @monolith) (js->clj (clj->js @monolith) :keywordize-keys true))
+  (= (clj->js @monolith) (clj->js @monolith))
+  (= @monolith @monolith)
+  (= @monolith (js->clj (clj->js @monolith) :keywordize-keys true))
+  (type @monolith)
+
+  (def uid "SGXvf26OEpeVDQ79XIH2V71fVnT2")
+
+  (def user-data-ref (->
+                       (js/firebase.database)
+                       (.ref (str "users/" uid))))
+
   (->
     user-data-ref
     (.set #js {:username "wellwell"
                :email "leon.talbert@gmail.com"
-               :data
+               :data (pr-str @monolith)
                }))
 
+  (.start ui "#firebase" uiConfig)
+
+  (use 'nangpress.app :reload-all)
+
+  (load-file "nangpress/app.cljs")
   )
 
-(def uiConfig #js {:callbacks #js {:signInSuccess (fn [user credential redirectUrl]
-                                                      (println "sucessful sign in")
-                                                      (.dir js/console user)
-                                                      false
-                                                      )}
-                     :signInFlow "popup"
-                     :signInOptions (array
-                                      #js {:provider
-                                           js/firebase.auth.EmailAuthProvider.PROVIDER_ID})
-                     :tosUrl "https://google.com"
-                   :credentialHelper js/firebaseui.auth.CredentialHelper.NONE
-                     })
-
-(def ui (js/firebaseui.auth.AuthUI. (js/firebase.auth)))
-
-(.start ui "#firebase" uiConfig)
 
