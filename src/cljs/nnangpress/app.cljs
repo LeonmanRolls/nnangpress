@@ -544,10 +544,6 @@
                      (drop 1)
                      clojure.string/join))]
 
-    (println "nav! " new-path)
-    (println "current-route " (current-route))
-    (println "current-route type " (type (current-route)) )
-
     (when (not (empty? new-path))
       (om/update! (current-route) [new-path]))
     (.setToken history new-path)))
@@ -976,7 +972,6 @@
     (js/firebase.auth)
     (.onAuthStateChanged
       (fn [user]
-        (println "User state changed")
         (.dir js/console user))))
 
   (set! js/firebase.database.Refernce (fn [e]
