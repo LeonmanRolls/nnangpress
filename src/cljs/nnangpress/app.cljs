@@ -643,10 +643,14 @@
                                  (dom/footer #js {:id "main-footer" :className "footer cf" :style (css/css-object css/main-footer)}
                                              "Website by Nang")))))))
 
-
-
+(defmulti widget-data (fn [x] x))
 
 (defmulti widget (fn [data owner] (:widget-uid data)))
+
+(defmethod widget-data 001 [_]
+  {:widget-uid 001
+   :widget-name "Standard text widget"
+   :inner-html ["<p> Hi there </p>"]})
 
 ;Medium text block
 (defmethod widget 001 [data owner]
@@ -672,6 +676,20 @@
       (dom/div #js {:id (.toString uuid)
                     :style #js {:color "black"}
                     :dangerouslySetInnerHTML #js {:__html (first (:inner-html data))}}))))
+
+(defmethod widget-data 002 [_]
+  {:widget-uid 002
+   :widget-name "Grid"
+   :imgs [{:id "entry-1"
+           :className "mega-entry"
+           :data-src "http://solariarchitects.com/img/wadestown/wadestown-00.jpg"
+           :data-width "320"
+           :data-height "400"}
+          {:id "entry-2"
+           :className "mega-entry"
+           :data-src "http://solariarchitects.com/img/lyall/lyall-00.jpg"
+           :data-width "320"
+           :data-height "400"}]})
 
 ;Image grid
 (defmethod widget 002 [{:keys [imgs] :as data} owner]
@@ -710,6 +728,11 @@
                              :dangerouslySetInnerHTML
                              #js {:__html (apply str (map widget-img imgs))}})))))
 
+(defmethod widget-data 003 [_]
+  {:widget-uid 003
+   :widget-name "Standard text widget"
+   :inner-html ["<p> Hi there </p>"]})
+
 ;Boxed medium text
 (defmethod widget 003 [data owner]
   (reify
@@ -734,6 +757,16 @@
       (dom/div #js {:id (.toString uuid)
                     :className "box-paragraph"
                     :dangerouslySetInnerHTML #js {:__html (first (:inner-html data))}}))))
+
+(defmethod widget-data 004 [_]
+  {:widget-uid 004
+   :widget-name "Accordion"
+   :text [{:title {:widget-uid 001
+                   :widget-name "Standard text widget"
+                   :inner-html ["<p> Hi there </p>"]}
+           :sub {:widget-uid 001
+                 :widget-name "Standard text widget"
+                 :inner-html ["<p> Hi there </p>"]}}]})
 
 ;Accordion
 (defmethod widget 004 [data owner]
@@ -769,6 +802,11 @@
                (dom/div #js {:className "accordion"}
                         (apply dom/dl nil (om/build-all accordion-sub [{} {}])))))))
 
+(defmethod widget-data 005 [_]
+  {:widget-uid 005
+   :widget-name "Standard text widget"
+   :inner-html ["<p> Hi there </p>"]})
+
 ;Clear box red border
 (defmethod widget 005 [data owner]
   (reify
@@ -794,6 +832,11 @@
                     :className "box-paragraph-clear"
                     :dangerouslySetInnerHTML #js {:__html (first (:inner-html data))}}))))
 
+(defmethod widget-data 006 [_]
+  {:widget-uid 006
+   :widget-name "Standard image widget"
+   :img "http://solariarchitects.com/img/leaderboards/group_photo_everyday_zoomed.jpg"})
+
 ;Simple Image
 (defmethod widget 006 [{:keys [img] :as data} owner]
   (reify
@@ -806,13 +849,31 @@
       (dom/img #js {:style #js {:width "100%"}
                     :src img}))))
 
-(defn main-view [data owner]
-  (reify
-    om/IRender
-    (render [_]
-      (dom/div nil
-               (apply dom/div #js {:className "main-view"}
-                      (om/build-all widget data))))))
+(defmethod widget-data 007 [_]
+  {:widget-uid 007
+   :widget-name "Grid"
+   :imgs [{:id "entry-1"
+           :className "mega-entry"
+           :data-src "http://solariarchitects.com/img/teampics/jsolari_everyday.jpg"
+           :data-width "320"
+           :data-height "400"}
+          {:id "entry-1-1"
+           :className "mega-entry"
+           :title "WE HAVE A LAUGH"
+           :text "Cue James in a bald cap, need I say more?"
+           :data-width "320"
+           :data-height "400"}
+          {:id "entry-2"
+           :className "mega-entry"
+           :data-src "http://solariarchitects.com/img/teampics/csolari_everyday.jpg"
+           :data-width "320"
+           :data-height "400"}
+          {:id "entry-2-1"
+           :className "mega-entry"
+           :title "WE HAVE A LIFE (that isn't work)"
+           :text "Whether you have a family of 4 small children, you coach the local badminton team or you’re into Comic-con you need to have YOUR own time to enjoy YOUR life. We respect and welcome that. Sure, there may be occasions where we all have to put in the extra mile but it’s not expected that you do it 52 weeks of the year just to get recognized OR be valued."
+           :data-width "320"
+           :data-height "400"}]})
 
 (defmethod widget 007 [{:keys [imgs] :as data} owner]
   (reify
@@ -875,6 +936,34 @@
                                                          widget-text)
                                                        imgs))}})))))
 
+(defn main-view [data owner]
+  (reify
+    om/IInitState
+    (init-state [_]
+      {:add-widget (fn []
+                     (println "add-widget ran")
+                     (let [widget-id (js/parseInt
+                                       (.-value
+                                         (om/get-node owner "add-widget")))]
+                       (om/transact! data (fn [x]
+                                            (conj x (widget-data widget-id))))))
+       :remove-widget (fn [_])})
+
+    om/IRenderState
+    (render-state [_ {:keys [add-widget remove-widget] :as state}]
+      (dom/div #js {:className "main-view"}
+               (apply dom/div nil
+                      (om/build-all widget data))
+               (dom/div #js {:className "edit"}
+                        "add widget: "
+                        (dom/input #js {:ref "add-widget"})
+                        (dom/button #js {:onClick (fn [_] (add-widget))}
+                                    "Submit"))
+               (dom/div #js {:className "edit"}
+                        "remove widget: "
+                        (dom/input #js {:ref "remove-widget"})
+                        (dom/button #js {:onClick (fn [_] (remove-widget "remove-widget"))}
+                                    "Submit"))))))
 
 (defn master [{:keys [::routes-map ::current-route ::active-route] :as data} owner]
   (reify
