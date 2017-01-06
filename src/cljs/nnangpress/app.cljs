@@ -501,16 +501,16 @@
                             :data  (pr-str @remote-monolith)})))))
 
 (defn current-route []
-  (om/ref-cursor (::current-route (om/root-cursor remote-monolith))))
+  (om/ref-cursor (::current-route (om/root-cursor monolith))))
 
 (defn logo-text []
-  (om/ref-cursor (::logo-text (om/root-cursor remote-monolith))))
+  (om/ref-cursor (::logo-text (om/root-cursor monolith))))
 
 (defn logo-hint []
-  (om/ref-cursor (-> (om/root-cursor remote-monolith) ::routes-map ::nav-hint)))
+  (om/ref-cursor (-> (om/root-cursor monolith) ::routes-map ::nav-hint)))
 
 (defn active-route []
-  (om/ref-cursor (-> (om/root-cursor remote-monolith) ::active-route)))
+  (om/ref-cursor (-> (om/root-cursor monolith) ::active-route)))
 
 ;Routing
 (defn get-token []
@@ -940,12 +940,12 @@
   (reify
     om/IInitState
     (init-state [_]
-      {:add-widget (fn []
+      {:add-widget (fn [cursor]
                      (println "add-widget ran")
                      (let [widget-id (js/parseInt
                                        (.-value
                                          (om/get-node owner "add-widget")))]
-                       (om/transact! data (fn [x]
+                       (om/transact! cursor (fn [x]
                                             (conj x (widget-data widget-id))))))
        :remove-widget (fn [_])})
 
@@ -957,7 +957,7 @@
                (dom/div #js {:className "edit"}
                         "add widget: "
                         (dom/input #js {:ref "add-widget"})
-                        (dom/button #js {:onClick (fn [_] (add-widget))}
+                        (dom/button #js {:onClick (fn [_] (add-widget data))}
                                     "Submit"))
                (dom/div #js {:className "edit"}
                         "remove widget: "
@@ -1037,7 +1037,7 @@
       (.once "value")
       (.then (fn [snapshot]
                (reset! remote-monolith (rdr/read-string (.-data (.val snapshot))))
-               (om/root master remote-monolith
+               (om/root master monolith
                         {:target (. js/document (getElementById "super-container"))}))))))
 
 (comment
