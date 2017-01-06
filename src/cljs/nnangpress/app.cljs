@@ -24,6 +24,11 @@
 (defn string-contains? [x y]
   (not= -1 (.indexOf x y)))
 
+(defn vec-remove
+  "remove elem in coll"
+  [coll pos]
+  (vec  (concat  (subvec coll 0 pos)  (subvec coll  (inc pos)))))
+
 (def routes-map {::route-name "/"
                  ::bg-img "home_page.jpg"
                  ::nav-hint ["Architects"]
@@ -941,13 +946,17 @@
     om/IInitState
     (init-state [_]
       {:add-widget (fn [cursor]
-                     (println "add-widget ran")
                      (let [widget-id (js/parseInt
                                        (.-value
                                          (om/get-node owner "add-widget")))]
                        (om/transact! cursor (fn [x]
-                                            (conj x (widget-data widget-id))))))
-       :remove-widget (fn [_])})
+                                              (conj x (widget-data widget-id))))))
+       :remove-widget (fn [cursor]
+                        (let [widget-pos (js/parseInt
+                                          (.-value
+                                            (om/get-node owner "remove-widget")))]
+                          (om/transact! cursor (fn [x]
+                                                 (vec-remove x widget-pos)))))})
 
     om/IRenderState
     (render-state [_ {:keys [add-widget remove-widget] :as state}]
@@ -962,7 +971,7 @@
                (dom/div #js {:className "edit"}
                         "remove widget: "
                         (dom/input #js {:ref "remove-widget"})
-                        (dom/button #js {:onClick (fn [_] (remove-widget "remove-widget"))}
+                        (dom/button #js {:onClick (fn [_] (remove-widget data))}
                                     "Submit"))))))
 
 (defn master [{:keys [::routes-map ::current-route ::active-route] :as data} owner]
