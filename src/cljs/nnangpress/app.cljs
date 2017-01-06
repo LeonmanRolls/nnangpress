@@ -703,6 +703,11 @@
     (init-state [_]
       (let [uuid (.toString (random-uuid))]
         {:uuid uuid
+         :default-img {:id "entry-15"
+                       :className "mega-entry"
+                       :data-src "http://solariarchitects.com/img/lyall/lyall-00.jpg"
+                       :data-width "320"
+                       :data-height "400"}
          :widget-img (fn [{:keys [id className data-src data-width data-height] :as data}]
                        (str
                          "<div"
@@ -711,7 +716,20 @@
                          " data-src=\"" data-src  "\""
                          " data-width=\"" data-width  "\""
                          " data-height=\"" data-height  "\""
-                         "></div>"))}))
+                         "></div>"))
+         :update-url (fn [{:keys [data-src] :as data} owner]
+                       (let [uid (random-uuid)]
+                         (reify
+                           om/IRender
+                           (render [_]
+                             (dom/div nil
+                                      (dom/input #js {:value data-src
+                                                      :style #js {:width "100%"}
+                                                      :onChange (fn [e]
+                                                                  (om/update!
+                                                                    data
+                                                                    :data-src
+                                                                    (.. e -target -value)))}))))))}))
 
     om/IDidUpdate
     (did-update  [this prev-props prev-state]
@@ -727,11 +745,21 @@
           (.megafoliopro #js {}))))
 
     om/IRenderState
-    (render-state [_ {:keys [widget-img] :as state}]
-      (dom/div #js {:className "container"}
-               (dom/div #js {:className "megafolio-container"
-                             :dangerouslySetInnerHTML
-                             #js {:__html (apply str (map widget-img imgs))}})))))
+    (render-state [_ {:keys [widget-img update-url default-img] :as state}]
+      (dom/div nil
+               (dom/div #js {:className "container"}
+                        (dom/div #js {:className "megafolio-container"
+                                      :dangerouslySetInnerHTML
+                                      #js {:__html (apply str (map widget-img imgs))}}))
+
+               (apply dom/div nil
+                      (om/build-all update-url imgs))
+
+               (dom/button #js {:onClick (fn [_]
+                                           (om/transact!
+                                             imgs
+                                             (fn [x] (conj x default-img))))}
+                           "Add an image")))))
 
 (defmethod widget-data 003 [_]
   {:widget-uid 003
