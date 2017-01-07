@@ -703,11 +703,12 @@
     (init-state [_]
       (let [uuid (.toString (random-uuid))]
         {:uuid uuid
-         :default-img {:id "entry-15"
-                       :className "mega-entry"
-                       :data-src "http://solariarchitects.com/img/lyall/lyall-00.jpg"
-                       :data-width "320"
-                       :data-height "400"}
+         :default-img (fn []
+                        {:id (.toString (random-uuid))
+                         :className "mega-entry"
+                         :data-src "http://solariarchitects.com/img/lyall/lyall-00.jpg"
+                         :data-width "320"
+                         :data-height "400"})
          :widget-img (fn [{:keys [id className data-src data-width data-height] :as data}]
                        (str
                          "<div"
@@ -717,11 +718,11 @@
                          " data-width=\"" data-width  "\""
                          " data-height=\"" data-height  "\""
                          "></div>"))
-         :update-url (fn [{:keys [data-src] :as data} owner]
+         :update-url (fn [{:keys [id data-src] :as data} owner]
                        (let [uid (random-uuid)]
                          (reify
-                           om/IRender
-                           (render [_]
+                           om/IRenderState
+                           (render-state [_ {:keys [cursor] :as state}]
                              (dom/div nil
                                       (dom/input #js {:value data-src
                                                       :style #js {:width "100%"}
@@ -729,7 +730,30 @@
                                                                   (om/update!
                                                                     data
                                                                     :data-src
-                                                                    (.. e -target -value)))}))))))}))
+                                                                    (.. e -target -value)))})
+                                      (dom/button
+                                        #js {:onClick (fn [_]
+                                                        (om/transact!
+                                                          cursor
+                                                          (fn [imgs]
+                                                           (vec
+                                                           (remove
+                                                            (fn [img]
+                                                              (println "id img: " (:id img))
+                                                              (println "id: " id)
+                                                              (println
+                                                                "true?: "
+                                                               (= (:id img) id))
+                                                              (= (:id img) id)
+                                                              )
+                                                            imgs)
+                                                            )
+
+                                                            )
+
+                                                          ))}
+                                        "Delete")
+                                      )))))}))
 
     om/IDidUpdate
     (did-update  [this prev-props prev-state]
@@ -753,12 +777,13 @@
                                       #js {:__html (apply str (map widget-img imgs))}}))
 
                (apply dom/div nil
-                      (om/build-all update-url imgs))
+                      (om/build-all update-url imgs
+                                    {:state {:cursor imgs}}))
 
                (dom/button #js {:onClick (fn [_]
                                            (om/transact!
                                              imgs
-                                             (fn [x] (conj x default-img))))}
+                                             (fn [x] (conj x (default-img)))))}
                            "Add an image")))))
 
 (defmethod widget-data 003 [_]
