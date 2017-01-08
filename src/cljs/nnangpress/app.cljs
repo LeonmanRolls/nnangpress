@@ -736,24 +736,11 @@
                                                         (om/transact!
                                                           cursor
                                                           (fn [imgs]
-                                                           (vec
-                                                           (remove
-                                                            (fn [img]
-                                                              (println "id img: " (:id img))
-                                                              (println "id: " id)
-                                                              (println
-                                                                "true?: "
-                                                               (= (:id img) id))
-                                                              (= (:id img) id)
-                                                              )
-                                                            imgs)
-                                                            )
-
-                                                            )
-
-                                                          ))}
-                                        "Delete")
-                                      )))))}))
+                                                            (vec (remove
+                                                                   (fn [img]
+                                                                     (= (:id img) id))
+                                                                   imgs)))))}
+                                        "Delete"))))))}))
 
     om/IDidUpdate
     (did-update  [this prev-props prev-state]
@@ -827,14 +814,14 @@
                  :inner-html ["<p> Hi there </p>"]}}]})
 
 ;Accordion
-(defmethod widget 004 [data owner]
+(defmethod widget 004 [{:keys [text] :as data} owner]
   (reify
     om/IInitState
     (init-state [_]
       (let [uuid (str "a" (subs (.toString (random-uuid)) 0 5))]
         {:uuid uuid
          :accordion-sub
-         (fn [data owner]
+         (fn [{:keys [title sub] :as data} owner]
            (reify
              om/IRender
              (render [_]
@@ -844,11 +831,15 @@
                                             :aria-expanded "false"
                                             :aria-controls "accordion1"
                                             :className (str uuid " accordion-title accordionTitle js-accordionTrigger")}
-                                       "Title text"))
+                                       (om/build widget title)))
                         (dom/dd #js {:className "accordion-content accordionItem is-collapsed"
                                      :id "accordion1"
                                      :aria-hidden "true"}
-                                (dom/p nil "Sub text"))))))}))
+                                (om/build widget sub))))))}))
+
+    om/IDidUpdate
+    (did-update  [this prev-props prev-state]
+      (js/accordion (str "." (:uuid (om/get-state owner)))))
 
     om/IDidMount
     (did-mount [_]
@@ -858,7 +849,28 @@
     (render-state [_ {:keys [accordion-sub] :as state}]
       (dom/div nil
                (dom/div #js {:className "accordion"}
-                        (apply dom/dl nil (om/build-all accordion-sub [{} {}])))))))
+                        (apply dom/dl nil (om/build-all accordion-sub text)))
+               (dom/button
+                 #js{:onClick (fn [_] (om/transact!
+                                        text
+                                        (fn [text]
+                                          (conj text {:title (widget-data 001)
+                                                      :sub (widget-data 001)}))))}
+                 "Add Section")
+
+               (dom/div #js {:style #js {:marginTop "20px"}}
+                        "remove accordion section: "
+                        (dom/input #js {:ref "remove-accordion-section"})
+                        (dom/button
+                          #js {:onClick (fn [_]
+                                          (let [widget-pos (js/parseInt
+                                                             (.-value
+                                                               (om/get-node
+                                                                 owner
+                                                                 "remove-accordion-section")))]
+                                            (om/transact! text (fn [x]
+                                                                 (vec-remove x widget-pos)))))}
+                          "Submit"))))))
 
 (defmethod widget-data 005 [_]
   {:widget-uid 005
