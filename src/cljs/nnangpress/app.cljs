@@ -12,6 +12,7 @@
 
 (enable-console-print!)
 
+;Utils Start -----
 (defn tree-seq-path [branch? children root & [node-fn]]
   (let [node-fn (or node-fn identity)
         walk (fn walk  [path node]
@@ -29,6 +30,33 @@
   "remove elem in coll"
   [coll pos]
   (vec  (concat  (subvec coll 0 pos)  (subvec coll  (inc pos)))))
+
+(defn uid []
+  (.toString (random-uuid)))
+;Utils End -----
+
+;Core Start -----
+(defn remove-element
+  "Requires label to be passed in as state"
+  [data owner]
+  (reify
+    om/IRenderState
+    (render-state [_ {:keys [label] :as state}]
+      (let [ref-id (uid)]
+        (dom/div #js {:style #js {:marginTop "20px"}
+                      :className "edit"
+                      }
+                 (str label ": ")
+                 (dom/input #js {:ref ref-id})
+                 (dom/button
+                   #js {:onClick (fn [_]
+                                   (let [widget-pos (js/parseInt
+                                                      (.-value
+                                                        (om/get-node owner ref-id)))]
+                                     (om/transact! data (fn [x]
+                                                          (vec-remove x widget-pos)))))}
+                   "Submit"))))))
+;Core End -----
 
 (def monolith (atom {}))
 
@@ -404,19 +432,7 @@
                                                       :sub (widget-data 001)}))))}
                  "Add Section")
 
-               (dom/div #js {:style #js {:marginTop "20px"}}
-                        "remove accordion section: "
-                        (dom/input #js {:ref "remove-accordion-section"})
-                        (dom/button
-                          #js {:onClick (fn [_]
-                                          (let [widget-pos (js/parseInt
-                                                             (.-value
-                                                               (om/get-node
-                                                                 owner
-                                                                 "remove-accordion-section")))]
-                                            (om/transact! text (fn [x]
-                                                                 (vec-remove x widget-pos)))))}
-                          "Submit"))))))
+               (om/build remove-element text {:state {:label "remove accordion section"}})))))
 
 (defmethod widget-data 005 [_]
   {:widget-uid 005
@@ -564,8 +580,8 @@
                                               (conj x (widget-data widget-id))))))
        :remove-widget (fn [cursor]
                         (let [widget-pos (js/parseInt
-                                          (.-value
-                                            (om/get-node owner "remove-widget")))]
+                                           (.-value
+                                             (om/get-node owner "remove-widget")))]
                           (om/transact! cursor (fn [x]
                                                  (vec-remove x widget-pos)))))})
 
@@ -579,11 +595,8 @@
                         (dom/input #js {:ref "add-widget"})
                         (dom/button #js {:onClick (fn [_] (add-widget data))}
                                     "Submit"))
-               (dom/div #js {:className "edit"}
-                        "remove widget: "
-                        (dom/input #js {:ref "remove-widget"})
-                        (dom/button #js {:onClick (fn [_] (remove-widget data))}
-                                    "Submit"))))))
+
+               (om/build remove-element data {:state {:label "Remove widget"}})))))
 
 (defn master [{:keys [:routes-map :current-route :active-route] :as data} owner]
   (reify
