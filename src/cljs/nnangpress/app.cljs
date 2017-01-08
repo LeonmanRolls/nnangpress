@@ -32,11 +32,11 @@
   (vec  (concat  (subvec coll 0 pos)  (subvec coll  (inc pos)))))
 
 (def monolith (atom {:active-route {:route-name "/from-us"
-                                     :bg-img "home_page.jpg"
-                                     :nav-hint ["From us"]
-                                     :nav-hint-style {:color "black"}
-                                     :widgets []
-                                     :children []}
+                                    :bg-img "home_page.jpg"
+                                    :nav-hint ["From us"]
+                                    :nav-hint-style {:color "black"}
+                                    :widgets []
+                                    :children []}
                      :current-route ["/"]
                      :logo-text ["Solari"]
                      :routes-map dd/routes-map}))
@@ -672,17 +672,17 @@
                  (om/root master monolith
                           {:target (. js/document (getElementById "super-container"))}))))
 
-    #_(GET "/edn/defaultdata.edn"
+    (GET "/edn/defaultdata.edn"
            {:handler (fn [resp]
                        #_(println "hi " (type (:monolith (rdr/read-string resp))))
                        #_(println "hi " (:monolith (rdr/read-string resp)))
-                       #_(reset! monolith (:monolith (rdr/read-string resp)))
-                       #_(println "after reset: " @monolith)
+                       (reset! monolith (rdr/read-string resp))
+                       (println "after reset: " @monolith)
                        (om/root master monolith
                                 {:target (. js/document (getElementById "super-container"))})
                        )})
 
-    (om/root master monolith
+    #_(om/root master monolith
              {:target (. js/document (getElementById "super-container"))})))
 
 
