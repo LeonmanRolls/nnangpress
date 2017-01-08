@@ -33,20 +33,19 @@
 
 (def monolith (atom {}))
 
-(def remote-monolith (atom {}))
-
-(add-watch remote-monolith :watcher
-           (fn  [key atom old-state new-state]
-             (let [uid "SGXvf26OEpeVDQ79XIH2V71fVnT2"
-                   user-data-ref (->
-                                   (js/firebase.database)
-                                   (.ref (str "users/" uid)))]
-               (prn "-- Atom Changed --")
-               (->
-                 user-data-ref
-                 (.set #js {:username "wellwell"
-                            :email "leon.talbert@gmail.com"
-                            :data  (pr-str @remote-monolith)})))))
+(defn monolith-watcher-init [monolith]
+  (add-watch monolith :watcher
+             (fn  [key atom old-state new-state]
+               (let [uid "SGXvf26OEpeVDQ79XIH2V71fVnT2"
+                     user-data-ref (->
+                                     (js/firebase.database)
+                                     (.ref (str "users/" uid)))]
+                 (prn "-- Atom Changed --")
+                 (->
+                   user-data-ref
+                   (.set #js {:username "wellwell"
+                              :email "leon.talbert@gmail.com"
+                              :data  (pr-str @monolith)}))))))
 
 (defn ref-cursor-init [monolith]
   (defn routes-map []
@@ -660,7 +659,7 @@
         (.ref (str "users/" uid))
         (.once "value")
         (.then (fn [snapshot]
-                 (reset! remote-monolith (rdr/read-string (.-data (.val snapshot))))
+                 (reset! monolith (rdr/read-string (.-data (.val snapshot))))
                  (om/root master monolith
                           {:target (. js/document (getElementById "super-container"))}))))
 
