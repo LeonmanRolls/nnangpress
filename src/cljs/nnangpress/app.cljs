@@ -8,8 +8,7 @@
             [cljs.reader :as rdr]
             [goog.events :as ev]
             [goog.dom :as gdom]
-            [ajax.core :refer [GET POST]]
-            [nnangpress.defaultdata :as dd]))
+            [ajax.core :refer [GET POST]]))
 
 (enable-console-print!)
 
@@ -665,16 +664,10 @@
 
     (GET "/edn/defaultdata.edn"
            {:handler (fn [resp]
-                       #_(println "hi " (type (:monolith (rdr/read-string resp))))
-                       #_(println "hi " (:monolith (rdr/read-string resp)))
                        (reset! monolith (rdr/read-string resp))
-                       (println "after reset: " @monolith)
                        (om/root master monolith
-                                {:target (. js/document (getElementById "super-container"))})
-                       )})
-
-    #_(om/root master monolith
-             {:target (. js/document (getElementById "super-container"))})))
+                                {:target (. js/document
+                                            (getElementById "super-container"))}))})))
 
 
 (comment
