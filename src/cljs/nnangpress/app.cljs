@@ -44,8 +44,7 @@
     (render-state [_ {:keys [label] :as state}]
       (let [ref-id (uid)]
         (dom/div #js {:style #js {:marginTop "20px"}
-                      :className "edit"
-                      }
+                      :className "edit"}
                  (str label ": ")
                  (dom/input #js {:ref ref-id})
                  (dom/button
@@ -478,8 +477,15 @@
 
     om/IRenderState
     (render-state [_ {:keys [uuid] :as state}]
-      (dom/img #js {:style #js {:width "100%"}
-                    :src img}))))
+      (dom/div nil
+               (println "type: " (type img))
+               (dom/img #js {:style #js {:width "100%"}
+                             :src img})
+
+               (dom/input #js {:value img
+                               :style #js {:width "100%"}
+                               :onChange (fn [e]
+                                           (om/update! data :img (.. e -target -value)))})))))
 
 (defmethod widget-data 007 [_]
   {:widget-uid 007
