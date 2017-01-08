@@ -1,7 +1,94 @@
+(ns nnangpress.defaultdata)
+
+(def routes-map {:route-name "/"
+                 :bg-img "home_page.jpg"
+                 :nav-hint ["Architects"]
+                 :nav-hint-style #js {:color "black"}
+                 :widgets [{:widget-uid 001
+                             :widget-name "Standard text widget"
+                             :inner-html ["<p> Hi there </p>"]}
+                            ]
+                 :children [{:route-name "/for-you"
+                              :bg-img "home_page.jpg"
+                              :grey-bg? true
+                              :nav-hint ["For you"]
+                              :nav-hint-style #js {:color "white"}
+                              :widgets []
+                              :children [{:route-name "/all-projects"
+                                           :bg-img "#333"
+                                           :nav-hint ["All Projects"]
+                                           :nav-hint-style #js {:color "white"}
+                                           :widgets [
+                                                      {:widget-uid 001
+                                                       :widget-name "Standard text widget"
+                                                       :inner-html ["<p> Hi there </p>"]}
+                                                      {:widget-uid 002
+                                                       :widget-name "Grid"
+                                                       :imgs [
+                                                              {:id "entry-1"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/wadestown/wadestown-00.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+                                                              {:id "entry-2"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/lyall/lyall-00.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+                                                              {:id "entry-3"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/catline/catline-00.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+
+                                                              {:id "entry-4"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/plimmerton/plimmerton-00.jpg "
+                                                               :data-width "320"
+                                                               :data-height "400"}
+                                                              {:id "entry-5"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/vedado/vedado-00.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+                                                              {:id "entry-6"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/sharella/sharella-00.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+
+                                                              {:id "entry-8"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/pascal/pascal-00.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+                                                              {:id "entry-9"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/sugarloaf/sugarloaf-00.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+                                                              {:id "entry-10"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/detroit/detroit-00.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+
+                                                              {:id "entry-11"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/oasis/oasis-00.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+                                                              {:id "entry-12"
+                                                               :className "mega-entry"
+                                                               :data-src "http://solariarchitects.com/img/tinakori/tinakori-00.jpg"
+                                                               :data-width "320"
+                                                               :data-height "400"}
+                                                              {:id "entry-13"
                                                                :className "mega-entry"
                                                                :data-src "http://solariarchitects.com/img/firemans/firemans-00.jpg"
                                                                :data-width "320"
                                                                :data-height "400"}
+
                                                               {:id "entry-14"
                                                                :className "mega-entry"
                                                                :data-src "http://solariarchitects.com/img/roxburgh/roxburgh-00.png"
@@ -13,17 +100,18 @@
                                                                :data-width "320"
                                                                :data-height "400"}
                                                               ]}]
-                                           ::children []}
-                                          {::route-name "/residential"
-                                           ::bg-img "#333"
-                                           ::nav-hint ["Residential"]
-                                           ::nav-hint-style #js {:color "white"}
-                                           ::widgets [{:widget-uid 001
+                                           :children []}
+                                          {:route-name "/residential"
+                                           :bg-img "#333"
+                                           :nav-hint ["Residential"]
+                                           :nav-hint-style #js {:color "white"}
+                                           :widgets [{:widget-uid 001
                                                        :widget-name "Standard text widget"
                                                        :inner-html ["<p> Hi there </p>"]}
                                                       {:widget-uid 002
                                                        :widget-name "Grid"
                                                        :imgs [
+
                                                               {:id "entry-1"
                                                                :className "mega-entry"
                                                                :data-src "http://solariarchitects.com/img/wadestown/wadestown-00.jpg"
@@ -50,12 +138,12 @@
                                                                :data-width "320"
                                                                :data-height "400"}
                                                               ]}]
-                                           ::children []}
-{::route-name "/multi-unit"
- ::bg-img "#333"
- ::nav-hint ["Multi Unit"]
- ::nav-hint-style #js {:color "white"}
- ::widgets [{:widget-uid 001
+                                           :children []}
+{:route-name "/multi-unit"
+ :bg-img "#333"
+ :nav-hint ["Multi Unit"]
+ :nav-hint-style #js {:color "white"}
+ :widgets [{:widget-uid 001
              :widget-name "Standard text widget"
              :inner-html ["<p> Hi there </p>"]}
             {:widget-uid 002
@@ -97,12 +185,12 @@
                      :data-width "320"
                      :data-height "400"}
                     ]}]
- ::children []}
-{::route-name "/commercial"
- ::bg-img "#333"
- ::nav-hint ["Commercial"]
- ::nav-hint-style #js {:color "white"}
- ::widgets [
+ :children []}
+{:route-name "/commercial"
+ :bg-img "#333"
+ :nav-hint ["Commercial"]
+ :nav-hint-style #js {:color "white"}
+ :widgets [
             {:widget-uid 001
              :widget-name "Standard text widget"
              :inner-html ["<p> Hi there </p>"]}
@@ -125,13 +213,13 @@
                      :data-width "320"
                      :data-height "400"}
                     ]}]
- ::children []}
-{::route-name "/our-process"
- ::bg-img "from_uss.jpg"
- ::grey-bg? true
- ::nav-hint ["Our Process"]
- ::nav-hint-style #js {:color "white"}
- ::widgets [{:widget-uid 001
+ :children []}
+{:route-name "/our-process"
+ :bg-img "from_uss.jpg"
+ :grey-bg? true
+ :nav-hint ["Our Process"]
+ :nav-hint-style #js {:color "white"}
+ :widgets [{:widget-uid 001
              :widget-name "Standard text widget"
              :inner-html ["<p> Hi there </p>"]}
             {:widget-uid 003
@@ -143,13 +231,13 @@
             {:widget-uid 003
              :widget-name "Standard text widget"
              :inner-html ["<p> Hi there </p>"]}]
- ::children []}
-{::route-name "/faqs"
- ::bg-img "from_uss.jpg"
- ::grey-bg? true
- ::nav-hint ["Faqs"]
- ::nav-hint-style #js {:color "white"}
- ::widgets [{:widget-uid 001
+ :children []}
+{:route-name "/faqs"
+ :bg-img "from_uss.jpg"
+ :grey-bg? true
+ :nav-hint ["Faqs"]
+ :nav-hint-style #js {:color "white"}
+ :widgets [{:widget-uid 001
              :widget-name "Standard text widget"
              :inner-html ["<p> Hi there </p>"]}
             {:widget-uid 004
@@ -160,15 +248,16 @@
                      :sub {:widget-uid 001
                            :widget-name "Standard text widget"
                            :inner-html ["<p> Hi there </p>"]}}
+
                     ]}
             ]
- ::children []}
-{::route-name "/your-team"
- ::bg-img "from_uss.jpg"
- ::grey-bg? true
- ::nav-hint ["Your Team"]
- ::nav-hint-style #js {:color "white"}
- ::widgets [{:widget-uid 001
+ :children []}
+{:route-name "/your-team"
+ :bg-img "from_uss.jpg"
+ :grey-bg? true
+ :nav-hint ["Your Team"]
+ :nav-hint-style #js {:color "white"}
+ :widgets [{:widget-uid 001
              :widget-name "Standard text widget"
              :inner-html ["<p> Hi there </p>"]}
             {:widget-uid 006
@@ -192,6 +281,7 @@
                      :data-src "http://solariarchitects.com/img/teampics/mcane_everyday.jpg"
                      :data-width "320"
                      :data-height "400"}
+
                     {:id "entry-4"
                      :className "mega-entry"
                      :data-src "http://solariarchitects.com/img/teampics/mzyteka_everyday.jpg"
@@ -214,29 +304,29 @@
                      :data-height "400"}
                     ]}
             ]
- ::children []}]}
-{::route-name "/for-architects"
- ::bg-img "for_architects.jpg"
- ::grey-bg? true
- ::nav-hint ["For Architects"]
- ::nav-hint-style #js {:color "white"}
- ::widgets [{:widget-uid 001
+ :children []}]}
+{:route-name "/for-architects"
+ :bg-img "for_architects.jpg"
+ :grey-bg? true
+ :nav-hint ["For Architects"]
+ :nav-hint-style #js {:color "white"}
+ :widgets [{:widget-uid 001
              :widget-name "Standard text widget"
              :inner-html ["<p> Hi there </p>"]}]
- ::children [{::route-name "/your-career"
-              ::bg-img "your_career.jpg"
-              ::grey-bg? true
-              ::nav-hint ["Your career"]
-              ::nav-hint-style #js {:color "white"}
-              ::widgets [{:widget-uid 001
+ :children [{:route-name "/your-career"
+              :bg-img "your_career.jpg"
+              :grey-bg? true
+              :nav-hint ["Your career"]
+              :nav-hint-style #js {:color "white"}
+              :widgets [{:widget-uid 001
                           :widget-name "Standard text widget"
                           :inner-html ["<p> Hi there </p>"]}]
-              ::children []}
-             {::route-name "/meet-the-team"
-              ::bg-img "#333"
-              ::nav-hint ["Meet the team"]
-              ::nav-hint-style #js {:color "white"}
-              ::widgets [{:widget-uid 001
+              :children []}
+             {:route-name "/meet-the-team"
+              :bg-img "#333"
+              :nav-hint ["Meet the team"]
+              :nav-hint-style #js {:color "white"}
+              :widgets [{:widget-uid 001
                           :widget-name "Standard text widget"
                           :inner-html ["<p> Hi there </p>"]}
                          {:widget-uid 006
@@ -278,6 +368,7 @@
                                   :text "Hi there"
                                   :data-width "320"
                                   :data-height "400"}
+
                                  {:id "entry-4"
                                   :className "mega-entry"
                                   :data-src "http://solariarchitects.com/img/teampics/mzyteka_everyday.jpg"
@@ -289,6 +380,7 @@
                                   :text "Hi there"
                                   :data-width "320"
                                   :data-height "400"}
+
                                  {:id "entry-5"
                                   :className "mega-entry"
                                   :data-src "http://solariarchitects.com/img/teampics/maddis_everyday.jpg"
@@ -318,183 +410,44 @@
                                   :data-height "400"}
                                  ]}
                          ]
-              ::children []}
-             {::route-name "/jobs"
-              ::bg-img "for_architects.jpg"
-              ::grey-bg? true
-              ::nav-hint ["jobs"]
-              ::nav-hint-style #js {:color "white"}
-              ::widgets [{:widget-uid 001
+              :children []}
+             {:route-name "/jobs"
+              :bg-img "for_architects.jpg"
+              :grey-bg? true
+              :nav-hint ["jobs"]
+              :nav-hint-style #js {:color "white"}
+              :widgets [{:widget-uid 001
                           :widget-name "Standard text widget"
                           :inner-html ["<p> Hi there </p>"]}
                          {:widget-uid 005
                           :widget-name "Standard text widget"
                           :inner-html ["<p> Hi there </p>"]}
                          ]
-              ::children []}]}
-{::route-name "/from-us"
- ::bg-img "from_us.jpg"
- ::grey-bg? true
- ::nav-hint ["From us"]
- ::nav-hint-style #js {:color "white"}
- ::widgets []
- ::children [{::route-name "/solari-social"
-              ::bg-img "from_us.jpg"
-              ::grey-bg? true
-              ::nav-hint ["#solarisocial"]
-              ::nav-hint-style #js {:color "white"}
-              ::widgets []
-              ::children []}]}
-{::route-name "/contact"
- ::bg-img "from_uss.jpg"
- ::grey-bg? true
- ::nav-hint ["Contact"]
- ::nav-hint-style #js {:color "white"}
- ::widgets []
- ::children [{::route-name "/info"
-              ::bg-img "from_uss.jpg"
-              ::grey-bg? true
-              ::nav-hint ["Info"]
-              ::nav-hint-style #js {:color "white"}
-              ::widgets []
-              ::children []}]}]})
-(def monolith (atom {::active-route {::route-name "/from-us"
-                                     ::bg-img "home_page.jpg"
-                                     ::nav-hint ["From us"]
-                                     ::nav-hint-style #js {:color "black"}
-                                     ::widgets []
-                                     ::children []}
-                     ::current-route ["/"]
-                     ::logo-text ["Solari"]
-                     ::routes-map routes-map}))
-(= 
-    (rdr/read-string (pr-str @monolith))
-    @monolith
-    )
-(pr-str @monolith)
-    (rdr/read-string (pr-str @monolith))
-    (first (rdr/read-string (pr-str @monolith))) 
-(pr-str @monolith)
-(= 
-   @monolith 
-    )
-(=
-    (rdr/read-string (pr-str @monolith))
-    @monolith
-    )
-(pr-str @monolith)
-(rdr/read-string (pr-str @monolith))
-  (def uid "SGXvf26OEpeVDQ79XIH2V71fVnT2")
-  (->
-    (js/firebase.database)
-    (.ref (str "users/" uid)))
-(->
-    user-data-ref
-    (.set #js {:username "wellwell"
-               :email "leon.talbert@gmail.com"
-               :data (pr-str @monolith)
-               }))
-  (def user-data-ref (->
-                       (js/firebase.database)
-                       (.ref (str "users/" uid))))
-(->
-    user-data-ref
-    (.set #js {:username "wellwell"
-               :email "leon.talbert@gmail.com"
-               :data (pr-str @monolith)
-               }))
-l
-@monolith
-user-data-erf
-user-data-ref
-  (def uid "SGXvf26OEpeVDQ79XIH2V71fVnT2")
-  (def user-data-ref (->
-                       (js/firebase.database)
-                       (.ref (str "users/" uid))))
-(->
-    user-data-ref
-    (.set #js {:username "wellwell"
-               :email "leon.talbert@gmail.com"
-               :data  (clj->js @monolith)
-               }))
-(->
-    user-data-ref
-    (.set #js {:username "wellwell"
-               :email "leon.talbert@gmail.com"
-               :data  (pr-str @monolith)
-               }))
-(->
-    user-data-ref
-    (.set #js {:username "wellwell"
-               :email "leon.talbert@gmail.com"
-               :data  (pr-str @monolith)
-               }))
-(->
-    user-data-ref
-    (.set #js {:username "wellwell"
-               :email "leon.talbert@gmail.com"
-               :data  (pr-str @monolith)
-               }))
-  (def uid "SGXvf26OEpeVDQ79XIH2V71fVnT2")
-(def user-data-ref (->
-                       (js/firebase.database)
-                       (.ref (str "users/" uid))))
-(->
-    user-data-ref
-    (.set #js {:username "wellwell"
-               :email "leon.talbert@gmail.com"
-               :data  (pr-str @monolith)
-               }))
-l
-(str :hi)
-(name :hi)
-l
-  (def uid "SGXvf26OEpeVDQ79XIH2V71fVnT2")
-  (def user-data-ref (->
-                       (js/firebase.database)
-                       (.ref (str "users/" uid))))
-(->
-    user-data-ref
-    (.set #js {:username "wellwell"
-               :email "leon.talbert@gmail.com"
-               :data  (pr-str @monolith)
-               }))
-gl
-(map 
-    println 
-    {:widget-uid 001
-     :widget-name "Standard text widget"
-     :inner-html ["<p> Hi there </p>"]}
-    )
-  (def uid "SGXvf26OEpeVDQ79XIH2V71fVnT2")
-l
-(map println {:hi "hi" :there "there})
-(map prn {:hi "hi" :there "there"})
-(start-repl)
-(ns nnangpress.app
-  (:import [goog.history Html5History EventType])
-  (:require-macros [cljs.core.async.macros :refer  [go go-loop]])
-  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
-            [om.dom :as dom :include-macros true]
-            [clojure.spec :as s]
-            [cljs.core.async :as cas :refer [>! <! put! chan pub sub close!]]
-            [cljs.reader :as rdr]
-            [goog.events :as ev]
-            [goog.dom :as gdom]
-            [ajax.core :refer [GET POST]]))
-  (GET "/edn/defaultdata.edn")
-  (GET "/edn/defaltdata.edn")
-  (GET "/edn/defaultdata.edn")
-  (GET "/edn/defaultdata.edn"
-       {:handler (fn [resp]
-                   (println "hi " resp)
-                   )})
-(GET "/edn/defaultdata.edn"
-       {:handler (fn [resp]
-                   (println "hi " (type resp))
-                   )})
-(GET "/edn/defaultdata.edn"
-       {:handler (fn [resp]
-                   (println "hi " (type (rdr/read-string resp)))
-                   )})
-dd/routes-map
+              :children []}]}
+{:route-name "/from-us"
+ :bg-img "from_us.jpg"
+ :grey-bg? true
+ :nav-hint ["From us"]
+ :nav-hint-style #js {:color "white"}
+ :widgets []
+ :children [{:route-name "/solari-social"
+              :bg-img "from_us.jpg"
+              :grey-bg? true
+              :nav-hint ["#solarisocial"]
+              :nav-hint-style #js {:color "white"}
+              :widgets []
+              :children []}]}
+{:route-name "/contact"
+ :bg-img "from_uss.jpg"
+ :grey-bg? true
+ :nav-hint ["Contact"]
+ :nav-hint-style #js {:color "white"}
+ :widgets []
+ :children [{:route-name "/info"
+              :bg-img "from_uss.jpg"
+              :grey-bg? true
+              :nav-hint ["Info"]
+              :nav-hint-style #js {:color "white"}
+              :widgets []
+              :children []}]}]})
+
