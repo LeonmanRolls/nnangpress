@@ -31,15 +31,7 @@
   [coll pos]
   (vec  (concat  (subvec coll 0 pos)  (subvec coll  (inc pos)))))
 
-(def monolith (atom {:active-route {:route-name "/from-us"
-                                    :bg-img "home_page.jpg"
-                                    :nav-hint ["From us"]
-                                    :nav-hint-style {:color "black"}
-                                    :widgets []
-                                    :children []}
-                     :current-route ["/"]
-                     :logo-text ["Solari"]
-                     :routes-map dd/routes-map}))
+(def monolith (atom {}))
 
 (def remote-monolith (atom {}))
 
