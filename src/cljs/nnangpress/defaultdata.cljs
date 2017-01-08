@@ -3,7 +3,7 @@
 (def routes-map {:route-name "/"
                  :bg-img "home_page.jpg"
                  :nav-hint ["Architects"]
-                 :nav-hint-style #js {:color "black"}
+                 :nav-hint-style {:color "black"}
                  :widgets [{:widget-uid 001
                              :widget-name "Standard text widget"
                              :inner-html ["<p> Hi there </p>"]}
@@ -12,12 +12,12 @@
                               :bg-img "home_page.jpg"
                               :grey-bg? true
                               :nav-hint ["For you"]
-                              :nav-hint-style #js {:color "white"}
+                              :nav-hint-style {:color "white"}
                               :widgets []
                               :children [{:route-name "/all-projects"
                                            :bg-img "#333"
                                            :nav-hint ["All Projects"]
-                                           :nav-hint-style #js {:color "white"}
+                                           :nav-hint-style {:color "white"}
                                            :widgets [
                                                       {:widget-uid 001
                                                        :widget-name "Standard text widget"
@@ -104,7 +104,7 @@
                                           {:route-name "/residential"
                                            :bg-img "#333"
                                            :nav-hint ["Residential"]
-                                           :nav-hint-style #js {:color "white"}
+                                           :nav-hint-style {:color "white"}
                                            :widgets [{:widget-uid 001
                                                        :widget-name "Standard text widget"
                                                        :inner-html ["<p> Hi there </p>"]}
@@ -142,7 +142,7 @@
 {:route-name "/multi-unit"
  :bg-img "#333"
  :nav-hint ["Multi Unit"]
- :nav-hint-style #js {:color "white"}
+ :nav-hint-style {:color "white"}
  :widgets [{:widget-uid 001
              :widget-name "Standard text widget"
              :inner-html ["<p> Hi there </p>"]}
@@ -189,7 +189,7 @@
 {:route-name "/commercial"
  :bg-img "#333"
  :nav-hint ["Commercial"]
- :nav-hint-style #js {:color "white"}
+ :nav-hint-style {:color "white"}
  :widgets [
             {:widget-uid 001
              :widget-name "Standard text widget"
@@ -218,7 +218,7 @@
  :bg-img "from_uss.jpg"
  :grey-bg? true
  :nav-hint ["Our Process"]
- :nav-hint-style #js {:color "white"}
+ :nav-hint-style  {:color "white"}
  :widgets [{:widget-uid 001
              :widget-name "Standard text widget"
              :inner-html ["<p> Hi there </p>"]}
@@ -236,7 +236,7 @@
  :bg-img "from_uss.jpg"
  :grey-bg? true
  :nav-hint ["Faqs"]
- :nav-hint-style #js {:color "white"}
+ :nav-hint-style {:color "white"}
  :widgets [{:widget-uid 001
              :widget-name "Standard text widget"
              :inner-html ["<p> Hi there </p>"]}
@@ -256,7 +256,7 @@
  :bg-img "from_uss.jpg"
  :grey-bg? true
  :nav-hint ["Your Team"]
- :nav-hint-style #js {:color "white"}
+ :nav-hint-style {:color "white"}
  :widgets [{:widget-uid 001
              :widget-name "Standard text widget"
              :inner-html ["<p> Hi there </p>"]}
@@ -309,7 +309,7 @@
  :bg-img "for_architects.jpg"
  :grey-bg? true
  :nav-hint ["For Architects"]
- :nav-hint-style #js {:color "white"}
+ :nav-hint-style {:color "white"}
  :widgets [{:widget-uid 001
              :widget-name "Standard text widget"
              :inner-html ["<p> Hi there </p>"]}]
@@ -317,7 +317,7 @@
               :bg-img "your_career.jpg"
               :grey-bg? true
               :nav-hint ["Your career"]
-              :nav-hint-style #js {:color "white"}
+              :nav-hint-style {:color "white"}
               :widgets [{:widget-uid 001
                           :widget-name "Standard text widget"
                           :inner-html ["<p> Hi there </p>"]}]
@@ -325,7 +325,7 @@
              {:route-name "/meet-the-team"
               :bg-img "#333"
               :nav-hint ["Meet the team"]
-              :nav-hint-style #js {:color "white"}
+              :nav-hint-style {:color "white"}
               :widgets [{:widget-uid 001
                           :widget-name "Standard text widget"
                           :inner-html ["<p> Hi there </p>"]}
@@ -415,7 +415,7 @@
               :bg-img "for_architects.jpg"
               :grey-bg? true
               :nav-hint ["jobs"]
-              :nav-hint-style #js {:color "white"}
+              :nav-hint-style {:color "white"}
               :widgets [{:widget-uid 001
                           :widget-name "Standard text widget"
                           :inner-html ["<p> Hi there </p>"]}
@@ -428,26 +428,26 @@
  :bg-img "from_us.jpg"
  :grey-bg? true
  :nav-hint ["From us"]
- :nav-hint-style #js {:color "white"}
+ :nav-hint-style {:color "white"}
  :widgets []
  :children [{:route-name "/solari-social"
               :bg-img "from_us.jpg"
               :grey-bg? true
               :nav-hint ["#solarisocial"]
-              :nav-hint-style #js {:color "white"}
+              :nav-hint-style {:color "white"}
               :widgets []
               :children []}]}
 {:route-name "/contact"
  :bg-img "from_uss.jpg"
  :grey-bg? true
  :nav-hint ["Contact"]
- :nav-hint-style #js {:color "white"}
+ :nav-hint-style {:color "white"}
  :widgets []
  :children [{:route-name "/info"
               :bg-img "from_uss.jpg"
               :grey-bg? true
               :nav-hint ["Info"]
-              :nav-hint-style #js {:color "white"}
+              :nav-hint-style {:color "white"}
               :widgets []
               :children []}]}]})
 

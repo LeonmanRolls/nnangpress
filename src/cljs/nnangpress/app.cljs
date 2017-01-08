@@ -34,7 +34,7 @@
 (def monolith (atom {:active-route {:route-name "/from-us"
                                      :bg-img "home_page.jpg"
                                      :nav-hint ["From us"]
-                                     :nav-hint-style #js {:color "black"}
+                                     :nav-hint-style {:color "black"}
                                      :widgets []
                                      :children []}
                      :current-route ["/"]
@@ -116,8 +116,7 @@
       (let [{:keys [:nav-hint :nav-hint-style]} (om/observe owner (active-route))]
         (dom/div #js {:className "nav-hint-outer"}
                  (dom/div #js {:className "nav-hint-inner"
-                               :style nav-hint-style
-                               }
+                               :style (clj->js nav-hint-style)}
                           (first nav-hint)))))))
 
 (defn nav-menu-logo

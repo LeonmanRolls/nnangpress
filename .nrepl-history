@@ -1,5 +1,3 @@
-                                                               :className "mega-entry"
-                                                               :data-src "http://solariarchitects.com/img/firemans/firemans-00.jpg"
                                                                :data-width "320"
                                                                :data-height "400"}
                                                               {:id "entry-14"
@@ -498,3 +496,5 @@ l
                    (println "hi " (type (rdr/read-string resp)))
                    )})
 dd/routes-map
+(js-obj {:hi "there"})
+(clj->js {:hi "there"})
