@@ -6,8 +6,7 @@
                  :nav-hint-style {:color "black"}
                  :widgets [{:widget-uid 001
                              :widget-name "Standard text widget"
-                             :inner-html ["<p> Hi there </p>"]}
-                            ]
+                             :inner-html ["<p> Hi there </p>"]}]
                  :children [{:route-name "/for-you"
                               :bg-img "home_page.jpg"
                               :grey-bg? true
@@ -18,8 +17,7 @@
                                            :bg-img "#333"
                                            :nav-hint ["All Projects"]
                                            :nav-hint-style {:color "white"}
-                                           :widgets [
-                                                      {:widget-uid 001
+                                           :widgets [{:widget-uid 001
                                                        :widget-name "Standard text widget"
                                                        :inner-html ["<p> Hi there </p>"]}
                                                       {:widget-uid 002

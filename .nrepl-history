@@ -1,9 +1,3 @@
-                                                               :data-width "320"
-                                                               :data-height "400"}
-                                                              {:id "entry-14"
-                                                               :className "mega-entry"
-                                                               :data-src "http://solariarchitects.com/img/roxburgh/roxburgh-00.png"
-                                                               :data-width "320"
                                                                :data-height "400"}
                                                               {:id "entry-15"
                                                                :className "mega-entry"
@@ -498,3 +492,9 @@ l
 dd/routes-map
 (js-obj {:hi "there"})
 (clj->js {:hi "there"})
+  (defn outer []
+    (defn inner [x] x)
+    )
+(inner 4)
+(outer)
+(inner 4)

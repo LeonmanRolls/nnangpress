@@ -56,17 +56,21 @@
                             :email "leon.talbert@gmail.com"
                             :data  (pr-str @remote-monolith)})))))
 
-(defn current-route []
-  (om/ref-cursor (:current-route (om/root-cursor monolith))))
+(defn ref-cursor-init [monolith]
+  (defn routes-map []
+    (om/ref-cursor (:routes-map (om/root-cursor monolith))))
 
-(defn logo-text []
-  (om/ref-cursor (:logo-text (om/root-cursor monolith))))
+  (defn current-route []
+    (om/ref-cursor (:current-route (om/root-cursor monolith))))
 
-(defn logo-hint []
-  (om/ref-cursor (-> (om/root-cursor monolith) :routes-map :nav-hint)))
+  (defn logo-text []
+    (om/ref-cursor (:logo-text (om/root-cursor monolith))))
 
-(defn active-route []
-  (om/ref-cursor (-> (om/root-cursor monolith) :active-route)))
+  (defn logo-hint []
+    (om/ref-cursor (-> (om/root-cursor monolith) :routes-map :nav-hint)))
+
+  (defn active-route []
+    (om/ref-cursor (-> (om/root-cursor monolith) :active-route))))
 
 ;Routing
 (defn get-token []
@@ -85,11 +89,11 @@
                    (goog.events/listen EventType.NAVIGATE #(handle-url-change %))
                    (.setEnabled true)))
 
-(defn nav! [token]
+(defn nav! [token routes-map]
   (let [paths (tree-seq-path
                 #(contains? % :children)
                 #(:children %)
-                dd/routes-map
+                routes-map
                 #(:route-name %))
         active-path  (first (filter (fn [x] (= (last x) token)) paths))
         new-path (if
@@ -104,10 +108,10 @@
       (om/update! (current-route) [new-path]))
     (.setToken history new-path)))
 
-(defn js-link [route-name e]
+(defn js-link [routes-map route-name e]
   (do
     (.preventDefault e)
-    (nav! route-name)))
+    (nav! route-name routes-map)))
 
 (defn nav-hint [data owner]
   (reify
@@ -124,9 +128,10 @@
   (reify
     om/IRender
     (render [_]
-      (let [logo-text-obs (om/observe owner (logo-text))]
+      (let [logo-text-obs (om/observe owner (logo-text))
+            routes-map-obs (om/observe owner (routes-map))]
         (dom/h1 #js {:className "logo"
-                     :onClick (partial js-link "/")}
+                     :onClick (partial js-link @routes-map-obs "/")}
                 (first logo-text-obs))))))
 
 (defn nav-menu
@@ -144,7 +149,8 @@
     om/IRenderState
     (render-state [_ {:keys [depth str-beautify] :as state}]
       (let [curr-route (first (om/observe owner (current-route)))
-            active? (string-contains? curr-route route-name)]
+            active? (string-contains? curr-route route-name)
+            routes-map-obs (om/observe owner (routes-map))]
 
         (cond
           (= "/" route-name)
@@ -154,7 +160,7 @@
           (not (empty? children))
           (dom/div #js {:style #js {:position "relative"}}
                    (dom/li #js {:className (str "nav-li " (when active? "active-li"))
-                                :onClick (partial js-link route-name)}
+                                :onClick (partial js-link @routes-map-obs route-name)}
                            (dom/div #js {:className (str (when active? "active-text"))}
                                     (str-beautify route-name)))
                    (when active?
@@ -163,7 +169,7 @@
 
           :else
           (dom/li #js {:className (str "sub-nav-li " (when active? "active-text"))
-                       :onClick (partial js-link route-name)}
+                       :onClick (partial js-link @routes-map-obs route-name)}
                   (str-beautify route-name)))))))
 
 (defn main-nav-view [{:keys [:routes-map] :as data} owner]
@@ -655,6 +661,8 @@
                         (js/firebase.database)
                         (.ref (str "users/" uid)))]
 
+    (ref-cursor-init monolith)
+
     #_(->
         (js/firebase.database)
         (.ref (str "users/" uid))
@@ -689,5 +697,6 @@
       om/IRenderState
       (render-state [_ {:keys [uuid] :as state}]
         (dom/div nil "Skeleton Widget"))))
+
   )
 
