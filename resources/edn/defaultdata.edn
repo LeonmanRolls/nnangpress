@@ -314,37 +314,37 @@
             :inner-html ["<p> Hi there </p>"]}
            {:widget-uid 006
             :widget-name "Standard image widget"
-            :img "http://solariarchitects.com/img/leaderboards/group_photo_everyday_zoomed.jpg"}
+            :img "http://solariarchitects.com/img/leaderboards/group_photo_hipster.jpg"}
            {:widget-uid 002
             :widget-name "Grid"
             :imgs [{:id "entry-1"
                     :className "mega-entry"
-                    :data-src "http://solariarchitects.com/img/teampics/jsolari_everyday.jpg"
+                    :data-src "http://solariarchitects.com/img/teampics/jsolari_hipster.jpg"
                     :data-width "320"
                     :data-height "400"}
                    {:id "entry-2"
                     :className "mega-entry"
-                    :data-src "http://solariarchitects.com/img/teampics/csolari_everyday.jpg"
+                    :data-src "http://solariarchitects.com/img/teampics/csolari_hipster.jpg"
                     :data-width "320"
                     :data-height "400"}
                    {:id "entry-3"
                     :className "mega-entry"
-                    :data-src "http://solariarchitects.com/img/teampics/mcane_everyday.jpg"
+                    :data-src "http://solariarchitects.com/img/teampics/mcane_hipster.jpg"
                     :data-width "320"
                     :data-height "400"}
                    {:id "entry-4"
                     :className "mega-entry"
-                    :data-src "http://solariarchitects.com/img/teampics/mzyteka_everyday.jpg"
+                    :data-src "http://solariarchitects.com/img/teampics/mzyteka_hipster.jpg"
                     :data-width "320"
                     :data-height "400"}
                    {:id "entry-5"
                     :className "mega-entry"
-                    :data-src "http://solariarchitects.com/img/teampics/maddis_everyday.jpg"
+                    :data-src "http://solariarchitects.com/img/teampics/maddis_hipster.jpg"
                     :data-width "320"
                     :data-height "400"}
                    {:id "entry-6"
                     :className "mega-entry"
-                    :data-src "http://solariarchitects.com/img/teampics/mmarshall_everyday.jpg"
+                    :data-src "http://solariarchitects.com/img/teampics/mmarshall_hipster.jpg"
                     :data-width "320"
                     :data-height "400"}
                    {:id "entry-8"
