@@ -344,17 +344,20 @@
                                 :data-src "http://solariarchitects.com/img/teampics/jsolari_everyday.jpg"
                                 :data-width "320"
                                 :data-height "400"}
+
+                               {:id "entry-2"
+                                :className "mega-entry"
+                                :data-src "http://solariarchitects.com/img/teampics/csolari_everyday.jpg"
+                                :data-width "320"
+                                :data-height "400"}
+
                                {:id "entry-1-1"
                                 :className "mega-entry"
                                 :title "WE HAVE A LAUGH"
                                 :text "Cue James in a bald cap, need I say more?"
                                 :data-width "320"
                                 :data-height "400"}
-                               {:id "entry-2"
-                                :className "mega-entry"
-                                :data-src "http://solariarchitects.com/img/teampics/csolari_everyday.jpg"
-                                :data-width "320"
-                                :data-height "400"}
+
                                {:id "entry-2-1"
                                 :className "mega-entry"
                                 :title "WE HAVE A LIFE (that isn't work)"

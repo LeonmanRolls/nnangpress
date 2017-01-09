@@ -519,6 +519,21 @@
     (init-state [_]
       (let [uuid (.toString (random-uuid))]
         {:uuid uuid
+         :default-img (fn []
+                        {:id (.toString (random-uuid))
+                         :className "mega-entry"
+                         :data-src "http://solariarchitects.com/img/lyall/lyall-00.jpg"
+                         :data-width "320"
+                         :data-height "400"})
+
+         :default-text (fn []
+                         {:id (.toString (random-uuid))
+                          :className "mega-entry"
+                          :title "WE HAVE A LAUGH"
+                          :text "Cue James in a bald cap, need I say more?"
+                          :data-width "320"
+                          :data-height "400"})
+
          :widget-img (fn [{:keys [id className data-src data-width data-height] :as data}]
                        (str
                          "<div"
@@ -528,6 +543,7 @@
                          " data-width=\"" data-width  "\""
                          " data-height=\"" data-height  "\""
                          "></div>"))
+
          :widget-text (fn [{:keys [id className data-width data-height title text] :as data}]
                         (str
                           "<div"
@@ -544,6 +560,7 @@
                           "</p>"
                           "<div class=\"see-all-button\">...see all</div>"
                           "</div>"))
+
          :text-or-img (fn [widget-img widget-text data]
                         (if (contains? data :text)
                           (widget-text data)
@@ -563,16 +580,31 @@
           (.megafoliopro #js {}))))
 
     om/IRenderState
-    (render-state [_ {:keys [widget-img widget-text text-or-img] :as state}]
-      (dom/div #js {:className "container"}
-               (dom/div #js {:className "megafolio-container"
-                             :dangerouslySetInnerHTML
-                             #js {:__html (apply str (map
-                                                       (partial
-                                                         text-or-img
-                                                         widget-img
-                                                         widget-text)
-                                                       imgs))}})))))
+    (render-state [_ {:keys [widget-img widget-text text-or-img default-img default-text]
+                      :as state}]
+      (dom/div nil
+               (dom/div #js {:className "container"}
+                        (dom/div #js {:className "megafolio-container"
+                                      :dangerouslySetInnerHTML
+                                      #js {:__html (apply str (map
+                                                                (partial
+                                                                  text-or-img
+                                                                  widget-img
+                                                                  widget-text)
+                                                                imgs))}}))
+               (dom/button #js {:onClick (fn [_]
+                                           (om/transact!
+                                             imgs
+                                             (fn [x] (conj x (default-img)))))}
+                           "Add an image")
+
+               (dom/button #js {:onClick (fn [_]
+                                           (om/transact!
+                                             imgs
+                                             (fn [x] (conj x (default-text)))))}
+                           "Add text")
+
+               (om/build remove-element imgs {:state {:label "remove nth element"}})))))
 
 (defn main-view [data owner]
   (reify
