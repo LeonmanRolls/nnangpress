@@ -55,6 +55,13 @@
                                      (om/transact! data (fn [x]
                                                           (vec-remove x widget-pos)))))}
                    "Submit"))))))
+
+(defn simple-input-cursor [value cursor korks]
+  (dom/input #js {:value value
+                  :style #js {:width "100%"}
+                  :onChange (fn [e]
+                              (om/update! cursor korks (.. e -target -value)))}))
+
 ;Core End -----
 
 (def monolith (atom {}))
@@ -592,6 +599,20 @@
                                                                   widget-img
                                                                   widget-text)
                                                                 imgs))}}))
+
+               (apply dom/div nil
+                      (om/build-all
+                        (fn [data owner]
+                          (reify
+                            om/IRender
+                            (render [_]
+                              (if (contains? data :text)
+                                (dom/div nil
+                                         (simple-input-cursor (:title data) data :title)
+                                         (simple-input-cursor (:text data) data :text))
+                                (simple-input-cursor (:data-src data) data :data-src)))))
+                        imgs))
+
                (dom/button #js {:onClick (fn [_]
                                            (om/transact!
                                              imgs
