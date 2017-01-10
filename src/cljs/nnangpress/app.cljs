@@ -627,6 +627,31 @@
 
                (om/build remove-element imgs {:state {:label "remove nth element"}})))))
 
+(defmethod widget-data 8 [_]
+  {:widget-uid 007
+   :widget-name "Right Nav"
+   :imgs []})
+
+(defmethod widget 8 [{:keys [lis] :as data} owner]
+  (reify
+    om/IInitState
+    (init-state [_]
+      {:uuid (random-uuid)
+       :li (fn [{:keys [route label active?] :as data} owner]
+             (reify
+               om/IRenderState
+               (render-state [_ {:keys [routes-map] :as state}]
+                 (dom/li #js {:className "right-nav-li"
+                              :onClick (partial js-link routes-map route) }
+                         (dom/div #js {:className (when active? "active-text")}
+                                  label)))))})
+
+    om/IRenderState
+    (render-state [_ {:keys [uuid li] :as state}]
+      (let [routes-map-obs (om/observe owner (routes-map))]
+        (apply dom/ul #js {:className "right-nav"}
+               (om/build-all li lis {:state {:routes-map routes-map-obs}}))))))
+
 (defn main-view [data owner]
   (reify
     om/IInitState

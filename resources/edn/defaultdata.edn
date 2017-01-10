@@ -261,7 +261,14 @@
  :grey-bg? true
  :nav-hint ["Your Team"]
  :nav-hint-style {:color "white"}
- :widgets [{:widget-uid 001
+ :widgets [{:widget-uid 8
+            :lis [{:route "/your-team"
+                   :label "Everyday us"
+                   :active? true}
+                  {:route "/architect-us"
+                   :label "Architect us"
+                   :active? false}]}
+           {:widget-uid 001
             :widget-name "Standard text widget"
             :inner-html ["<p> Hi there </p>"]}
            {:widget-uid 006
@@ -309,7 +316,14 @@
  :grey-bg? true
  :nav-hint ["Your Team"]
  :nav-hint-style {:color "white"}
- :widgets [{:widget-uid 001
+ :widgets [{:widget-uid 8
+            :lis [{:route "/your-team"
+                   :label "Everyday us"
+                   :active? false}
+                  {:route "/architect-us"
+                   :label "Architect us"
+                   :active? true}]}
+           {:widget-uid 001
             :widget-name "Standard text widget"
             :inner-html ["<p> Hi there </p>"]}
            {:widget-uid 006

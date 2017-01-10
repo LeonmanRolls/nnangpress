@@ -417,3 +417,31 @@ color: white !important;
 }
 
 /*Firebase End ----------------------------------------------------------------------------------*/
+
+.right-nav {
+  top: 100px;
+  width: 140px;
+  right: 15px;
+  position: fixed;
+  list-style: none;
+  padding: 0px;
+  border-top: 1px solid white;
+  border-left: 1px solid white;
+}
+
+.right-nav-li {
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 80%;
+  position: relative;
+  background-color: rgba(29,29,27,0.4);
+  display: block;
+  text-align: center;
+  color: #fff;
+  text-decoration: none;
+  padding: 18px;
+  outline: none;
+  margin-right: -1px;
+  border-bottom: 1px solid white
+}
+
