@@ -137,6 +137,12 @@
     (.preventDefault e)
     (nav! route-name routes-map)))
 
+(defn ^:export simpleRouteChange
+  "Possilbe problems with reference cursor"
+  [e]
+  (.dir js/console e)
+  #_(nav! route-name @(routes-map)))
+
 (defn nav-hint [data owner]
   (reify
     om/IRender
@@ -544,15 +550,26 @@
                           :data-width "320"
                           :data-height "400"})
 
-         :widget-img (fn [{:keys [id className data-src data-width data-height] :as data}]
+         :widget-img (fn [{:keys [id link className data-src data-width data-height title subtitle]
+                           :as data}]
                        (str
                          "<div"
                          " id=\"" id "\""
-                         " class=\"" className  "\""
+                         " class=\"" className  " norounded\""
                          " data-src=\"" data-src  "\""
                          " data-width=\"" data-width  "\""
                          " data-height=\"" data-height  "\""
-                         "></div>"))
+                         ">"
+                         "<div id=\"" link "--" id "\" class=\"mega-hover\""
+                         ">"
+                         "<div class=\"mega-hovertitle\">"
+                         title
+                         "<div class=\"mega-hoversubtitle\">"
+                         subtitle
+                         "</div>"
+                         "</div>"
+                         "</div>"
+                         "</div>"))
 
          :widget-text (fn [{:keys [id className data-width data-height title text] :as data}]
                         (str
@@ -584,7 +601,15 @@
 
     om/IDidMount
     (did-mount [_]
-      (let [uuid (om/get-state owner :uuid)]
+      (let [uuid (om/get-state owner :uuid)
+            routes-map-obs (om/observe owner (routes-map))]
+        (->
+          (js/$ ".megafolio-container")
+          (.click (fn [event]
+                    (js-link
+                      @routes-map-obs
+                      (first (clojure.string/split (-> event .-target .-id) #"--"))
+                      event))))
         (->
           (js/$ ".megafolio-container")
           (.megafoliopro #js {}))))
