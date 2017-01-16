@@ -8,7 +8,8 @@
             [cljs.reader :as rdr]
             [goog.events :as ev]
             [goog.dom :as gdom]
-            [ajax.core :refer [GET POST]]))
+            [ajax.core :refer [GET POST]]
+            [replumb.core :as replumb]))
 
 (enable-console-print!)
 
@@ -137,12 +138,6 @@
     (.preventDefault e)
     (nav! route-name routes-map)))
 
-(defn ^:export simpleRouteChange
-  "Possilbe problems with reference cursor"
-  [e]
-  (.dir js/console e)
-  #_(nav! route-name @(routes-map)))
-
 (defn nav-hint [data owner]
   (reify
     om/IRender
@@ -215,27 +210,8 @@
                         (om/build nav-hint {}))
 
                (dom/div #js {:className "nav-menu"}
-
                         (om/build nav-menu-logo {})
-
-                        (om/build nav-menu routes-map)
-
-                        #_(dom/div #js {:id "social-container" :style #js {:textAlign "center"}}
-                                   (dom/div nil
-                                            (dom/a #js {:href "http://pinterest.com/solariarchitect/" :target "_blank"}
-                                                   (dom/i #js {:className "fa fa-pinterest fa-2x"}))
-                                            (dom/a #js {:href "https://twitter.com/solariarch" :target "_blank"}
-                                                   (dom/i #js {:className "fa fa-twitter fa-2x"}))
-                                            (dom/a #js {:href "https://instagram.com/solariarchitects" :target "_blank"}
-                                                   (dom/i #js {:className "fa fa-instagram fa-2x"}))
-                                            (dom/a #js {:href "https://plus.google.com/114804027121182865701/about" :target "_blank"}
-                                                   (dom/i #js {:className "fa fa-google-plus fa-2x"}))
-                                            (dom/a #js {:href "https://www.facebook.com/pages/Solari-Architects/411733188915120" :target "_blank"}
-                                                   (dom/i #js {:className "fa fa-facebook fa-2x"}))))
-
-                        #_(dom/a #js {:href "http://nang.rocks" :target "_blank"}
-                                 (dom/footer #js {:id "main-footer" :className "footer cf" :style (css/css-object css/main-footer)}
-                                             "Website by Nang")))))))
+                        (om/build nav-menu routes-map))))))
 
 (defmulti widget-data (fn [x] x))
 
@@ -656,7 +632,7 @@
                (om/build remove-element imgs {:state {:label "remove nth element"}})))))
 
 (defmethod widget-data 8 [_]
-  {:widget-uid 007
+  {:widget-uid 8
    :widget-name "Right Nav"
    :imgs []})
 
@@ -794,7 +770,6 @@
                                 {:target (. js/document
                                             (getElementById "super-container"))}))})))
 
-
 (comment
 
   (defmethod widget 000 [data owner]
@@ -806,6 +781,35 @@
       om/IRenderState
       (render-state [_ {:keys [uuid] :as state}]
         (dom/div nil "Skeleton Widget"))))
+
+  (def cache (atom {}))
+
+  (GET "/edn/routingwidget.edn"
+       {:handler (fn [resp] (reset! cache (rdr/read-string resp)))})
+
+  (type (first (:components @cache)))
+  (eval-form @cache)
+
+  (defn eval-form [s]
+    (eval (empty-state)
+          s
+          {:eval       js-eval
+           :source-map true
+           :context    :expr}
+          (fn  [result] result)))
+
+  (eval (empty-state)
+        (list (first (:components @cache)))
+        {:eval       js-eval
+         :source-map true
+         :ns 'nnangpress.app
+         :context    :expr}
+        (fn  [result] result))
+
+  (eval-form (+ 1 2))
+  (eval-form (first (:components @cache)))
+
+
 
   )
 

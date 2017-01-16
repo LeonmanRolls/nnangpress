@@ -1,127 +1,3 @@
-                                                               :data-height "400"}
-                                                              {:id "entry-15"
-                                                               :className "mega-entry"
-                                                               :data-src "http://solariarchitects.com/img/leehouse/1.jpg"
-                                                               :data-width "320"
-                                                               :data-height "400"}
-                                                              ]}]
-                                           ::children []}
-                                          {::route-name "/residential"
-                                           ::bg-img "#333"
-                                           ::nav-hint ["Residential"]
-                                           ::nav-hint-style #js {:color "white"}
-                                           ::widgets [{:widget-uid 001
-                                                       :widget-name "Standard text widget"
-                                                       :inner-html ["<p> Hi there </p>"]}
-                                                      {:widget-uid 002
-                                                       :widget-name "Grid"
-                                                       :imgs [
-                                                              {:id "entry-1"
-                                                               :className "mega-entry"
-                                                               :data-src "http://solariarchitects.com/img/wadestown/wadestown-00.jpg"
-                                                               :data-width "320"
-                                                               :data-height "400"}
-                                                              {:id "entry-2"
-                                                               :className "mega-entry"
-                                                               :data-src "http://solariarchitects.com/img/lyall/lyall-00.jpg"
-                                                               :data-width "320"
-                                                               :data-height "400"}
-                                                              {:id "entry-3"
-                                                               :className "mega-entry"
-                                                               :data-src "http://solariarchitects.com/img/catline/catline-00.jpg"
-                                                               :data-width "320"
-                                                               :data-height "400"}
-                                                              {:id "entry-4"
-                                                               :className "mega-entry"
-                                                               :data-src "http://solariarchitects.com/img/plimmerton/plimmerton-00.jpg "
-                                                               :data-width "320"
-                                                               :data-height "400"}
-                                                              {:id "entry-15"
-                                                               :className "mega-entry"
-                                                               :data-src "http://solariarchitects.com/img/leehouse/1.jpg"
-                                                               :data-width "320"
-                                                               :data-height "400"}
-                                                              ]}]
-                                           ::children []}
-{::route-name "/multi-unit"
- ::bg-img "#333"
- ::nav-hint ["Multi Unit"]
- ::nav-hint-style #js {:color "white"}
- ::widgets [{:widget-uid 001
-             :widget-name "Standard text widget"
-             :inner-html ["<p> Hi there </p>"]}
-            {:widget-uid 002
-             :widget-name "Grid"
-             :imgs [
-                    {:id "entry-5"
-                     :className "mega-entry"
-                     :data-src "http://solariarchitects.com/img/vedado/vedado-00.jpg"
-                     :data-width "320"
-                     :data-height "400"}
-                    {:id "entry-6"
-                     :className "mega-entry"
-                     :data-src "http://solariarchitects.com/img/sharella/sharella-00.jpg"
-                     :data-width "320"
-                     :data-height "400"}
-                    {:id "entry-8"
-                     :className "mega-entry"
-                     :data-src "http://solariarchitects.com/img/pascal/pascal-00.jpg"
-                     :data-width "320"
-                     :data-height "400"}
-                    {:id "entry-9"
-                     :className "mega-entry"
-                     :data-src "http://solariarchitects.com/img/sugarloaf/sugarloaf-00.jpg"
-                     :data-width "320"
-                     :data-height "400"}
-                    {:id "entry-10"
-                     :className "mega-entry"
-                     :data-src "http://solariarchitects.com/img/detroit/detroit-00.jpg"
-                     :data-width "320"
-                     :data-height "400"}
-                    {:id "entry-13"
-                     :className "mega-entry"
-                     :data-src "http://solariarchitects.com/img/firemans/firemans-00.jpg"
-                     :data-width "320"
-                     :data-height "400"}
-                    {:id "entry-14"
-                     :className "mega-entry"
-                     :data-src "http://solariarchitects.com/img/roxburgh/roxburgh-00.png"
-                     :data-width "320"
-                     :data-height "400"}
-                    ]}]
- ::children []}
-{::route-name "/commercial"
- ::bg-img "#333"
- ::nav-hint ["Commercial"]
- ::nav-hint-style #js {:color "white"}
- ::widgets [
-            {:widget-uid 001
-             :widget-name "Standard text widget"
-             :inner-html ["<p> Hi there </p>"]}
-            {:widget-uid 002
-             :widget-name "Grid"
-             :imgs [
-                    {:id "entry-11"
-                     :className "mega-entry"
-                     :data-src "http://solariarchitects.com/img/oasis/oasis-00.jpg"
-                     :data-width "320"
-                     :data-height "400"}
-                    {:id "entry-12"
-                     :className "mega-entry"
-                     :data-src "http://solariarchitects.com/img/tinakori/tinakori-00.jpg"
-                     :data-width "320"
-                     :data-height "400"}
-                    {:id "entry-13"
-                     :className "mega-entry"
-                     :data-src "http://solariarchitects.com/img/firemans/firemans-00.jpg"
-                     :data-width "320"
-                     :data-height "400"}
-                    ]}]
- ::children []}
-{::route-name "/our-process"
- ::bg-img "from_uss.jpg"
- ::grey-bg? true
- ::nav-hint ["Our Process"]
  ::nav-hint-style #js {:color "white"}
  ::widgets [{:widget-uid 001
              :widget-name "Standard text widget"
@@ -498,3 +374,127 @@ dd/routes-map
 (inner 4)
 (outer)
 (inner 4)
+(start-repl)
+(in-ns 'nnangpress.app)
+(ns nnangpress.app
+  (:import [goog.history Html5History EventType])
+  (:require-macros [cljs.core.async.macros :refer  [go go-loop]])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [clojure.spec :as s]
+            [cljs.core.async :as cas :refer [>! <! put! chan pub sub close!]]
+            [cljs.reader :as rdr]
+            [goog.events :as ev]
+            [goog.dom :as gdom]
+            [ajax.core :refer [GET POST]]))
+  (GET "/edn/routingwidget.edn")
+  (def cache (atom {}))
+(GET "/edn/defaultdata.edn"
+       {:handler (fn [resp]
+                   (reset! cache (rdr/read-string resp))
+                   )})
+@cache
+(GET "/edn/routingwidget.edn"
+       {:handler (fn [resp]
+                   (reset! cache (rdr/read-string resp))
+                   )})
+@cache
+(type @cache)
+  (type (:components @cache))
+(:components @cache)
+(first (:components @cache))
+  (eval (first (:components @cache)))
+(ns nnangpress.app
+  (:import [goog.history Html5History EventType])
+  (:require-macros [cljs.core.async.macros :refer  [go go-loop]])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [clojure.spec :as s]
+            [cljs.core.async :as cas :refer [>! <! put! chan pub sub close!]]
+            [cljs.reader :as rdr]
+            [goog.events :as ev]
+            [goog.dom :as gdom]
+            [ajax.core :refer [GET POST]]
+            [cljs.js :refer [empty-state eval js-eval]]))
+(defn eval-form [s]
+    (eval  (empty-state)
+          s 
+          {:eval       js-eval
+           :source-map true
+           :context    :expr}
+          (fn  [result] result)))
+  (eval-form (+ 1 2))
+@cache
+  (def cache (atom {}))
+  (GET "/edn/routingwidget.edn"
+       {:handler (fn [resp] (reset! cache (rdr/read-string resp)))})
+(first (:components @cache))
+  (eval-form (first (:components @cache)))
+  (GET "/edn/routingwidget.edn"
+       {:handler (fn [resp] (reset! cache (rdr/read-string resp)))})
+@cache
+  (GET "/edn/routingwidget.edn"
+       {:handler (fn [resp] (reset! cache (rdr/read-string resp)))})
+@cache
+  (eval-form ~(first (:components @cache)))
+(:components @cache)
+(first (:components @cache))
+~(first (:components @cache))
+(unqtuoe (first (:components @cache)))
+  (eval-form (unquote (first (:components @cache))) )
+  (GET "/edn/routingwidget.edn"
+       {:handler (fn [resp] (reset! cache (rdr/read-string resp)))})
+(first (:components @cache))
+  (def cache (atom {}))
+  (GET "/edn/routingwidget.edn"
+       {:handler (fn [resp] (reset! cache (rdr/read-string resp)))})
+(first (:components @cache))
+  (eval-form (first (:components @cache)))
+(first (:components @cache))
+@cache
+  (def cache (atom {}))
+  (eval @cache)
+  (eval-form @cache)
+(eval (empty-state)
+        (+ 2 3) 
+        {:eval       js-eval
+         :source-map true
+         :ns 'nnangpress.app
+         :context    :expr}
+        (fn  [result] result))
+  (eval (empty-state)
+        (rdr/read-string "(+ 2 3)") 
+        {:eval       js-eval
+         :source-map true
+         :ns 'nnangpress.app
+         :context    :expr}
+        (fn  [result] result))
+  (eval (empty-state)
+        (rdr/read-string "(+ 2 3)") 
+        {:eval       js-eval
+         :source-map true
+         :context    :expr}
+        (fn  [result] result))
+  (eval (empty-state)
+        (rdr/read-string "(+ 2 3)") 
+        {:eval       js-eval
+         :source-map true
+         :context    :expr}
+        (fn  [result] result))
+  (GET "/edn/routingwidget.edn"
+       {:handler (fn [resp] (reset! cache (rdr/read-string resp)))})
+(first (:components @cache))
+  (eval (empty-state)
+(first (:components @cache))
+        {:eval       js-eval
+         :source-map true
+         :ns 'nnangpress.app
+         :context    :expr}
+        (fn  [result] result))
+  (eval (empty-state)
+        (list (first (:components @cache))) 
+        {:eval       js-eval
+         :source-map true
+         :ns 'nnangpress.app
+         :context    :expr}
+        (fn  [result] result))

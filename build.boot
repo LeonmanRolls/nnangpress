@@ -11,7 +11,8 @@
                   [org.clojure/clojurescript "1.9.293"]
                   [org.omcljs/om "0.8.6"]
                   [org.clojure/core.async "0.2.395"]
-                  [cljs-ajax "0.5.8"]])
+                  [cljs-ajax "0.5.8"]
+                  [replumb "0.2.4"]])
 
 (require
  '[adzerk.boot-cljs      :refer [cljs]]
