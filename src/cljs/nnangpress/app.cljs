@@ -689,20 +689,19 @@
 
     om/IRenderState
     (render-state [_ {:keys [add-widget remove-widget] :as state}]
-      (let [all-widgets-data-obs (om/observe owner (all-widgets-data))]
+      (let [all-widgets-data-obs (om/observe owner (all-widgets-data))
+            edit-mode-obs (om/observe owner (edit-mode))]
         (dom/div #js {:className "main-view"}
+
                  (apply dom/div nil
                         (om/build-all widget data))
 
-                 (dom/div #js {:className "edit"}
-                          (apply dom/div nil
-                                 (om/build-all widget all-widgets-data-obs))
-                          "add widget: "
-                          (dom/input #js {:ref "add-widget"})
-                          (dom/button #js {:onClick (fn [_] (add-widget data))}
-                                      "Submit"))
-
-                 (om/build remove-element data {:state {:label "Remove widget"}}))))))
+                 (when (first @edit-mode-obs)
+                   (dom/div #js {:className "edit"}
+                            (apply dom/div nil (om/build-all widget all-widgets-data-obs))
+                            "add widget: " (dom/input #js {:ref "add-widget"})
+                            (dom/button #js {:onClick (fn [_] (add-widget data))} "Submit")
+                            (om/build remove-element data {:state {:label "Remove widget"}}))))))))
 
 (defn master [{:keys [:routes-map :current-route :active-route] :as data} owner]
   (reify
