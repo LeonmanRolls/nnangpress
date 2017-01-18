@@ -13,6 +13,8 @@
 
 (enable-console-print!)
 
+(declare edit-mode)
+
 ;Utils Start -----
 (defn tree-seq-path [branch? children root & [node-fn]]
   (let [node-fn (or node-fn identity)
@@ -67,7 +69,15 @@
   (reify 
     om/IRender
     (render [_]
-      (dom/div #js{:className "admin-toolbar"} "Toolbar"))))
+      (let []
+        (dom/div #js{:className "admin-toolbar"} 
+                 (dom/button #js {:onClick (fn [_] 
+                                             (println "clicked")
+                                             (om/transact! 
+                                               (edit-mode) 
+                                               (fn [dabool]
+                                                 [(not (first dabool))] )))}
+                             "Toogle edit mode"))))))
 ;Core End -----
 
 (def monolith (atom {}))
