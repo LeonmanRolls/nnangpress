@@ -6,6 +6,22 @@
                 :children []}
  :current-route ["/"]
  :logo-text ["Solari"]
+ :all-widgets-data [{:widget-uid 001
+                     :widget-name "Standard text widget"
+                     :inner-html ["<p> Hi there </p>"]}
+                    {:widget-uid 002
+                     :widget-name "Grid"
+                     :imgs [{:id "entry-1"
+                             :className "mega-entry"
+                             :data-src "http://solariarchitects.com/img/wadestown/wadestown-00.jpg"
+                             :data-width "320"
+                             :data-height "400"}
+                            {:id "entry-2"
+                             :className "mega-entry"
+                             :data-src "http://solariarchitects.com/img/lyall/lyall-00.jpg"
+                             :data-width "320"
+                             :data-height "400"}]}]
+ :edit-mode [true]
  :routes-map {:route-name "/"
               :bg-img "home_page.jpg"
               :nav-hint ["Architects"]

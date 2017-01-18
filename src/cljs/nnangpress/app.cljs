@@ -62,7 +62,6 @@
                   :style #js {:width "100%"}
                   :onChange (fn [e]
                               (om/update! cursor korks (.. e -target -value)))}))
-
 ;Core End -----
 
 (def monolith (atom {}))
@@ -82,6 +81,12 @@
                               :data  (pr-str @monolith)}))))))
 
 (defn ref-cursor-init [monolith]
+  (defn edit-mode []
+    (om/ref-cursor (:edit-mode (om/root-cursor monolith))))
+
+  (defn all-widgets-data []
+    (om/ref-cursor (:all-widgets-data (om/root-cursor monolith))))
+
   (defn routes-map []
     (om/ref-cursor (:routes-map (om/root-cursor monolith))))
 
@@ -492,17 +497,6 @@
            :title "WE HAVE A LAUGH"
            :text "Cue James in a bald cap, need I say more?"
            :data-width "320"
-           :data-height "400"}
-          {:id "entry-2"
-           :className "mega-entry"
-           :data-src "http://solariarchitects.com/img/teampics/csolari_everyday.jpg"
-           :data-width "320"
-           :data-height "400"}
-          {:id "entry-2-1"
-           :className "mega-entry"
-           :title "WE HAVE A LIFE (that isn't work)"
-           :text "Whether you have a family of 4 small children, you coach the local badminton team or you’re into Comic-con you need to have YOUR own time to enjoy YOUR life. We respect and welcome that. Sure, there may be occasions where we all have to put in the extra mile but it’s not expected that you do it 52 weeks of the year just to get recognized OR be valued."
-           :data-width "320"
            :data-height "400"}]})
 
 (defmethod widget 007 [{:keys [imgs] :as data} owner]
@@ -593,43 +587,47 @@
     om/IRenderState
     (render-state [_ {:keys [widget-img widget-text text-or-img default-img default-text]
                       :as state}]
-      (dom/div nil
-               (dom/div #js {:className "container"}
-                        (dom/div #js {:className "megafolio-container"
-                                      :dangerouslySetInnerHTML
-                                      #js {:__html (apply str (map
-                                                                (partial
-                                                                  text-or-img
-                                                                  widget-img
-                                                                  widget-text)
-                                                                imgs))}}))
+      (let [edit-mode-obs (om/observe owner (edit-mode))]
+        (dom/div nil
+                 (dom/div #js {:className "container"}
+                          (dom/div #js {:className "megafolio-container"
+                                        :dangerouslySetInnerHTML
+                                        #js {:__html (apply str (map
+                                                                  (partial
+                                                                    text-or-img
+                                                                    widget-img
+                                                                    widget-text)
+                                                                  imgs))}}))
 
-               (apply dom/div nil
-                      (om/build-all
-                        (fn [data owner]
-                          (reify
-                            om/IRender
-                            (render [_]
-                              (if (contains? data :text)
-                                (dom/div nil
-                                         (simple-input-cursor (:title data) data :title)
-                                         (simple-input-cursor (:text data) data :text))
-                                (simple-input-cursor (:data-src data) data :data-src)))))
-                        imgs))
+                 (when (first @edit-mode-obs)
 
-               (dom/button #js {:onClick (fn [_]
-                                           (om/transact!
-                                             imgs
-                                             (fn [x] (conj x (default-img)))))}
-                           "Add an image")
+                   (dom/div nil 
+                            (apply dom/div nil
+                                   (om/build-all
+                                     (fn [data owner]
+                                       (reify
+                                         om/IRender
+                                         (render [_]
+                                           (if (contains? data :text)
+                                             (dom/div nil
+                                                      (simple-input-cursor (:title data) data :title)
+                                                      (simple-input-cursor (:text data) data :text))
+                                             (simple-input-cursor (:data-src data) data :data-src)))))
+                                     imgs))
 
-               (dom/button #js {:onClick (fn [_]
-                                           (om/transact!
-                                             imgs
-                                             (fn [x] (conj x (default-text)))))}
-                           "Add text")
+                            (dom/button #js {:onClick (fn [_]
+                                                        (om/transact!
+                                                          imgs
+                                                          (fn [x] (conj x (default-img)))))}
+                                        "Add an image")
 
-               (om/build remove-element imgs {:state {:label "remove nth element"}})))))
+                            (dom/button #js {:onClick (fn [_]
+                                                        (om/transact!
+                                                          imgs
+                                                          (fn [x] (conj x (default-text)))))}
+                                        "Add text")
+
+                            (om/build remove-element imgs {:state {:label "remove nth element"}}))))))))
 
 (defmethod widget-data 8 [_]
   {:widget-uid 8
@@ -675,16 +673,20 @@
 
     om/IRenderState
     (render-state [_ {:keys [add-widget remove-widget] :as state}]
-      (dom/div #js {:className "main-view"}
-               (apply dom/div nil
-                      (om/build-all widget data))
-               (dom/div #js {:className "edit"}
-                        "add widget: "
-                        (dom/input #js {:ref "add-widget"})
-                        (dom/button #js {:onClick (fn [_] (add-widget data))}
-                                    "Submit"))
+      (let [all-widgets-data-obs (om/observe owner (all-widgets-data))]
+        (dom/div #js {:className "main-view"}
+                 (apply dom/div nil
+                        (om/build-all widget data))
 
-               (om/build remove-element data {:state {:label "Remove widget"}})))))
+                 (dom/div #js {:className "edit"}
+                          (apply dom/div nil
+                                 (om/build-all widget all-widgets-data-obs))
+                          "add widget: "
+                          (dom/input #js {:ref "add-widget"})
+                          (dom/button #js {:onClick (fn [_] (add-widget data))}
+                                      "Submit"))
+
+                 (om/build remove-element data {:state {:label "Remove widget"}}))))))
 
 (defn master [{:keys [:routes-map :current-route :active-route] :as data} owner]
   (reify

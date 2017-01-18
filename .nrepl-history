@@ -1,409 +1,466 @@
- ::nav-hint-style #js {:color "white"}
- ::widgets [{:widget-uid 001
-             :widget-name "Standard text widget"
-             :inner-html ["<p> Hi there </p>"]}
-            {:widget-uid 003
-             :widget-name "Standard text widget"
-             :inner-html ["<p> Hi there </p>"]}
-            {:widget-uid 003
-             :widget-name "Standard text widget"
-             :inner-html ["<p> Hi there </p>"]}
-            {:widget-uid 003
-             :widget-name "Standard text widget"
-             :inner-html ["<p> Hi there </p>"]}]
- ::children []}
-{::route-name "/faqs"
- ::bg-img "from_uss.jpg"
- ::grey-bg? true
- ::nav-hint ["Faqs"]
- ::nav-hint-style #js {:color "white"}
- ::widgets [{:widget-uid 001
-             :widget-name "Standard text widget"
-             :inner-html ["<p> Hi there </p>"]}
-            {:widget-uid 004
-             :widget-name "Accordion"
-             :text [{:title {:widget-uid 001
-                             :widget-name "Standard text widget"
-                             :inner-html ["<p> Hi there </p>"]}
-                     :sub {:widget-uid 001
-                           :widget-name "Standard text widget"
-                           :inner-html ["<p> Hi there </p>"]}}
-                    ]}
-            ]
- ::children []}
-{::route-name "/your-team"
- ::bg-img "from_uss.jpg"
- ::grey-bg? true
- ::nav-hint ["Your Team"]
- ::nav-hint-style #js {:color "white"}
- ::widgets [{:widget-uid 001
-             :widget-name "Standard text widget"
-             :inner-html ["<p> Hi there </p>"]}
-            {:widget-uid 006
-             :widget-name "Standard image widget"
-             :img "http://solariarchitects.com/img/leaderboards/group_photo_everyday_zoomed.jpg"}
-            {:widget-uid 002
-             :widget-name "Grid"
-             :imgs [
-                    {:id "entry-1"
-                     :className "mega-entry"
-                     :data-src "http://solariarchitects.com/img/teampics/jsolari_everyday.jpg"
-                     :data-width "320"
-                     :data-height "400"}
-                    {:id "entry-2"
-                     :className "mega-entry"
-                     :data-src "http://solariarchitects.com/img/teampics/csolari_everyday.jpg"
-                     :data-width "320"
-                     :data-height "400"}
-                    {:id "entry-3"
-                     :className "mega-entry"
-                     :data-src "http://solariarchitects.com/img/teampics/mcane_everyday.jpg"
-                     :data-width "320"
-                     :data-height "400"}
-                    {:id "entry-4"
-                     :className "mega-entry"
-                     :data-src "http://solariarchitects.com/img/teampics/mzyteka_everyday.jpg"
-                     :data-width "320"
-                     :data-height "400"}
-                    {:id "entry-5"
-                     :className "mega-entry"
-                     :data-src "http://solariarchitects.com/img/teampics/maddis_everyday.jpg"
-                     :data-width "320"
-                     :data-height "400"}
-                    {:id "entry-6"
-                     :className "mega-entry"
-                     :data-src "http://solariarchitects.com/img/teampics/mmarshall_everyday.jpg"
-                     :data-width "320"
-                     :data-height "400"}
-                    {:id "entry-8"
-                     :className "mega-entry"
-                     :data-src "http://solariarchitects.com/img/teampics/Linda_Normal_Resized.jpg"
-                     :data-width "320"
-                     :data-height "400"}
-                    ]}
-            ]
- ::children []}]}
-{::route-name "/for-architects"
- ::bg-img "for_architects.jpg"
- ::grey-bg? true
- ::nav-hint ["For Architects"]
- ::nav-hint-style #js {:color "white"}
- ::widgets [{:widget-uid 001
-             :widget-name "Standard text widget"
-             :inner-html ["<p> Hi there </p>"]}]
- ::children [{::route-name "/your-career"
-              ::bg-img "your_career.jpg"
-              ::grey-bg? true
-              ::nav-hint ["Your career"]
-              ::nav-hint-style #js {:color "white"}
-              ::widgets [{:widget-uid 001
-                          :widget-name "Standard text widget"
-                          :inner-html ["<p> Hi there </p>"]}]
-              ::children []}
-             {::route-name "/meet-the-team"
-              ::bg-img "#333"
-              ::nav-hint ["Meet the team"]
-              ::nav-hint-style #js {:color "white"}
-              ::widgets [{:widget-uid 001
-                          :widget-name "Standard text widget"
-                          :inner-html ["<p> Hi there </p>"]}
-                         {:widget-uid 006
-                          :widget-name "Standard image widget"
-                          :img "http://solariarchitects.com/img/leaderboards/group_photo_everyday_zoomed.jpg"}
-                         {:widget-uid 007
-                          :widget-name "Grid"
-                          :imgs [
-                                 {:id "entry-1"
-                                  :className "mega-entry"
-                                  :data-src "http://solariarchitects.com/img/teampics/jsolari_everyday.jpg"
-                                  :data-width "320"
-                                  :data-height "400"}
-                                 {:id "entry-1-1"
-                                  :className "mega-entry"
-                                  :title "WE HAVE A LAUGH"
-                                  :text "Cue James in a bald cap, need I say more?"
-                                  :data-width "320"
-                                  :data-height "400"}
-                                 {:id "entry-2"
-                                  :className "mega-entry"
-                                  :data-src "http://solariarchitects.com/img/teampics/csolari_everyday.jpg"
-                                  :data-width "320"
-                                  :data-height "400"}
-                                 {:id "entry-2-1"
-                                  :className "mega-entry"
-                                  :title "WE HAVE A LIFE (that isn't work)"
-                                  :text "Whether you have a family of 4 small children, you coach the local badminton team or you’re into Comic-con you need to have YOUR own time to enjoy YOUR life. We respect and welcome that. Sure, there may be occasions where we all have to put in the extra mile but it’s not expected that you do it 52 weeks of the year just to get recognized OR be valued."
-                                  :data-width "320"
-                                  :data-height "400"}
-                                 {:id "entry-3"
-                                  :className "mega-entry"
-                                  :data-src "http://solariarchitects.com/img/teampics/mcane_everyday.jpg"
-                                  :data-width "320"
-                                  :data-height "400"}
-                                 {:id "entry-3-1"
-                                  :className "mega-entry"
-                                  :title "title"
-                                  :text "Hi there"
-                                  :data-width "320"
-                                  :data-height "400"}
-                                 {:id "entry-4"
-                                  :className "mega-entry"
-                                  :data-src "http://solariarchitects.com/img/teampics/mzyteka_everyday.jpg"
-                                  :data-width "320"
-                                  :data-height "400"}
-                                 {:id "entry-4-1"
-                                  :className "mega-entry"
-                                  :title "title"
-                                  :text "Hi there"
-                                  :data-width "320"
-                                  :data-height "400"}
-                                 {:id "entry-5"
-                                  :className "mega-entry"
-                                  :data-src "http://solariarchitects.com/img/teampics/maddis_everyday.jpg"
-                                  :data-width "320"
-                                  :data-height "400"}
-                                 {:id "entry-5-1"
-                                  :className "mega-entry"
-                                  :title "title"
-                                  :text "Hi there"
-                                  :data-width "320"
-                                  :data-height "400"}
-                                 {:id "entry-6"
-                                  :className "mega-entry"
-                                  :data-src "http://solariarchitects.com/img/teampics/mmarshall_everyday.jpg"
-                                  :data-width "320"
-                                  :data-height "400"}
-                                 {:id "entry-6-1"
-                                  :className "mega-entry"
-                                  :title "title"
-                                  :text "Hi there"
-                                  :data-width "320"
-                                  :data-height "400"}
-                                 {:id "entry-8"
-                                  :className "mega-entry"
-                                  :data-src "http://solariarchitects.com/img/teampics/Linda_Normal_Resized.jpg"
-                                  :data-width "320"
-                                  :data-height "400"}
-                                 ]}
-                         ]
-              ::children []}
-             {::route-name "/jobs"
-              ::bg-img "for_architects.jpg"
-              ::grey-bg? true
-              ::nav-hint ["jobs"]
-              ::nav-hint-style #js {:color "white"}
-              ::widgets [{:widget-uid 001
-                          :widget-name "Standard text widget"
-                          :inner-html ["<p> Hi there </p>"]}
-                         {:widget-uid 005
-                          :widget-name "Standard text widget"
-                          :inner-html ["<p> Hi there </p>"]}
-                         ]
-              ::children []}]}
-{::route-name "/from-us"
- ::bg-img "from_us.jpg"
- ::grey-bg? true
- ::nav-hint ["From us"]
- ::nav-hint-style #js {:color "white"}
- ::widgets []
- ::children [{::route-name "/solari-social"
-              ::bg-img "from_us.jpg"
-              ::grey-bg? true
-              ::nav-hint ["#solarisocial"]
-              ::nav-hint-style #js {:color "white"}
-              ::widgets []
-              ::children []}]}
-{::route-name "/contact"
- ::bg-img "from_uss.jpg"
- ::grey-bg? true
- ::nav-hint ["Contact"]
- ::nav-hint-style #js {:color "white"}
- ::widgets []
- ::children [{::route-name "/info"
-              ::bg-img "from_uss.jpg"
-              ::grey-bg? true
-              ::nav-hint ["Info"]
-              ::nav-hint-style #js {:color "white"}
-              ::widgets []
-              ::children []}]}]})
-(def monolith (atom {::active-route {::route-name "/from-us"
-                                     ::bg-img "home_page.jpg"
-                                     ::nav-hint ["From us"]
-                                     ::nav-hint-style #js {:color "black"}
-                                     ::widgets []
-                                     ::children []}
-                     ::current-route ["/"]
-                     ::logo-text ["Solari"]
-                     ::routes-map routes-map}))
-(= 
-    (rdr/read-string (pr-str @monolith))
-    @monolith
+  )
+(replumb/read-eval-call
+    {:preloads {:use '#{nnangpress.app}}}
+    (fn [rslt] rslt)
+    "nnangpress.app/widget-data"
+  )
+(replumb/read-eval-call
+    {:preloads {:use '#{nnangpress.app}}}
+    (fn [rslt] rslt)
+    "(nnangpress.app/widget-data 0)"
+  )
+  (replumb/read-eval-call
+    {:preloads {:use '#{nnangpress.app}}}
+    (fn [rslt] rslt)
+    "(nnangpress.app/widget-data 1)"
+  )
+(replumb/read-eval-call
+    {:preloads {:use '#{nnangpress.app}}}
+    (fn [rslt] rslt)
+    "(widget-data 1)"
+  )
+(replumb/read-eval-call
+    {:preloads {:use '#{nnangpress.app}}}
+    (fn [rslt] rslt)
+    "(nnangpress.app/widget-data 1)"
+  )
+  (widget-data 8)
+  (widget-data 9)
+(defmethod widget-data 9 [_]
+  {:widget-uid 9
+   :widget-name "Right Nav"
+   :imgs []})
+  (widget-data 9)
+(str 
+    (defmethod widget-data 9 [_]
+      {:widget-uid 9
+       :widget-name "Right Nav"
+       :imgs []}))
+(str 
+    '(defmethod widget-data 9 [_]
+      {:widget-uid 9
+       :widget-name "Right Nav"
+       :imgs []}))
+(rdr/read-string 
+    (str 
+      '(defmethod widget-data 9 [_]
+         {:widget-uid 9
+          :widget-name "Right Nav"
+          :imgs []}))  
     )
-(pr-str @monolith)
-    (rdr/read-string (pr-str @monolith))
-    (first (rdr/read-string (pr-str @monolith))) 
-(pr-str @monolith)
-(= 
-   @monolith 
+(rdr/read-string 
+    (str 
+      (defmethod widget-data 9 [_]
+         {:widget-uid 9
+          :widget-name "Right Nav"
+          :imgs []}))  
     )
-(=
-    (rdr/read-string (pr-str @monolith))
-    @monolith
+  (widget-data 9)
+(rdr/read-string 
+    (str 
+      (defmethod widget-data 10 [_]
+         {:widget-uid 10 
+          :widget-name "Right Nav"
+          :imgs []}))  
     )
-(pr-str @monolith)
-(rdr/read-string (pr-str @monolith))
-  (def uid "SGXvf26OEpeVDQ79XIH2V71fVnT2")
-  (->
-    (js/firebase.database)
-    (.ref (str "users/" uid)))
-(->
-    user-data-ref
-    (.set #js {:username "wellwell"
-               :email "leon.talbert@gmail.com"
-               :data (pr-str @monolith)
-               }))
-  (def user-data-ref (->
-                       (js/firebase.database)
-                       (.ref (str "users/" uid))))
-(->
-    user-data-ref
-    (.set #js {:username "wellwell"
-               :email "leon.talbert@gmail.com"
-               :data (pr-str @monolith)
-               }))
-l
-@monolith
-user-data-erf
-user-data-ref
-  (def uid "SGXvf26OEpeVDQ79XIH2V71fVnT2")
-  (def user-data-ref (->
-                       (js/firebase.database)
-                       (.ref (str "users/" uid))))
-(->
-    user-data-ref
-    (.set #js {:username "wellwell"
-               :email "leon.talbert@gmail.com"
-               :data  (clj->js @monolith)
-               }))
-(->
-    user-data-ref
-    (.set #js {:username "wellwell"
-               :email "leon.talbert@gmail.com"
-               :data  (pr-str @monolith)
-               }))
-(->
-    user-data-ref
-    (.set #js {:username "wellwell"
-               :email "leon.talbert@gmail.com"
-               :data  (pr-str @monolith)
-               }))
-(->
-    user-data-ref
-    (.set #js {:username "wellwell"
-               :email "leon.talbert@gmail.com"
-               :data  (pr-str @monolith)
-               }))
-  (def uid "SGXvf26OEpeVDQ79XIH2V71fVnT2")
-(def user-data-ref (->
-                       (js/firebase.database)
-                       (.ref (str "users/" uid))))
-(->
-    user-data-ref
-    (.set #js {:username "wellwell"
-               :email "leon.talbert@gmail.com"
-               :data  (pr-str @monolith)
-               }))
-l
-(str :hi)
-(name :hi)
-l
-  (def uid "SGXvf26OEpeVDQ79XIH2V71fVnT2")
-  (def user-data-ref (->
-                       (js/firebase.database)
-                       (.ref (str "users/" uid))))
-(->
-    user-data-ref
-    (.set #js {:username "wellwell"
-               :email "leon.talbert@gmail.com"
-               :data  (pr-str @monolith)
-               }))
-gl
-(map 
-    println 
-    {:widget-uid 001
-     :widget-name "Standard text widget"
-     :inner-html ["<p> Hi there </p>"]}
+  (widget-data 10)
+  (replumb/read-eval-call
+    {:preloads {:use '#{nnangpress.app}}}
+    (fn [rslt] rslt)
+    "(nnangpress.app/widget-data 1)"
+  )
+(str (.log js/console "hi there"))
+(replumb/read-eval-call
+    {:preloads {:use '#{nnangpress.app}}}
+    (fn [rslt] rslt)
+    (str (.log js/console "hi there"))
+  )
+(replumb/read-eval-call
+    {:preloads {:use '#{nnangpress.app}}}
+    (fn [rslt] rslt)
+    (str (.log js/console "hi there"))
+  )
+(str (def ))
+(str '(def ))
+(str '(def this "that"))
+(replumb/read-eval-call
+      {:preloads {:use '#{nnangpress.app}}}
+      (fn [rslt] rslt)
+      (str '(def this "that")))
+this
+(replumb/read-eval-call
+      {:preloads {:use '#{nnangpress.app}}}
+      (fn [rslt] rslt)
+      (str '(def nnangpress.app/this "that")))
+this
+(replumb/read-eval-call
+      {:preloads {:use '#{nnangpress.app}}}
+      (fn [rslt] rslt)
+      (str '(def this "that")))
+cljs.user/this
+nnangpress.app/this
+    (replumb/read-eval-call
+      {:preloads {:use '#{nnangpress.app}}}
+      (fn [rslt] rslt)
+      (str '(def this "that")))
+    (replumb/read-eval-call
+      {:init-fn! (fn [bla] (println bla))
+       :preloads {:use '#{nnangpress.app}}}
+      (fn [rslt] rslt)
+      (str '(def this "that")))
+  (replumb/read-eval-call
+    {:preloads {:use '#{nnangpress.app}}}
+    (fn [rslt] rslt)
+    (str '(+ 10 10)) 
     )
-  (def uid "SGXvf26OEpeVDQ79XIH2V71fVnT2")
-l
-(map println {:hi "hi" :there "there})
-(map prn {:hi "hi" :there "there"})
-(start-repl)
-(ns nnangpress.app
-  (:import [goog.history Html5History EventType])
-  (:require-macros [cljs.core.async.macros :refer  [go go-loop]])
-  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
-            [om.dom :as dom :include-macros true]
-            [clojure.spec :as s]
-            [cljs.core.async :as cas :refer [>! <! put! chan pub sub close!]]
-            [cljs.reader :as rdr]
-            [goog.events :as ev]
-            [goog.dom :as gdom]
-            [ajax.core :refer [GET POST]]))
-  (GET "/edn/defaultdata.edn")
-  (GET "/edn/defaltdata.edn")
-  (GET "/edn/defaultdata.edn")
-  (GET "/edn/defaultdata.edn"
-       {:handler (fn [resp]
-                   (println "hi " resp)
-                   )})
-(GET "/edn/defaultdata.edn"
-       {:handler (fn [resp]
-                   (println "hi " (type resp))
-                   )})
-(GET "/edn/defaultdata.edn"
-       {:handler (fn [resp]
-                   (println "hi " (type (rdr/read-string resp)))
-                   )})
-dd/routes-map
-(js-obj {:hi "there"})
-(clj->js {:hi "there"})
-  (defn outer []
-    (defn inner [x] x)
+(replumb/read-eval-call
+    {:preloads {:use '#{nnangpress.app}}}
+    (fn [rslt] rslt)
+    (str '(defmethod nnangpress.app/widget-data 10 [_]
+            {:widget-uid 10 
+             :widget-name "Right Nav"
+             :imgs []})) 
     )
-(inner 4)
-(outer)
-(inner 4)
-(start-repl)
-(in-ns 'nnangpress.app)
-(ns nnangpress.app
-  (:import [goog.history Html5History EventType])
-  (:require-macros [cljs.core.async.macros :refer  [go go-loop]])
-  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
-            [om.dom :as dom :include-macros true]
-            [clojure.spec :as s]
-            [cljs.core.async :as cas :refer [>! <! put! chan pub sub close!]]
-            [cljs.reader :as rdr]
-            [goog.events :as ev]
-            [goog.dom :as gdom]
-            [ajax.core :refer [GET POST]]))
-  (GET "/edn/routingwidget.edn")
-  (def cache (atom {}))
-(GET "/edn/defaultdata.edn"
-       {:handler (fn [resp]
-                   (reset! cache (rdr/read-string resp))
-                   )})
-@cache
-(GET "/edn/routingwidget.edn"
-       {:handler (fn [resp]
-                   (reset! cache (rdr/read-string resp))
-                   )})
-@cache
-(type @cache)
-  (type (:components @cache))
-(:components @cache)
-(first (:components @cache))
-  (eval (first (:components @cache)))
+  (widget-data 10)
+(replumb/read-eval-call
+    {:preloads {:use '#{nnangpress.app}}}
+    (fn [rslt] rslt)
+    (str '(defmethod nnangpress.app/widget-data 10 [_]
+            {:widget-uid 10 
+             :widget-name "Right Nav lol"
+             :imgs []})) 
+    )
+  (widget-data 10)
+(replumb/read-eval-call
+      {:preloads {:use '#{nnangpress.app}}}
+      (fn [rslt] 
+        rslt
+        (println (widget-data 10)))
+      (str '(defmethod nnangpress.app/widget-data 10 [_]
+              {:widget-uid 10 
+               :widget-name "Right Nav lol"
+               :imgs []})) 
+      )
+(replumb/read-eval-call
+    {:preloads {:use '#{nnangpress.app}}}
+    (fn [rslt] rslt)
+    (str '(defmethod widget 000 [data owner]
+            (reify
+              om/IInitState
+              (init-state [_]
+                {:uuid (random-uuid)})
+              om/IRenderState
+              (render-state [_ {:keys [uuid] :as state}]
+                (dom/div nil "Skeleton Widget"))))) 
+    )
+(replumb/read-eval-call
+    {:preloads {:use '#{nnangpress.app}}}
+    (fn [rslt] rslt)
+    (str '(defmethod nnangpress.app/widget 000 [data owner]
+            (reify
+              om/IInitState
+              (init-state [_]
+                {:uuid (random-uuid)})
+              om/IRenderState
+              (render-state [_ {:keys [uuid] :as state}]
+                (dom/div nil "Skeleton Widget"))))) 
+    )
+(replumb/read-eval-call
+    {:preloads {:require '#{nnangpress.app
+                            [om.dom :as dom]}
+                }}
+    (fn [rslt] rslt)
+    (str '(defmethod nnangpress.app/widget 000 [data owner]
+            (reify
+              om/IInitState
+              (init-state [_]
+                {:uuid (random-uuid)})
+              om/IRenderState
+              (render-state [_ {:keys [uuid] :as state}]
+                (dom/div nil "Skeleton Widget"))))) 
+    )
+(replumb/read-eval-call
+    {:preloads {:require '#{nnangpress.app
+                            [om.dom :as dom]}
+                }}
+    (fn [rslt] rslt)
+    (str '(defmethod nnangpress.app/widget 000 [data owner]
+            (reify
+              om/IInitState
+              (init-state [_]
+                {:uuid (random-uuid)})
+              om/IRenderState
+              (render-state [_ {:keys [uuid] :as state}]
+                (om.dom/div nil "Skeleton Widget"))))) 
+    )
+(replumb/read-eval-call
+    {:preloads {:require '#{nnangpress.app
+                            [om.dom :as dom :include-macros true]}
+                }}
+    (fn [rslt] rslt)
+    (str '(defmethod nnangpress.app/widget 000 [data owner]
+            (reify
+              om/IInitState
+              (init-state [_]
+                {:uuid (random-uuid)})
+              om/IRenderState
+              (render-state [_ {:keys [uuid] :as state}]
+                (om.dom/div nil "Skeleton Widget"))))) 
+    )
+(replumb/read-eval-call
+    {:preloads {:require '#{nnangpress.app
+                            [om.dom :as dom :include-macros true]}
+                }}
+    (fn [rslt] rslt)
+    (str '(defmethod nnangpress.app/widget 000 [data owner]
+            (reify
+              om/IInitState
+              (init-state [_]
+                {:uuid (random-uuid)})
+              om/IRenderState
+              (render-state [_ {:keys [uuid] :as state}]
+                (dom/div nil "Skeleton Widget"))))) 
+    )
+(replumb/read-eval-call
+    {:preloads {:require '#{nnangpress.app}
+                }}
+    (fn [rslt] rslt)
+    (str '(defmethod nnangpress.app/widget 000 [data owner]
+            (reify
+              om/IInitState
+              (init-state [_]
+                {:uuid (random-uuid)})
+              om/IRenderState
+              (render-state [_ {:keys [uuid] :as state}]
+                (dom/div nil "Skeleton Widget"))))) 
+    )
+(replumb/read-eval-call
+    {:preloads {:use '#{nnangpress.app}}}
+    (fn [rslt] rslt)
+    (str '(defmethod nnangpress.app/widget-data 10 [_]
+            {:widget-uid 10 
+             :widget-name "Right Nav lol"
+             :imgs []})) 
+    )
+(replumb/read-eval-call
+    {:preloads {:use '#{nnangpress.app}}}
+    (fn [rslt] rslt)
+    (str '(defmethod nnangpress.app/widget-data 10 [_]
+            {:widget-uid 10 
+             :widget-name "Right Nav lol"
+             :imgs []})) 
+    )
+(rdr/read-string 
+    (str 
+      (defmethod widget-data 10 [_]
+        {:widget-uid 10 
+         :widget-name "Right Nav"
+         :imgs []}))  
+    )
+(rdr/read-string 
+    (str 
+      '(defmethod widget-data 10 [_]
+        {:widget-uid 10 
+         :widget-name "Right Nav"
+         :imgs []}))  
+    )
+(str 
+      '(defmethod widget-data 10 [_]
+        {:widget-uid 10 
+         :widget-name "Right Nav"
+         :imgs []}))
+(str 
+      (defmethod widget-data 10 [_]
+        {:widget-uid 10 
+         :widget-name "Right Nav"
+         :imgs []}))
+(rdr/read-string 
+    (str 
+      '(defmethod widget-data 10 [_]
+        {:widget-uid 10 
+         :widget-name "Right Nav"
+         :imgs []}))  
+    )
+(rdr/read-string 
+    (str 
+      '(+ 1 2))  
+    )
+(rdr/read-string 
+    (str 
+      (+ 1 2))  
+    )
+(rdr/read-string 
+  "(+ 1 2)"
+    )
+(replumb/read-eval-call
+    {:preloads {:require '#{nnangpress.app}
+                }}
+    (fn [rslt] rslt)
+    (str '(defmethod nnangpress.app/widget 000 [data owner]
+            (reify
+              om/IInitState
+              (init-state [_]
+                {:uuid (random-uuid)})
+              om/IRenderState
+              (render-state [_ {:keys [uuid] :as state}]
+                (dom/div nil "Skeleton Widget"))))) 
+    )
+(replumb/read-eval-call
+    {:preloads {:require '#{nnangpress.app}
+                }}
+    (fn [rslt] rslt)
+    (str '(defmethod nnangpress.app/widget 000 [data owner]
+            (reify
+              om/IInitState
+              (init-state [_]
+                {:uuid (random-uuid)})
+              om/IRenderState
+              (render-state [_ {:keys [uuid] :as state}]
+                (dom/div nil "Skeleton Widget"))))) 
+    )
+(replumb/read-eval-call
+    {:preloads {:use '#{nnangpress.app}}}
+    (fn [rslt] rslt)
+    (str '(defmethod nnangpress.app/widget-data 10 [_]
+            {:widget-uid 10 
+             :widget-name "Right Nav lol"
+             :imgs []})) 
+    )
+(replumb/read-eval-call
+    {:preloads {:require '#{nnangpress.app}
+                }}
+    (fn [rslt] rslt)
+    (str 
+      '(ns nnangpress.app
+        (:import [goog.history Html5History EventType])
+        (:require-macros [cljs.core.async.macros :refer  [go go-loop]])
+        (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+                  [om.dom :as dom :include-macros true]
+                  [clojure.spec :as s]
+                  [cljs.core.async :as cas :refer [>! <! put! chan pub sub close!]]
+                  [cljs.reader :as rdr]
+                  [goog.events :as ev]
+                  [goog.dom :as gdom]
+                  [ajax.core :refer [GET POST]]
+                  [replumb.core :as replumb]))
+      ) 
+    )
+(replumb/read-eval-call
+    {:preloads {:require '#{nnangpress.app}
+                }}
+    (fn [rslt] rslt)
+    (str 
+      '(ns nnangpress.app
+        (:require-macros [cljs.core.async.macros :refer  [go go-loop]])
+        )
+      ) 
+    )
+(replumb/read-eval-call
+    {:preloads {:require '#{nnangpress.app}}
+     :src-paths ["js/app.js"]}
+    (fn [rslt] rslt)
+    (str '(defmethod nnangpress.app/widget 000 [data owner]
+            (reify
+              om/IInitState
+              (init-state [_]
+                {:uuid (random-uuid)})
+              om/IRenderState
+              (render-state [_ {:keys [uuid] :as state}]
+                (dom/div nil "Skeleton Widget"))))) 
+    )
+(replumb/read-eval-call
+    {:preloads {:require '#{nnangpress.app}}
+     :src-paths ["js/app.js"]}
+    (fn [rslt] rslt)
+    (str '(defmethod nnangpress.app/widget 000 [data owner]
+            (reify
+              om/IInitState
+              (init-state [_]
+                {:uuid (random-uuid)})
+              om/IRenderState
+              (render-state [_ {:keys [uuid] :as state}]
+                (om.dom/div nil "Skeleton Widget"))))) 
+    )
+(replumb/read-eval-call
+    {:preloads {:require '#{nnangpress.app}}
+     :src-paths ["js/app.js"]}
+    (fn [rslt] rslt)
+    (str '(defmethod nnangpress.app/widget 000 [data owner]
+            (reify
+              om/IInitState
+              (init-state [_]
+                {:uuid (random-uuid)})
+              om/IRenderState
+              (render-state [_ {:keys [uuid] :as state}]
+                (om.dom/div nil "Skeleton Widget"))))) 
+    )
+(replumb/read-eval-call
+    {:preloads {:require '#{[om.dom :as dom :include-macros true]}}
+     :src-paths ["js/app.js"]}
+    (fn [rslt] rslt)
+    (str '()) 
+    )
+(replumb/read-eval-call
+    {:preloads {:require '#{[om.dom :as dom :include-macros true]}}
+     :src-paths ["js/app.js"]}
+    (fn [rslt] rslt)
+    (str 'dom/div) 
+    )
+(replumb/read-eval-call
+    {:preloads {:require '#{[om.dom :as dom :include-macros true]}}
+     :src-paths ["js/app.js"]}
+    (fn [rslt] rslt)
+    (str 'om.dom/div) 
+    )
+(replumb/read-eval-call
+    {:preloads {:require '#{}}
+     :src-paths ["js/app.js"]}
+    (fn [rslt] rslt)
+    (str 'om.dom/div) 
+    )
+(replumb/read-eval-call
+    {:preloads {:require '#{}}
+     :src-paths ["js/app.js"]}
+    (fn [rslt] rslt)
+    (str 'om.dom/div) 
+    )
+(replumb/read-eval-call
+    {:preloads {:require '#{nnangpress.app}}
+     :src-paths ["js/app.js"]}
+    (fn [rslt] rslt)
+    (str '(defmethod nnangpress.app/widget 000 [data owner]
+            (reify
+              om/IInitState
+              (init-state [_]
+                {:uuid (random-uuid)})
+              om/IRenderState
+              (render-state [_ {:keys [uuid] :as state}]
+                (om.dom/div nil "Skeleton Widget"))))) 
+    )
+(replumb/read-eval-call
+      {:preloads {:require '#{nnangpress.app}
+                  }}
+      (fn [rslt] (println rslt))
+      (str '(require '[om.dom :as dom :include-macros true])) 
+      )
+(replumb/read-eval-call
+      (merge (replumb/browser-options ["/js" "/js/app.out"]
+                                      io/fetch-file!)
+             {:warning-as-error true}
+             (fn [rslt] (println rslt))
+             (str '(require '[om.dom :as dom :include-macros true])) 
+             )
+      )
+(replumb/read-eval-call
+      (merge (replumb/browser-options ["/js" "/js/app.out"]
+                                      io/fetch-file!)
+             {:warning-as-error true}
+             )
+      (fn [rslt] (println rslt))
+      (str '(require '[om.dom :as dom :include-macros true]))
+      )
+(replumb/browser-options ["/js" "/js/app.out"]
+                                      io/fetch-file!)
 (ns nnangpress.app
   (:import [goog.history Html5History EventType])
   (:require-macros [cljs.core.async.macros :refer  [go go-loop]])
@@ -415,86 +472,29 @@ dd/routes-map
             [goog.events :as ev]
             [goog.dom :as gdom]
             [ajax.core :refer [GET POST]]
-            [cljs.js :refer [empty-state eval js-eval]]))
-(defn eval-form [s]
-    (eval  (empty-state)
-          s 
-          {:eval       js-eval
-           :source-map true
-           :context    :expr}
-          (fn  [result] result)))
-  (eval-form (+ 1 2))
-@cache
-  (def cache (atom {}))
-  (GET "/edn/routingwidget.edn"
-       {:handler (fn [resp] (reset! cache (rdr/read-string resp)))})
-(first (:components @cache))
-  (eval-form (first (:components @cache)))
-  (GET "/edn/routingwidget.edn"
-       {:handler (fn [resp] (reset! cache (rdr/read-string resp)))})
-@cache
-  (GET "/edn/routingwidget.edn"
-       {:handler (fn [resp] (reset! cache (rdr/read-string resp)))})
-@cache
-  (eval-form ~(first (:components @cache)))
-(:components @cache)
-(first (:components @cache))
-~(first (:components @cache))
-(unqtuoe (first (:components @cache)))
-  (eval-form (unquote (first (:components @cache))) )
-  (GET "/edn/routingwidget.edn"
-       {:handler (fn [resp] (reset! cache (rdr/read-string resp)))})
-(first (:components @cache))
-  (def cache (atom {}))
-  (GET "/edn/routingwidget.edn"
-       {:handler (fn [resp] (reset! cache (rdr/read-string resp)))})
-(first (:components @cache))
-  (eval-form (first (:components @cache)))
-(first (:components @cache))
-@cache
-  (def cache (atom {}))
-  (eval @cache)
-  (eval-form @cache)
-(eval (empty-state)
-        (+ 2 3) 
-        {:eval       js-eval
-         :source-map true
-         :ns 'nnangpress.app
-         :context    :expr}
-        (fn  [result] result))
-  (eval (empty-state)
-        (rdr/read-string "(+ 2 3)") 
-        {:eval       js-eval
-         :source-map true
-         :ns 'nnangpress.app
-         :context    :expr}
-        (fn  [result] result))
-  (eval (empty-state)
-        (rdr/read-string "(+ 2 3)") 
-        {:eval       js-eval
-         :source-map true
-         :context    :expr}
-        (fn  [result] result))
-  (eval (empty-state)
-        (rdr/read-string "(+ 2 3)") 
-        {:eval       js-eval
-         :source-map true
-         :context    :expr}
-        (fn  [result] result))
-  (GET "/edn/routingwidget.edn"
-       {:handler (fn [resp] (reset! cache (rdr/read-string resp)))})
-(first (:components @cache))
-  (eval (empty-state)
-(first (:components @cache))
-        {:eval       js-eval
-         :source-map true
-         :ns 'nnangpress.app
-         :context    :expr}
-        (fn  [result] result))
-  (eval (empty-state)
-        (list (first (:components @cache))) 
-        {:eval       js-eval
-         :source-map true
-         :ns 'nnangpress.app
-         :context    :expr}
-        (fn  [result] result))
+            [replumb.core :as replumb]
+            [replumb.browser.io :as io]))
+(ns nnangpress.app
+  (:import [goog.history Html5History EventType])
+  (:require-macros [cljs.core.async.macros :refer  [go go-loop]])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [clojure.spec :as s]
+            [cljs.core.async :as cas :refer [>! <! put! chan pub sub close!]]
+            [cljs.reader :as rdr]
+            [goog.events :as ev]
+            [goog.dom :as gdom]
+            [ajax.core :refer [GET POST]]
+            [replumb.core :as replumb]
+            [replumb.browser.io :as io]))
+(str 
+'(require '[om.dom :as dom :include-macros true])
+'(defmethod nnangpress.app/widget 1 [data owner]
+             (reify
+               om/IInitState
+               (init-state [_]
+                 {:uuid (random-uuid)})
+               om/IRenderState
+               (render-state [_ {:keys [uuid] :as state}]
+                 (om.dom/div nil "Skeleton Widget"))))
+        )
