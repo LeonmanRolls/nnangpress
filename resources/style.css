@@ -43,8 +43,15 @@ p {
 }
 
 .edit {
-  color: red;
-  background: black;
+  color: white;
+  background: #494949;
+  padding: 10px;
+}
+
+.selectWidget {
+    border: 1px white solid;
+    padding: 5px;
+    margin: 5px;
 }
 
 .grey-out {

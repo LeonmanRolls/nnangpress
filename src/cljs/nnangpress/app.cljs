@@ -13,7 +13,7 @@
 
 (enable-console-print!)
 
-(declare edit-mode)
+(declare edit-mode widget)
 
 ;Utils Start -----
 (defn tree-seq-path [branch? children root & [node-fn]]
@@ -78,6 +78,15 @@
                                                (fn [dabool]
                                                  [(not (first dabool))] )))}
                              "Toogle edit mode"))))))
+
+(defn select-widget-wrapper [{:keys [widget-name] :as data} owner]
+  (reify 
+    om/IRender 
+    (render [_]
+      (dom/div #js {:className "selectWidget"} 
+               widget-name 
+               (dom/button nil "Add widget")
+               (om/build widget data {:init-state {:advertise? true}})))))
 ;Core End -----
 
 (def monolith (atom {}))
@@ -685,9 +694,10 @@
 
                  (when (first @edit-mode-obs)
                    (dom/div #js {:className "edit"}
+
                             (apply dom/div nil 
-                                   (om/build-all widget all-widgets-data-obs 
-                                                 {:init-state {:advertise? true}}))
+                                   (om/build-all select-widget-wrapper all-widgets-data-obs))
+
                             "add widget: " (dom/input #js {:ref "add-widget"})
                             (dom/button #js {:onClick (fn [_] (add-widget data))} "Submit")
                             (om/build remove-element data {:state {:label "Remove widget"}}))))))))
@@ -788,33 +798,6 @@
       om/IRenderState
       (render-state [_ {:keys [uuid] :as state}]
         (dom/div nil "Skeleton Widget"))))
-
-  (def cache (atom {}))
-
-  (GET "/edn/routingwidget.edn"
-       {:handler (fn [resp] (reset! cache (rdr/read-string resp)))})
-
-  (type (first (:components @cache)))
-  (eval-form @cache)
-
-  (defn eval-form [s]
-    (eval (empty-state)
-          s
-          {:eval       js-eval
-           :source-map true
-           :context    :expr}
-          (fn  [result] result)))
-
-  (eval (empty-state)
-        (list (first (:components @cache)))
-        {:eval       js-eval
-         :source-map true
-         :ns 'nnangpress.app
-         :context    :expr}
-        (fn  [result] result))
-
-  (eval-form (+ 1 2))
-  (eval-form (first (:components @cache)))
 
   )
 
