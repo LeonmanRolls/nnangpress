@@ -248,25 +248,48 @@
   (reify
     om/IInitState
     (init-state [_]
-      {:uuid (random-uuid)})
+      {:uuid (random-uuid)
+       :advertise? false})
 
     om/IDidMount
     (did-mount [_]
-      (let [uuid (.toString (om/get-state owner :uuid)) ]
-        (js/Medium. #js {:element (.getElementById js/document uuid)
-                         :mode js/Medium.richMode
-                         :placeholder "Your Text here"
-                         :modifiers #js {:q (fn [event element]
-                                              (om/update!
-                                                data
-                                                :inner-html
-                                                [(.-innerHTML (gdom/getElement uuid))]))}})))
+      (let [uuid (.toString (om/get-state owner :uuid))
+            advertise? (om/get-state owner :advertise?)
+            edit-mode-obs (om/observe owner (edit-mode))]
+
+        (when (and (first @edit-mode-obs) (not advertise?))
+          (js/Medium. #js {:element (.getElementById js/document uuid)
+                           :mode js/Medium.richMode
+                           :placeholder "Your Text here"
+                           :modifiers #js {:q (fn [event element]
+                                                (om/update!
+                                                  data
+                                                  :inner-html
+                                                  [(.-innerHTML (gdom/getElement uuid))]))}}))))
+
+    om/IDidUpdate
+    (did-update [_ _ _]
+      (let [uuid (.toString (om/get-state owner :uuid))
+            advertise? (om/get-state owner :advertise?)
+            edit-mode-obs (om/observe owner (edit-mode))]
+
+        (when (and (first @edit-mode-obs) (not advertise?))
+          (js/Medium. #js {:element (.getElementById js/document uuid)
+                           :mode js/Medium.richMode
+                           :placeholder "Your Text here"
+                           :modifiers #js {:q (fn [event element]
+                                                (om/update!
+                                                  data
+                                                  :inner-html
+                                                  [(.-innerHTML (gdom/getElement uuid))]))}}))))
 
     om/IRenderState
     (render-state [_ {:keys [uuid] :as state}]
-      (dom/div #js {:id (.toString uuid)
-                    :style #js {:color "black"}
-                    :dangerouslySetInnerHTML #js {:__html (first (:inner-html data))}}))))
+      (let [edit-mode-obs (om/observe owner (edit-mode))]
+
+        (dom/div #js {:id (.toString uuid)
+                      :style #js {:color "black"}
+                      :dangerouslySetInnerHTML #js {:__html (first (:inner-html data))}})))))
 
 (defmethod widget-data 003 [_]
   {:widget-uid 003
@@ -278,25 +301,48 @@
   (reify
     om/IInitState
     (init-state [_]
-      {:uuid (random-uuid)})
+      {:uuid (random-uuid)
+       :advertise? false})
 
     om/IDidMount
     (did-mount [_]
-      (let [uuid (.toString (om/get-state owner :uuid)) ]
-        (js/Medium. #js {:element (.getElementById js/document uuid)
-                         :mode js/Medium.richMode
-                         :placeholder "Your Text here"
-                         :modifiers #js {:q (fn [event element]
-                                              (om/update!
-                                                data
-                                                :inner-html
-                                                [(.-innerHTML (gdom/getElement uuid))]))}})))
+      (let [uuid (.toString (om/get-state owner :uuid))
+            advertise? (om/get-state owner :advertise?)
+            edit-mode-obs (om/observe owner (edit-mode))]
+
+        (when (and (first @edit-mode-obs) (not advertise?))
+          (js/Medium. #js {:element (.getElementById js/document uuid)
+                           :mode js/Medium.richMode
+                           :placeholder "Your Text here"
+                           :modifiers #js {:q (fn [event element]
+                                                (om/update!
+                                                  data
+                                                  :inner-html
+                                                  [(.-innerHTML (gdom/getElement uuid))]))}}))))
+
+    om/IDidUpdate
+    (did-update [_ _ _]
+      (let [uuid (.toString (om/get-state owner :uuid))
+            advertise? (om/get-state owner :advertise?)
+            edit-mode-obs (om/observe owner (edit-mode))]
+
+        (when (and (first @edit-mode-obs) (not advertise?)) 
+          (js/Medium. #js {:element (.getElementById js/document uuid)
+                           :mode js/Medium.richMode
+                           :placeholder "Your Text here"
+                           :modifiers #js {:q (fn [event element]
+                                                (om/update!
+                                                  data
+                                                  :inner-html
+                                                  [(.-innerHTML (gdom/getElement uuid))]))}}))))
 
     om/IRenderState
     (render-state [_ {:keys [uuid] :as state}]
-      (dom/div #js {:id (.toString uuid)
-                    :className "box-paragraph"
-                    :dangerouslySetInnerHTML #js {:__html (first (:inner-html data))}}))))
+      (let [edit-mode-obs (om/observe owner (edit-mode))]
+
+        (dom/div #js {:id (.toString uuid)
+                      :className "box-paragraph"
+                      :dangerouslySetInnerHTML #js {:__html (first (:inner-html data))}})))))
 
 (defmethod widget-data 004 [_]
   {:widget-uid 004
@@ -315,6 +361,7 @@
     (init-state [_]
       (let [uuid (str "a" (subs (.toString (random-uuid)) 0 5))]
         {:uuid uuid
+         :advertise? false
          :accordion-sub
          (fn [{:keys [title sub] :as data} owner]
            (reify
@@ -342,18 +389,23 @@
 
     om/IRenderState
     (render-state [_ {:keys [accordion-sub] :as state}]
-      (dom/div nil
-               (dom/div #js {:className "accordion"}
-                        (apply dom/dl nil (om/build-all accordion-sub text)))
-               (dom/button
-                 #js{:onClick (fn [_] (om/transact!
-                                        text
-                                        (fn [text]
-                                          (conj text {:title (widget-data 001)
-                                                      :sub (widget-data 001)}))))}
-                 "Add Section")
+      (let [advertise? (om/get-state owner :advertise?)
+            edit-mode-obs (om/observe owner (edit-mode))]
+        (dom/div nil
+                 (dom/div #js {:className "accordion"}
+                          (apply dom/dl nil (om/build-all accordion-sub text)))
 
-               (om/build remove-element text {:state {:label "remove accordion section"}})))))
+                 (when (and (first @edit-mode-obs) (not advertise?))
+                   (dom/div nil 
+                            (dom/button
+                              #js{:onClick (fn [_] (om/transact!
+                                                     text
+                                                     (fn [text]
+                                                       (conj text {:title (widget-data 001)
+                                                                   :sub (widget-data 001)}))))}
+                              "Add Section")
+                            (om/build remove-element text 
+                                      {:state {:label "remove accordion section"}}))))))))
 
 (defmethod widget-data 005 [_]
   {:widget-uid 005
@@ -365,19 +417,40 @@
   (reify
     om/IInitState
     (init-state [_]
-      {:uuid (random-uuid)})
+      {:uuid (random-uuid)
+       :active? false})
 
     om/IDidMount
     (did-mount [_]
-      (let [uuid (.toString (om/get-state owner :uuid)) ]
-        (js/Medium. #js {:element (.getElementById js/document uuid)
-                         :mode js/Medium.richMode
-                         :placeholder "Your Text here"
-                         :modifiers #js {:q (fn [event element]
-                                              (om/update!
-                                                data
-                                                :inner-html
-                                                [(.-innerHTML (gdom/getElement uuid))]))}})))
+      (let [uuid (.toString (om/get-state owner :uuid)) 
+            advertise? (om/get-state owner :advertise?)
+            edit-mode-obs (om/observe owner (edit-mode))]
+
+        (when (and (first @edit-mode-obs) (not advertise?))
+          (js/Medium. #js {:element (.getElementById js/document uuid)
+                           :mode js/Medium.richMode
+                           :placeholder "Your Text here"
+                           :modifiers #js {:q (fn [event element]
+                                                (om/update!
+                                                  data
+                                                  :inner-html
+                                                  [(.-innerHTML (gdom/getElement uuid))]))}}))))
+
+    om/IDidUpdate 
+    (did-update [_ _ _]
+      (let [uuid (.toString (om/get-state owner :uuid)) 
+            advertise? (om/get-state owner :advertise?)
+            edit-mode-obs (om/observe owner (edit-mode))]
+
+        (when (and (first @edit-mode-obs) (not advertise?))
+          (js/Medium. #js {:element (.getElementById js/document uuid)
+                           :mode js/Medium.richMode
+                           :placeholder "Your Text here"
+                           :modifiers #js {:q (fn [event element]
+                                                (om/update!
+                                                  data
+                                                  :inner-html
+                                                  [(.-innerHTML (gdom/getElement uuid))]))}}))))
 
     om/IRenderState
     (render-state [_ {:keys [uuid] :as state}]
@@ -395,19 +468,22 @@
   (reify
     om/IInitState
     (init-state [_]
-      {:uuid (random-uuid)})
+      {:uuid (random-uuid)
+       :advertise? false})
 
     om/IRenderState
     (render-state [_ {:keys [uuid] :as state}]
-      (dom/div nil
-               (println "type: " (type img))
-               (dom/img #js {:style #js {:width "100%"}
-                             :src img})
+      (let [advertise? (om/get-state owner :advertise?)
+            edit-mode-obs (om/observe owner (edit-mode))]
 
-               (dom/input #js {:value img
-                               :style #js {:width "100%"}
-                               :onChange (fn [e]
-                                           (om/update! data :img (.. e -target -value)))})))))
+        (dom/div nil
+                 (dom/img #js {:style #js {:width "100%"}
+                               :src img})
+                 (when (and (first @edit-mode-obs) (not advertise?)) 
+                   (dom/input #js {:value img
+                                   :style #js {:width "100%"}
+                                   :onChange (fn [e]
+                                               (om/update! data :img (.. e -target -value)))})))))))
 
 (defmethod widget-data 007 [_]
   {:widget-uid 007
@@ -430,6 +506,7 @@
     (init-state [_]
       (let [uuid (.toString (random-uuid))]
         {:uuid uuid
+         :advertise? false
          :default-img (fn []
                         {:id (.toString (random-uuid))
                          :className "mega-entry"
@@ -510,7 +587,7 @@
           (.megafoliopro #js {}))))
 
     om/IRenderState
-    (render-state [_ {:keys [widget-img widget-text text-or-img default-img default-text]
+    (render-state [_ {:keys [widget-img widget-text text-or-img default-img default-text advertise?]
                       :as state}]
       (let [edit-mode-obs (om/observe owner (edit-mode))]
         (dom/div nil
@@ -524,7 +601,7 @@
                                                                     widget-text)
                                                                   imgs))}}))
 
-                 (when (first @edit-mode-obs)
+                 (when (and (first @edit-mode-obs) (not advertise?))
 
                    (dom/div nil 
                             (apply dom/div nil
@@ -559,6 +636,7 @@
    :widget-name "Right Nav"
    :imgs []})
 
+;Small right nav 
 (defmethod widget 8 [{:keys [lis] :as data} owner]
   (reify
     om/IInitState
@@ -607,7 +685,9 @@
 
                  (when (first @edit-mode-obs)
                    (dom/div #js {:className "edit"}
-                            (apply dom/div nil (om/build-all widget all-widgets-data-obs))
+                            (apply dom/div nil 
+                                   (om/build-all widget all-widgets-data-obs 
+                                                 {:init-state {:advertise? true}}))
                             "add widget: " (dom/input #js {:ref "add-widget"})
                             (dom/button #js {:onClick (fn [_] (add-widget data))} "Submit")
                             (om/build remove-element data {:state {:label "Remove widget"}}))))))))

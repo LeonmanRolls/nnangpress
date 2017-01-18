@@ -9,6 +9,23 @@
  :all-widgets-data [{:widget-uid 001
                      :widget-name "Standard text widget"
                      :inner-html ["<p> Hi there </p>"]}
+                    {:widget-uid 003
+                     :widget-name "Standard text widget"
+                     :inner-html ["<p> Hi there </p>"]}
+                    {:widget-uid 004
+                     :widget-name "Accordion"
+                     :text [{:title {:widget-uid 001
+                                     :widget-name "Standard text widget"
+                                     :inner-html ["<p> Hi there </p>"]}
+                             :sub {:widget-uid 001
+                                   :widget-name "Standard text widget"
+                                   :inner-html ["<p> Hi there </p>"]}}]}
+                    {:widget-uid 005
+                     :widget-name "Standard text widget"
+                     :inner-html ["<p> Hi there </p>"]}
+                    {:widget-uid 006
+                     :widget-name "Standard image widget"
+                     :img "http://solariarchitects.com/img/leaderboards/group_photo_everyday_zoomed.jpg"}
                     {:widget-uid 007
                      :widget-name "Grid"
                      :imgs [{:id "entry-1"
@@ -22,7 +39,7 @@
                              :text "Cue James in a bald cap, need I say more?"
                              :data-width "320"
                              :data-height "400"}]}]
- :edit-mode [true]
+ :edit-mode [false]
  :routes-map {:route-name "/"
               :bg-img "home_page.jpg"
               :nav-hint ["Architects"]
