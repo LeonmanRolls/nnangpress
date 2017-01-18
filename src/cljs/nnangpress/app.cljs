@@ -62,6 +62,12 @@
                   :style #js {:width "100%"}
                   :onChange (fn [e]
                               (om/update! cursor korks (.. e -target -value)))}))
+
+(defn admin-toolbar [data owner]
+  (reify 
+    om/IRender
+    (render [_]
+      (dom/div #js{:className "admin-toolbar"} "Toolbar"))))
 ;Core End -----
 
 (def monolith (atom {}))
@@ -736,6 +742,7 @@
           (-> (js/$ "body" ) (.addClass "grey-out"))
           (-> (js/$ "body" ) (.removeClass "grey-out")))
         (dom/div nil
+                 (om/build admin-toolbar {})                                   
                  (om/build main-view widgets)
                  (om/build main-nav-view data))))))
 
@@ -810,8 +817,6 @@
 
   (eval-form (+ 1 2))
   (eval-form (first (:components @cache)))
-
-
 
   )
 
