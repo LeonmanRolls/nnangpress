@@ -13,7 +13,7 @@
 
 (enable-console-print!)
 
-(declare edit-mode widget)
+(declare edit-mode widget active-route)
 
 ;Utils Start -----
 (defn tree-seq-path [branch? children root & [node-fn]]
@@ -81,11 +81,13 @@
 
 (defn select-widget-wrapper [{:keys [widget-name] :as data} owner]
   (reify 
-    om/IRender 
-    (render [_]
+    om/IRenderState 
+    (render-state [_ {:keys [cursor] :as state}]
       (dom/div #js {:className "selectWidget"} 
                widget-name 
-               (dom/button nil "Add widget")
+               (dom/button #js {:onClick (fn [_] (om/transact! 
+                                                   cursor 
+                                                   (fn [x] (conj x data))))} "Add widget")
                (om/build widget data {:init-state {:advertise? true}})))))
 ;Core End -----
 
@@ -689,6 +691,8 @@
             edit-mode-obs (om/observe owner (edit-mode))]
         (dom/div #js {:className "main-view"}
 
+                 (println "data: " data)
+
                  (apply dom/div nil
                         (om/build-all widget data))
 
@@ -696,7 +700,8 @@
                    (dom/div #js {:className "edit"}
 
                             (apply dom/div nil 
-                                   (om/build-all select-widget-wrapper all-widgets-data-obs))
+                                   (om/build-all select-widget-wrapper all-widgets-data-obs
+                                                 {:state {:cursor data}}))
 
                             "add widget: " (dom/input #js {:ref "add-widget"})
                             (dom/button #js {:onClick (fn [_] (add-widget data))} "Submit")
