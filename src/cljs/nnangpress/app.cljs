@@ -93,13 +93,16 @@
 
 (defn all-widget-wrapper [{:keys [object-id] :as data} owner]
   (reify 
-    om/IRender 
-    (render [_]
+    om/IRenderState 
+    (render-state [_ {:keys [current-widgets] :as state}]
       (dom/div nil 
-               (println "lol... " object-id)
-               (dom/button nil "Delete") 
-               (om/build widget data)        
-               ))))
+               (dom/button #js{:onClick (fn [_] (om/transact! 
+                                                  current-widgets 
+                                                  (fn [x]
+                                                    (vec
+                                                      (remove #(= (:object-id %) object-id) x)))))} 
+                           "Delete") 
+               (om/build widget data)))))
 ;Core End -----
 
 (def monolith (atom {}))
@@ -711,7 +714,8 @@
         (dom/div #js {:className "main-view"}
 
                  (apply dom/div nil
-                        (om/build-all all-widget-wrapper data))
+                        (om/build-all all-widget-wrapper data
+                                      {:state {:current-widgets data}}))
 
                  (when (first @edit-mode-obs)
                    (dom/div #js {:className "edit"}
