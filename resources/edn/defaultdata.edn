@@ -55,7 +55,9 @@
               :widgets [{:widget-uid 001
                          :object-id "a" 
                          :widget-name "Standard text widget"
-                         :inner-html ["<p> Hi there lol</p>"]}]
+                         :inner-html ["<p> Hi there lol</p>"]}
+                        {:widget-uid 2
+                         :object-id "asdfas"}]
               :children [{:route-name "/for-you"
                           :bg-img "home_page.jpg"
                           :grey-bg? true

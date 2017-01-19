@@ -321,6 +321,48 @@
                       :style #js {:color "black"}
                       :dangerouslySetInnerHTML #js {:__html (first (:inner-html data))}})))))
 
+(defmethod widget-data 2 [_]
+  {:widget-uid 2
+   :object-id (uid)})
+
+(defmethod widget 002 [data owner]
+  (reify
+    om/IInitState
+    (init-state [_]
+      {:uid (uid)})
+
+    om/IDidMount
+    (did-mount [_]
+      (let [uid (om/get-state owner :uid)]
+        (->
+          (js/$ (str ".royalSlider"))
+          (.royalSlider #js {:keyboardNavEnabled true :controlNavigation "bullets"
+                             :autoScaleSlider true :autoScaleSliderWidth 14
+                             :autoScaleSliderHeight 9
+                             :slidesSpacing 0
+                             :imageScaleMode "fill"
+                             :fullscreen #js {:enabled true :nativeFS true}}))))
+
+    om/IRenderState
+    (render-state [_ {:keys [uid] :as state}]
+      (dom/div #js {:id uid 
+                    :style #js {:color "black"}
+                    :dangerouslySetInnerHTML 
+                    #js {:__html "
+                         <div class=\"royalSlider rsDefault\">
+                                 <img class=\"rsImg\" src=\"image.jpg\" alt=\"image desc\" />
+                                 <a class=\"rsImg\" href=\"image.jpg\">image desc</a>
+                                 <p>Content goes here</p>
+                                 <div>
+                                 <img class=\"rsImg\" src=\"image.jpg\" data-rsVideo=\"https://vimeo.com/44878206\" />
+                                 </div>
+                                 <div>
+                                 </div>
+                                 <div class=\"rsContent\">
+                                 </div>
+                                 </div>  
+                                 "}}))))
+
 (defmethod widget-data 003 [_]
   {:widget-uid 003
    :object-id (uid)

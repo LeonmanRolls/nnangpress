@@ -43,4 +43,8 @@ current route. Current route of the app is part of application state.
 
 - Ctrl + q to save text
 
+## Jquery plugins
 
+- In general the html these should be rendered with dangerouslysetinnerhtml. 
+We are looking to essentially sidestep react, ideally there should be no 
+jquery plugins.
