@@ -95,14 +95,17 @@
   (reify 
     om/IRenderState 
     (render-state [_ {:keys [current-widgets] :as state}]
-      (dom/div nil 
-               (dom/button #js{:onClick (fn [_] (om/transact! 
-                                                  current-widgets 
-                                                  (fn [x]
-                                                    (vec
-                                                      (remove #(= (:object-id %) object-id) x)))))} 
-                           "Delete") 
-               (om/build widget data)))))
+      (let [edit-mode-obs (om/observe owner (edit-mode))]
+        (dom/div nil 
+                 (when (first @edit-mode-obs)
+                   (dom/button #js{:onClick (fn [_] 
+                                              (om/transact! 
+                                                current-widgets 
+                                                (fn [x]
+                                                  (vec
+                                                    (remove #(= (:object-id %) object-id) x)))))} 
+                               "Delete"))
+                 (om/build widget data))))))
 ;Core End -----
 
 (def monolith (atom {}))
