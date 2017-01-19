@@ -350,16 +350,15 @@
                     :dangerouslySetInnerHTML 
                     #js {:__html "
                          <div class=\"royalSlider rsDefault\">
-                                 <img class=\"rsImg\" src=\"image.jpg\" alt=\"image desc\" />
-                                 <a class=\"rsImg\" href=\"image.jpg\">image desc</a>
-                                 <p>Content goes here</p>
-                                 <div>
-                                 <img class=\"rsImg\" src=\"image.jpg\" data-rsVideo=\"https://vimeo.com/44878206\" />
-                                 </div>
-                                 <div>
-                                 </div>
-                                 <div class=\"rsContent\">
-                                 </div>
+                                 <img class=\"rsImg\" 
+                                 src=\"http://placekitten.com/900/600\" 
+                                 alt=\"image desc\" />
+                                 <img class=\"rsImg\" 
+                                 src=\"http://placekitten.com/900/600\" 
+                                 alt=\"image desc\" />
+                                 <img class=\"rsImg\" 
+                                 src=\"http://placekitten.com/900/600\" 
+                                 alt=\"image desc\" />
                                  </div>  
                                  "}}))))
 

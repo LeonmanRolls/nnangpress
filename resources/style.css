@@ -176,11 +176,14 @@ p {
 .main-view {
   text-align: left;
   height: 100%;
-  margin-left: 320px;
+  padding-left: 320px;
   margin-top: 100px;
-  margin-right: 160px;
+  padding-right: 160px;
   line-height: 2;
   letter-spacing: 0.1em;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .box-paragraph {
@@ -465,3 +468,8 @@ color: white !important;
     z-index: 100;
 }
 
+/*royalslider Start --------------------------------------------------------------------------------*/
+.royalSlider {
+    width: 100%;
+}
+/*royalslider End ----------------------------------------------------------------------------------*/
