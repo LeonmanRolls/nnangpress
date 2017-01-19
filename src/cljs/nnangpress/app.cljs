@@ -766,11 +766,7 @@
 
                             (apply dom/div nil 
                                    (om/build-all select-widget-wrapper all-widgets-data-obs
-                                                 {:state {:cursor data}}))
-
-                            "add widget: " (dom/input #js {:ref "add-widget"})
-                            (dom/button #js {:onClick (fn [_] (add-widget data))} "Submit")
-                            (om/build remove-element data {:state {:label "Remove widget"}}))))))))
+                                                 {:state {:cursor data}})))))))))
 
 (defn master [{:keys [:routes-map :current-route :active-route] :as data} owner]
   (reify

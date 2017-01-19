@@ -10,6 +10,9 @@
                      :object-id "a" 
                      :widget-name "Standard text widget"
                      :inner-html ["<p> Hi there </p>"]}
+                    {:widget-uid 002
+                     :widget-name "Slider"
+                     :object-id "basdfafoi"}
                     {:widget-uid 003
                          :object-id "b" 
                      :widget-name "Standard text widget"
