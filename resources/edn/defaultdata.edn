@@ -7,30 +7,38 @@
  :current-route ["/"]
  :logo-text ["Solari"]
  :all-widgets-data [{:widget-uid 001
+                     :object-id "a" 
                      :widget-name "Standard text widget"
                      :inner-html ["<p> Hi there </p>"]}
                     {:widget-uid 003
+                         :object-id "b" 
                      :widget-name "Standard text widget"
                      :inner-html ["<p> Hi there </p>"]}
                     {:widget-uid 004
+                         :object-id "c" 
                      :widget-name "Accordion"
                      :text [{:title {:widget-uid 001
+                         :object-id "d" 
                                      :widget-name "Standard text widget"
                                      :inner-html ["<p> Hi there </p>"]}
                              :sub {:widget-uid 001
+                         :object-id "e" 
                                    :widget-name "Standard text widget"
                                    :inner-html ["<p> Hi there </p>"]}}]}
                     {:widget-uid 005
+                         :object-id "f" 
                      :widget-name "Standard text widget"
                      :inner-html ["<p> Hi there </p>"]}
                     {:widget-uid 006
+                         :object-id "g" 
                      :widget-name "Standard image widget"
-                     :img "http://solariarchitects.com/img/leaderboards/group_photo_everyday_zoomed.jpg"}
+                     :img "http://placekitten.com/800/400"}
                     {:widget-uid 007
+                         :object-id "h" 
                      :widget-name "Grid"
                      :imgs [{:id "entry-1"
                              :className "mega-entry"
-                             :data-src "http://solariarchitects.com/img/teampics/jsolari_everyday.jpg"
+                             :data-src "http://placekitten.com/300/301"
                              :data-width "320"
                              :data-height "400"}
                             {:id "entry-1-1"
@@ -45,6 +53,7 @@
               :nav-hint ["Architects"]
               :nav-hint-style {:color "black"}
               :widgets [{:widget-uid 001
+                         :object-id "a" 
                          :widget-name "Standard text widget"
                          :inner-html ["<p> Hi there lol</p>"]}]
               :children [{:route-name "/for-you"
@@ -58,9 +67,11 @@
                                       :nav-hint ["All Projects"]
                                       :nav-hint-style {:color "white"}
                                       :widgets [{:widget-uid 001
+                                                 :object-id "b" 
                                                  :widget-name "Standard text widget"
                                                  :inner-html ["<p> Hi there </p>"]}
                                                 {:widget-uid 007
+                                                 :object-id "c" 
                                                  :widget-name "Grid"
                                                  :imgs [{:id "entry-1"
                                                          :className "mega-entry"
@@ -79,14 +90,20 @@
                                                   :nav-hint ["Faqs"]
                                                   :nav-hint-style {:color "white"}
                                                   :widgets [{:widget-uid 001
+                                                             :object-id "d" 
                                                              :widget-name "Standard text widget"
                                                              :inner-html ["<p> Hi there </p>"]}
                                                             {:widget-uid 004
+
+                                                             :object-id "e" 
                                                              :widget-name "Accordion"
                                                              :text [{:title {:widget-uid 001
+                                                                             :object-id "f" 
                                                                              :widget-name "Standard text widget"
                                                                              :inner-html ["<p> Hi there </p>"]}
                                                                      :sub {:widget-uid 001
+
+                                                                           :object-id "g" 
                                                                            :widget-name "Standard text widget"
                                                                            :inner-html ["<p> Hi there </p>"]}}]}]
                                                   :children []}]}
@@ -95,9 +112,11 @@
                                       :nav-hint ["Residential"]
                                       :nav-hint-style {:color "white"}
                                       :widgets [{:widget-uid 001
+                                                 :object-id "h" 
                                                  :widget-name "Standard text widget"
                                                  :inner-html ["<p> Hi there </p>"]}
                                                 {:widget-uid 007
+                                                 :object-id "8" 
                                                  :widget-name "Grid"
                                                  :imgs [{:id "entry-1"
                                                          :className "mega-entry"
@@ -116,9 +135,11 @@
                                       :nav-hint ["Multi Unit"]
                                       :nav-hint-style {:color "white"}
                                       :widgets [{:widget-uid 001
+                                                 :object-id "j" 
                                                  :widget-name "Standard text widget"
                                                  :inner-html ["<p> Hi there </p>"]}
                                                 {:widget-uid 007
+                                                 :object-id "k" 
                                                  :widget-name "Grid"
                                                  :imgs [{:id "entry-1"
                                                          :className "mega-entry"
@@ -137,9 +158,11 @@
                                       :nav-hint ["Commercial"]
                                       :nav-hint-style {:color "white"}
                                       :widgets [{:widget-uid 001
+                                                 :object-id "l" 
                                                  :widget-name "Standard text widget"
                                                  :inner-html ["<p> Hi there </p>"]}
                                                 {:widget-uid 007
+                                                 :object-id "m" 
                                                  :widget-name "Grid"
                                                  :imgs [{:id "entry-1"
                                                          :className "mega-entry"
@@ -153,38 +176,46 @@
                                                          :data-width "320"
                                                          :data-height "400"}]}]
                                       :children []}
-                                     {:route-name "/our-process"
-                                      :bg-img "from_uss.jpg"
-                                      :grey-bg? true
-                                      :nav-hint ["Our Process"]
-                                      :nav-hint-style  {:color "white"}
-                                      :widgets [{:widget-uid 001
-                                                 :widget-name "Standard text widget"
-                                                 :inner-html ["<p> Hi there </p>"]}
-                                                {:widget-uid 003
-                                                 :widget-name "Standard text widget"
-                                                 :inner-html ["<p> Hi there </p>"]}
-                                                {:widget-uid 003
-                                                 :widget-name "Standard text widget"
-                                                 :inner-html ["<p> Hi there </p>"]}
-                                                {:widget-uid 003
-                                                 :widget-name "Standard text widget"
-                                                 :inner-html ["<p> Hi there </p>"]}]
-                                      :children []}
+{:route-name "/our-process"
+ :bg-img "from_uss.jpg"
+ :grey-bg? true
+ :nav-hint ["Our Process"]
+ :nav-hint-style  {:color "white"}
+ :widgets [{:widget-uid 001
+            :object-id "n" 
+            :widget-name "Standard text widget"
+            :inner-html ["<p> Hi there </p>"]}
+           {:widget-uid 003
+            :object-id "o" 
+            :widget-name "Standard text widget"
+            :inner-html ["<p> Hi there </p>"]}
+           {:widget-uid 003
+            :object-id "p" 
+            :widget-name "Standard text widget"
+            :inner-html ["<p> Hi there </p>"]}
+           {:widget-uid 003
+            :object-id "q" 
+            :widget-name "Standard text widget"
+            :inner-html ["<p> Hi there </p>"]}]
+ :children []}
 {:route-name "/faqs"
  :bg-img "from_uss.jpg"
  :grey-bg? true
  :nav-hint ["Faqs"]
  :nav-hint-style {:color "white"}
  :widgets [{:widget-uid 001
+            :object-id "r" 
             :widget-name "Standard text widget"
             :inner-html ["<p> Hi there </p>"]}
            {:widget-uid 004
+            :object-id "s" 
             :widget-name "Accordion"
             :text [{:title {:widget-uid 001
+                            :object-id "t" 
                             :widget-name "Standard text widget"
                             :inner-html ["<p> Hi there </p>"]}
                     :sub {:widget-uid 001
+                          :object-id "u" 
                           :widget-name "Standard text widget"
                           :inner-html ["<p> Hi there </p>"]}}]}]
  :children []}
@@ -194,6 +225,7 @@
  :nav-hint ["Your Team"]
  :nav-hint-style {:color "white"}
  :widgets [{:widget-uid 8
+            :object-id "v" 
             :lis [{:route "/your-team"
                    :label "Everyday us"
                    :active? true}
@@ -201,12 +233,15 @@
                    :label "Architect us"
                    :active? false}]}
            {:widget-uid 001
+            :object-id "w" 
             :widget-name "Standard text widget"
             :inner-html ["<p> Hi there </p>"]}
            {:widget-uid 006
+            :object-id "x" 
             :widget-name "Standard image widget"
             :img "http://solariarchitects.com/img/leaderboards/group_photo_everyday_zoomed.jpg"}
            {:widget-uid 007
+            :object-id "y" 
             :widget-name "Grid"
             :imgs [{:id "entry-1"
                     :className "mega-entry"
@@ -225,6 +260,7 @@
              :nav-hint ["Your Team"]
              :nav-hint-style {:color "white"}
              :widgets [{:widget-uid 8
+                        :object-id "z" 
                         :lis [{:route "/your-team"
                                :label "Everyday us"
                                :active? false}
@@ -232,12 +268,15 @@
                                :label "Architect us"
                                :active? true}]}
                        {:widget-uid 001
+                        :object-id "aa" 
                         :widget-name "Standard text widget"
                         :inner-html ["<p> Hi there </p>"]}
                        {:widget-uid 006
+                        :object-id "ab" 
                         :widget-name "Standard image widget"
                         :img "http://solariarchitects.com/img/leaderboards/group_photo_hipster.jpg"}
                        {:widget-uid 007
+                        :object-id "ac" 
                         :widget-name "Grid"
                         :imgs [{:id "entry-1"
                                 :className "mega-entry"
@@ -257,6 +296,7 @@
  :nav-hint ["For Architects"]
  :nav-hint-style {:color "white"}
  :widgets [{:widget-uid 001
+            :object-id "ad" 
             :widget-name "Standard text widget"
             :inner-html ["<p> Hi there </p>"]}]
  :children [{:route-name "/your-career"
@@ -265,6 +305,7 @@
              :nav-hint ["Your career"]
              :nav-hint-style {:color "white"}
              :widgets [{:widget-uid 001
+                        :object-id "ae" 
                         :widget-name "Standard text widget"
                         :inner-html ["<p> Hi there </p>"]}]
              :children []}
@@ -273,12 +314,15 @@
              :nav-hint ["Meet the team"]
              :nav-hint-style {:color "white"}
              :widgets [{:widget-uid 001
+                        :object-id "af" 
                         :widget-name "Standard text widget"
                         :inner-html ["<p> Hi there </p>"]}
                        {:widget-uid 006
+                        :object-id "ag" 
                         :widget-name "Standard image widget"
                         :img "http://solariarchitects.com/img/leaderboards/group_photo_everyday_zoomed.jpg"}
                        {:widget-uid 007
+                        :object-id "ah" 
                         :widget-name "Grid"
                         :imgs [{:id "entry-1"
                                 :className "mega-entry"
@@ -380,14 +424,18 @@
             :nav-hint ["Faqs"]
             :nav-hint-style {:color "white"}
             :widgets [{:widget-uid 001
+                       :object-id "ai" 
                        :widget-name "Standard text widget"
                        :inner-html ["<p> Hi there </p>"]}
                       {:widget-uid 004
+                       :object-id "aj" 
                        :widget-name "Accordion"
                        :text [{:title {:widget-uid 001
+                                       :object-id "ak" 
                                        :widget-name "Standard text widget"
                                        :inner-html ["<p> Hi there </p>"]}
                                :sub {:widget-uid 001
+                                     :object-id "al" 
                                      :widget-name "Standard text widget"
                                      :inner-html ["<p> Hi there </p>"]}}]}]
             :children []}]}
@@ -397,9 +445,11 @@
  :nav-hint ["jobs"]
  :nav-hint-style {:color "white"}
  :widgets [{:widget-uid 001
+            :object-id "am" 
             :widget-name "Standard text widget"
             :inner-html ["<p> Hi there </p>"]}
            {:widget-uid 005
+            :object-id "ao" 
             :widget-name "Standard text widget"
             :inner-html ["<p> Hi there </p>"]}]
  :children []}]}

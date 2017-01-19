@@ -71,6 +71,7 @@
     (render [_]
       (let []
         (dom/div #js{:className "admin-toolbar"} 
+                 (dom/b nil "Welcome to Nnangpresss alpha ")
                  (dom/button #js {:onClick (fn [_] 
                                              (println "clicked")
                                              (om/transact! 
@@ -89,9 +90,20 @@
                                                    cursor 
                                                    (fn [x] (conj x data))))} "Add widget")
                (om/build widget data {:init-state {:advertise? true}})))))
+
+(defn all-widget-wrapper [{:keys [object-id] :as data} owner]
+  (reify 
+    om/IRender 
+    (render [_]
+      (dom/div nil 
+               (println "lol... " object-id)
+               (dom/button nil "Delete") 
+               (om/build widget data)        
+               ))))
 ;Core End -----
 
 (def monolith (atom {}))
+
 
 (defn monolith-watcher-init [monolith]
   (add-watch monolith :watcher
@@ -251,6 +263,7 @@
 
 (defmethod widget-data 001 [_]
   {:widget-uid 001
+   :object-id (uid)
    :widget-name "Standard text widget"
    :inner-html ["<p> Hi there </p>"]})
 
@@ -304,6 +317,7 @@
 
 (defmethod widget-data 003 [_]
   {:widget-uid 003
+   :object-id (uid)
    :widget-name "Standard text widget"
    :inner-html ["<p> Hi there </p>"]})
 
@@ -357,6 +371,7 @@
 
 (defmethod widget-data 004 [_]
   {:widget-uid 004
+   :object-id (uid)
    :widget-name "Accordion"
    :text [{:title {:widget-uid 001
                    :widget-name "Standard text widget"
@@ -420,6 +435,7 @@
 
 (defmethod widget-data 005 [_]
   {:widget-uid 005
+   :object-id (uid)
    :widget-name "Standard text widget"
    :inner-html ["<p> Hi there </p>"]})
 
@@ -471,6 +487,7 @@
 
 (defmethod widget-data 006 [_]
   {:widget-uid 006
+   :object-id (uid)
    :widget-name "Standard image widget"
    :img "http://solariarchitects.com/img/leaderboards/group_photo_everyday_zoomed.jpg"})
 
@@ -498,6 +515,7 @@
 
 (defmethod widget-data 007 [_]
   {:widget-uid 007
+   :object-id (uid)
    :widget-name "Grid"
    :imgs [{:id "entry-1"
            :className "mega-entry"
@@ -644,6 +662,7 @@
 
 (defmethod widget-data 8 [_]
   {:widget-uid 8
+   :object-id (uid)
    :widget-name "Right Nav"
    :imgs []})
 
@@ -691,10 +710,8 @@
             edit-mode-obs (om/observe owner (edit-mode))]
         (dom/div #js {:className "main-view"}
 
-                 (println "data: " data)
-
                  (apply dom/div nil
-                        (om/build-all widget data))
+                        (om/build-all all-widget-wrapper data))
 
                  (when (first @edit-mode-obs)
                    (dom/div #js {:className "edit"}
