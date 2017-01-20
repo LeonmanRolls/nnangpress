@@ -244,24 +244,24 @@
     (render-state [_ {:keys [depth max-depth str-beautify] :as state}]
       (let [curr-route (first (om/observe owner (current-route)))
             active? (string-contains? curr-route route-name)
-            routes-map-obs (om/observe owner (routes-map))]
+            routes-map-obs (om/observe owner (routes-map))
+            edit-mode-obs (om/observe owner (edit-mode))]
 
         (cond
-          (> depth max-depth) nil
-
           (= "/" route-name)
           (apply dom/ul #js {}
                  (concat 
                    (om/build-all nav-menu children {:state {:depth (inc depth)}})
-                   [(dom/button #js {:onClick (fn [_]   
-                                                (om/transact! 
-                                                  children 
-                                                  (fn [children]
-                                                    (conj children (basic-route)))))} "Add route")
-                    (om/build remove-element children 
-                              {:state {:label "remove nth route"}})]))
+                   (when (first @edit-mode-obs)
+                     [(dom/button #js {:onClick (fn [_]   
+                                                  (om/transact! 
+                                                    children 
+                                                    (fn [children]
+                                                      (conj children (basic-route)))))} "Add route")
+                      (om/build remove-element children 
+                                {:state {:label "remove nth route"}})])))
 
-          (and (not (empty? children)) (> depth 1))
+          (and (not (empty? children)) (> depth (if (first @edit-mode-obs) 2 1)))
           (dom/div #js {:style #js {:position "relative"}}
 
                    (dom/li #js {:className (str "sub-nav-li ")
@@ -281,7 +281,17 @@
 
                    (when active?
                      (apply dom/ul #js {:className "nav-ul"}
-                            (om/build-all nav-menu children {:state {:depth (inc depth)}}))))
+                            (concat 
+                              (om/build-all nav-menu children {:state {:depth (inc depth)}})
+                              (when (first @edit-mode-obs)
+                                [(dom/button #js {:onClick (fn [_]   
+                                                             (om/transact! 
+                                                               children 
+                                                               (fn [children]
+                                                                 (conj children (basic-route)))))} 
+                                             "Add route")
+                                 (om/build remove-element children 
+                                           {:state {:label "remove nth route"}})])))))
 
           :else
           (dom/li #js {:className (str "sub-nav-li " (when active? "active-text"))
