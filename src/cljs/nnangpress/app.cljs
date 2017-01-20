@@ -235,6 +235,13 @@
           (apply dom/ul #js {}
                  (om/build-all nav-menu children {:state {:depth (inc depth)}}))
 
+          (and (not (empty? children)) (> depth 1))
+          (dom/div #js {:style #js {:position "relative"}}
+                   (dom/li #js {:className (str "sub-nav-li ")
+                                :onClick (partial js-link @routes-map-obs route-name)}
+                           (dom/div #js {:className (str (when active? "active-text"))}
+                                    (str-beautify route-name))))
+
           (not (empty? children))
           (dom/div #js {:style #js {:position "relative"}}
                    (dom/li #js {:className (str "nav-li " (when active? "active-li"))

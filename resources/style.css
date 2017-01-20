@@ -149,7 +149,7 @@ p {
   text-align: center;
   color: #fff;
   text-decoration: none;
-  padding: 18px;
+  padding: 17px;
   outline: none;
   margin-right: -1px;
   border-bottom: 1px solid white
@@ -161,7 +161,7 @@ p {
   left: 160px;
   width: 160px;
   border-top: 1px solid white;
-  margin-top: -1px;
+  margin-top: 0px;
   border-right: 1px solid white;
 }
 
