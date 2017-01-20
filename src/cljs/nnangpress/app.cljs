@@ -39,6 +39,26 @@
 ;Utils End -----
 
 ;Core Start -----
+(defn basic-route [] {:route-name (str "/parent" (subs (uid) 0 3))
+                      :bg-img "from_uss.jpg"
+                      :grey-bg? true
+                      :nav-hint ["nav hint"]
+                      :nav-hint-style {:color "white"}
+                      :widgets [{:widget-uid 001
+                                 :object-id (uid) 
+                                 :widget-name "Standard text widget"
+                                 :inner-html ["<p> Hi there </p>"]}]
+                      :children [{:route-name (str "/child" (subs (uid) 0 3))
+                                  :bg-img "from_uss.jpg"
+                                  :grey-bg? true
+                                  :nav-hint ["nav hint"]
+                                  :nav-hint-style {:color "white"}
+                                  :widgets [{:widget-uid 001
+                                             :object-id (uid) 
+                                             :widget-name "Standard text widget"
+                                             :inner-html ["<p> Hi there </p>"]}]
+                                  :children []}]})
+
 (defn remove-element
   "Requires label to be passed in as state"
   [data owner]
@@ -106,10 +126,8 @@
                                                     (remove #(= (:object-id %) object-id) x)))))} 
                                "Delete"))
                  (om/build widget data))))))
-;Core End -----
 
 (def monolith (atom {}))
-
 
 (defn monolith-watcher-init [monolith]
   (add-watch monolith :watcher
@@ -124,7 +142,7 @@
                    (.set #js {:username "wellwell"
                               :email "leon.talbert@gmail.com"
                               :data  (pr-str @monolith)}))))))
-
+;Core End -----
 (defn ref-cursor-init [monolith]
   (defn edit-mode []
     (om/ref-cursor (:edit-mode (om/root-cursor monolith))))
@@ -216,7 +234,7 @@
     om/IInitState
     (init-state  [_]
       {:depth 0
-       :max-depth 2
+       :max-depth 3
        :str-beautify (fn [s]
                        (->
                          (subs s 1)
@@ -233,7 +251,14 @@
 
           (= "/" route-name)
           (apply dom/ul #js {}
-                 (om/build-all nav-menu children {:state {:depth (inc depth)}}))
+                 (concat 
+                   (om/build-all nav-menu children {:state {:depth (inc depth)}})
+                   [(dom/button #js {:onClick (fn [_]   
+                                                (om/transact! 
+                                                  children 
+                                                  (fn [children]
+                                                    (conj children (basic-route))
+                                                    )))} "Add route")]))
 
           (and (not (empty? children)) (> depth 1))
           (dom/div #js {:style #js {:position "relative"}}
