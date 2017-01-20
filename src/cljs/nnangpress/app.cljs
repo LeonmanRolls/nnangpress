@@ -334,71 +334,76 @@
     om/IInitState
     (init-state [_]
       {:uid (uid)
+       :advertise? false
        :img-partial (fn [{:keys [url] :as data}] 
                       (str "<img class=\"rsImg\" src=\"" url "\"/>"))
        :default-img (fn []  
                       {:object-id (uid)
-                       :url "http://placekitten.com/900/600"})})
+                       :url "http://placekitten.com/900/600"})
+       :slider-init (fn [uid]
+                      (println "slider-init: " uid)
+                      (->
+                        (js/$ (str "#" uid))
+                        (.royalSlider #js {:keyboardNavEnabled true :controlNavigation "bullets"
+                                           :autoScaleSlider true :autoScaleSliderWidth 14
+                                           :autoScaleSliderHeight 9
+                                           :slidesSpacing 0
+                                           :imageScaleMode "fill"
+                                           :fullscreen #js {:enabled true :nativeFS true}})))})
 
     om/IDidMount
     (did-mount [_]
-      (let [uid (om/get-state owner :uid)]
-        (->
-          (js/$ (str ".royalSlider"))
-          (.royalSlider #js {:keyboardNavEnabled true :controlNavigation "bullets"
-                             :autoScaleSlider true :autoScaleSliderWidth 14
-                             :autoScaleSliderHeight 9
-                             :slidesSpacing 0
-                             :imageScaleMode "fill"
-                             :fullscreen #js {:enabled true :nativeFS true}}))))
+      (let [uid (om/get-state owner :uid)
+            slider-init (om/get-state owner :slider-init)]
+        (slider-init uid)))
 
-    ;Refactor
     om/IDidUpdate 
     (did-update [_ _ _]
-      (->
-        (js/$ (str ".royalSlider"))
-        (.royalSlider #js {:keyboardNavEnabled true :controlNavigation "bullets"
-                           :autoScaleSlider true :autoScaleSliderWidth 14
-                           :autoScaleSliderHeight 9
-                           :slidesSpacing 0
-                           :imageScaleMode "fill"
-                           :fullscreen #js {:enabled true :nativeFS true}})))
+      (let [uid (om/get-state owner :uid)
+            slider-init (om/get-state owner :slider-init)]
+        (slider-init uid)))
 
     om/IRenderState
-    (render-state [_ {:keys [uid img-partial default-img] :as state}]
-      (dom/div nil 
-               (dom/div #js {:id uid 
-                             :style #js {:color "black"}
-                             :dangerouslySetInnerHTML 
-                             #js {:__html 
-                                  (str 
-                                    "<div class=\"royalSlider rsDefault\">"
-                                    (apply str (map img-partial imgs))
-                                    "</div>")}})        
+    (render-state [_ {:keys [uid img-partial default-img advertise?] :as state}]
+      (let [edit-mode-obs (om/observe owner (edit-mode))]
+        (dom/div nil 
+                 (dom/div #js {:style #js {:color "black"}
+                               :dangerouslySetInnerHTML 
+                               #js {:__html 
+                                    (str 
+                                      "<div id=\"" uid "\" class=\"royalSlider rsDefault\">"
+                                      (apply str (map img-partial imgs))
+                                      "</div>")}})        
 
-               (dom/div nil 
-                        (apply dom/div nil
-                               (om/build-all
-                                 (fn [data owner]
-                                   (reify
-                                     om/IRender
-                                     (render [_]
-                                       (simple-input-cursor (:url data) data :url))))
-                                 imgs))
+                 (when (and (first @edit-mode-obs) (not advertise?))  
 
-                        (dom/button #js {:onClick (fn [_]
-                                                    (om/transact!
-                                                      imgs
-                                                      (fn [x] (conj x (default-img)))))}
-                                    "Add an image")
+                   (dom/div nil 
+                            (apply dom/div nil
+                                   (om/build-all
+                                     (fn [{:keys [url object-id] :as data} owner]
+                                       (reify
+                                         om/IRender
+                                         (render [_]
+                                           (dom/div nil 
+                                                    (simple-input-cursor (:url data) data :url)     
+                                                    (dom/button 
+                                                      #js {:onClick (fn [_]
+                                                                      (om/transact! 
+                                                                        imgs
+                                                                        (fn [x]
+                                                                          (vec 
+                                                                            (remove
+                                                                              #(= 
+                                                                                 (:object-id %)
+                                                                                 object-id) x)))))}
+                                                      "Delete")))))
+                                     imgs))
 
-                        #_(dom/button #js {:onClick (fn [_]
-                                                      (om/transact!
-                                                        imgs
-                                                        (fn [x] (conj x (default-text)))))}
-                                      "Add text")
-
-                        #_(om/build remove-element imgs {:state {:label "remove nth element"}}))))))
+                            (dom/button #js {:onClick (fn [_]
+                                                        (om/transact!
+                                                          imgs
+                                                          (fn [x] (conj x (default-img)))))}
+                                        "Add an image"))))))))
 
 (defmethod widget-data 003 [_]
   {:widget-uid 003
@@ -719,18 +724,19 @@
 
                    ;Refactor into own component
                    (dom/div nil 
-                            (apply dom/div nil
-                                   (om/build-all
-                                     (fn [data owner]
-                                       (reify
-                                         om/IRender
-                                         (render [_]
-                                           (if (contains? data :text)
-                                             (dom/div nil
-                                                      (simple-input-cursor (:title data) data :title)
-                                                      (simple-input-cursor (:text data) data :text))
-                                             (simple-input-cursor (:data-src data) data :data-src)))))
-                                     imgs))
+                            (apply 
+                              dom/div nil
+                              (om/build-all
+                                (fn [data owner]
+                                  (reify
+                                    om/IRender
+                                    (render [_]
+                                      (if (contains? data :text)
+                                        (dom/div nil
+                                                 (simple-input-cursor (:title data) data :title)
+                                                 (simple-input-cursor (:text data) data :text))
+                                        (simple-input-cursor (:data-src data) data :data-src)))))
+                                imgs))
 
                             (dom/button #js {:onClick (fn [_]
                                                         (om/transact!
@@ -744,7 +750,8 @@
                                                           (fn [x] (conj x (default-text)))))}
                                         "Add text")
 
-                            (om/build remove-element imgs {:state {:label "remove nth element"}}))))))))
+                            (om/build remove-element imgs 
+                                      {:state {:label "remove nth element"}}))))))))
 
 (defmethod widget-data 8 [_]
   {:widget-uid 8
