@@ -49,6 +49,10 @@ p {
   margin-top: 50px;
 }
 
+.edit input {
+    width: 100%;
+}
+
 .selectWidget {
     border: 1px white solid;
     padding: 5px;
