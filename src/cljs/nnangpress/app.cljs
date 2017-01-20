@@ -71,7 +71,7 @@
     (render [_]
       (let []
         (dom/div #js{:className "admin-toolbar"} 
-                 (dom/b nil "Welcome to Nnangpresss alpha ")
+                 (dom/b nil "Welcome to Nnangpress alpha ")
                  (dom/button #js {:onClick (fn [_] 
                                              (println "clicked")
                                              (om/transact! 
@@ -323,13 +323,22 @@
 
 (defmethod widget-data 2 [_]
   {:widget-uid 2
-   :object-id (uid)})
+   :object-id (uid)
+   :imgs [{:object-id (uid) 
+           :url "http://placekitten.com/900/600"} 
+          {:object-id (uid)
+           :url "http://placekitten.com/900/600"}]})
 
-(defmethod widget 002 [data owner]
+(defmethod widget 002 [{:keys [imgs] :as data} owner]
   (reify
     om/IInitState
     (init-state [_]
-      {:uid (uid)})
+      {:uid (uid)
+       :img-partial (fn [{:keys [url] :as data}] 
+                      (str "<img class=\"rsImg\" src=\"" url "\"/>"))
+       :default-img (fn []  
+                      {:object-id (uid)
+                       :url "http://placekitten.com/900/600"})})
 
     om/IDidMount
     (did-mount [_]
@@ -343,24 +352,53 @@
                              :imageScaleMode "fill"
                              :fullscreen #js {:enabled true :nativeFS true}}))))
 
+    ;Refactor
+    om/IDidUpdate 
+    (did-update [_ _ _]
+      (->
+        (js/$ (str ".royalSlider"))
+        (.royalSlider #js {:keyboardNavEnabled true :controlNavigation "bullets"
+                           :autoScaleSlider true :autoScaleSliderWidth 14
+                           :autoScaleSliderHeight 9
+                           :slidesSpacing 0
+                           :imageScaleMode "fill"
+                           :fullscreen #js {:enabled true :nativeFS true}})))
+
     om/IRenderState
-    (render-state [_ {:keys [uid] :as state}]
-      (dom/div #js {:id uid 
-                    :style #js {:color "black"}
-                    :dangerouslySetInnerHTML 
-                    #js {:__html "
-                         <div class=\"royalSlider rsDefault\">
-                                 <img class=\"rsImg\" 
-                                 src=\"http://placekitten.com/900/600\" 
-                                 alt=\"image desc\" />
-                                 <img class=\"rsImg\" 
-                                 src=\"http://placekitten.com/900/600\" 
-                                 alt=\"image desc\" />
-                                 <img class=\"rsImg\" 
-                                 src=\"http://placekitten.com/900/600\" 
-                                 alt=\"image desc\" />
-                                 </div>  
-                                 "}}))))
+    (render-state [_ {:keys [uid img-partial default-img] :as state}]
+      (dom/div nil 
+               (dom/div #js {:id uid 
+                             :style #js {:color "black"}
+                             :dangerouslySetInnerHTML 
+                             #js {:__html 
+                                  (str 
+                                    "<div class=\"royalSlider rsDefault\">"
+                                    (apply str (map img-partial imgs))
+                                    "</div>")}})        
+
+               (dom/div nil 
+                        (apply dom/div nil
+                               (om/build-all
+                                 (fn [data owner]
+                                   (reify
+                                     om/IRender
+                                     (render [_]
+                                       (simple-input-cursor (:url data) data :url))))
+                                 imgs))
+
+                        (dom/button #js {:onClick (fn [_]
+                                                    (om/transact!
+                                                      imgs
+                                                      (fn [x] (conj x (default-img)))))}
+                                    "Add an image")
+
+                        #_(dom/button #js {:onClick (fn [_]
+                                                      (om/transact!
+                                                        imgs
+                                                        (fn [x] (conj x (default-text)))))}
+                                      "Add text")
+
+                        #_(om/build remove-element imgs {:state {:label "remove nth element"}}))))))
 
 (defmethod widget-data 003 [_]
   {:widget-uid 003
@@ -679,6 +717,7 @@
 
                  (when (and (first @edit-mode-obs) (not advertise?))
 
+                   ;Refactor into own component
                    (dom/div nil 
                             (apply dom/div nil
                                    (om/build-all
