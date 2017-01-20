@@ -682,7 +682,17 @@
          :text-or-img (fn [widget-img widget-text data]
                         (if (contains? data :text)
                           (widget-text data)
-                          (widget-img data)))}))
+                          (widget-img data)))
+         
+         :edit-fn (fn [data owner]
+                                  (reify
+                                    om/IRender
+                                    (render [_]
+                                      (if (contains? data :text)
+                                        (dom/div nil
+                                                 (simple-input-cursor (:title data) data :title)
+                                                 (simple-input-cursor (:text data) data :text))
+                                        (simple-input-cursor (:data-src data) data :data-src)))))}))
 
     om/IDidUpdate
     (did-update  [this prev-props prev-state]
@@ -706,7 +716,7 @@
           (.megafoliopro #js {}))))
 
     om/IRenderState
-    (render-state [_ {:keys [widget-img widget-text text-or-img default-img default-text advertise?]
+    (render-state [_ {:keys [edit-fn widget-img widget-text text-or-img default-img default-text advertise?]
                       :as state}]
       (let [edit-mode-obs (om/observe owner (edit-mode))]
         (dom/div nil
@@ -722,21 +732,10 @@
 
                  (when (and (first @edit-mode-obs) (not advertise?))
 
-                   ;Refactor into own component
                    (dom/div nil 
                             (apply 
                               dom/div nil
-                              (om/build-all
-                                (fn [data owner]
-                                  (reify
-                                    om/IRender
-                                    (render [_]
-                                      (if (contains? data :text)
-                                        (dom/div nil
-                                                 (simple-input-cursor (:title data) data :title)
-                                                 (simple-input-cursor (:text data) data :text))
-                                        (simple-input-cursor (:data-src data) data :data-src)))))
-                                imgs))
+                              (om/build-all edit-fn imgs))
 
                             (dom/button #js {:onClick (fn [_]
                                                         (om/transact!
