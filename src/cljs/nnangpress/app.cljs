@@ -151,7 +151,7 @@
     (om/ref-cursor (:all-widgets-data (om/root-cursor monolith))))
 
   (defn routes-map []
-    (om/ref-cursor (:routes-map (om/root-cursor monolith))))
+    (om/ref-cursor (:routes-map (:route-widget (om/root-cursor monolith)))))
 
   (defn current-route []
     (om/ref-cursor (:current-route (om/root-cursor monolith))))
@@ -160,7 +160,7 @@
     (om/ref-cursor (:logo-text (om/root-cursor monolith))))
 
   (defn logo-hint []
-    (om/ref-cursor (-> (om/root-cursor monolith) :routes-map :nav-hint)))
+    (om/ref-cursor (-> (om/root-cursor monolith) :route-widget :routes-map :nav-hint)))
 
   (defn active-route []
     (om/ref-cursor (-> (om/root-cursor monolith) :active-route))))
@@ -206,6 +206,9 @@
     (.preventDefault e)
     (nav! route-name routes-map)))
 
+(defmulti navbar (fn [x] (:route-widget-id x)))
+
+;Solari navbar start ---------------------------
 (defn nav-hint [data owner]
   (reify
     om/IRender
@@ -299,7 +302,7 @@
 
                   (str-beautify route-name)))))))
 
-(defn main-nav-view [{:keys [:routes-map] :as data} owner]
+(defmethod navbar 1 [{:keys [:routes-map] :as data} owner]
   (reify
     om/IRender
     (render [this]
@@ -311,6 +314,7 @@
                (dom/div #js {:className "nav-menu"}
                         (om/build nav-menu-logo {})
                         (om/build nav-menu routes-map))))))
+;Solari navbar end ---------------------------
 
 (defmulti widget-data (fn [x] x))
 
@@ -862,7 +866,8 @@
                                    (om/build-all select-widget-wrapper all-widgets-data-obs
                                                  {:state {:cursor data}})))))))))
 
-(defn master [{:keys [:routes-map :current-route :active-route] :as data} owner]
+(defn master [{:keys [:route-widget :current-route :active-route] 
+               :as data} owner]
   (reify
     om/IInitState
     (init-state [_]
@@ -900,19 +905,21 @@
     om/IRenderState
     (render-state [_ {:keys [flatten-routes set-bg-img get-active-route] :as state}]
       (let [{:keys [:bg-img :widgets] :as fresh-active-route} (get-active-route
-                                                                (flatten-routes routes-map)
+                                                                (flatten-routes 
+                                                                  (:routes-map 
+                                                                    route-widget))
                                                                 current-route)]
 
         (om/update! active-route @fresh-active-route)
         (set-bg-img bg-img)
         (if
           (:grey-bg? fresh-active-route)
-          (-> (js/$ "body" ) (.addClass "grey-out"))
-          (-> (js/$ "body" ) (.removeClass "grey-out")))
+          (-> (js/$ "body") (.addClass "grey-out"))
+          (-> (js/$ "body") (.removeClass "grey-out")))
         (dom/div nil
                  (om/build admin-toolbar {})                                   
                  (om/build main-view widgets)
-                 (om/build main-nav-view data))))))
+                 (om/build navbar (:route-widget data)))))))
 
 (defn init []
   (let [uid "SGXvf26OEpeVDQ79XIH2V71fVnT2"

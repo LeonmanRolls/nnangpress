@@ -5,6 +5,7 @@
                 :widgets []
                 :children []}
  :current-route ["/"]
+ :current-navbar [0] 
  :logo-text ["Solari"]
  :all-widgets-data [{:widget-uid 001
                      :object-id "a" 
@@ -18,30 +19,30 @@
                             {:object-id "asdfipwnelj" 
                              :url "http://placekitten.com/900/600"}]}
                     {:widget-uid 003
-                         :object-id "b" 
+                     :object-id "b" 
                      :widget-name "Standard text widget"
                      :inner-html ["<p> Hi there </p>"]}
                     {:widget-uid 004
-                         :object-id "c" 
+                     :object-id "c" 
                      :widget-name "Accordion"
                      :text [{:title {:widget-uid 001
-                         :object-id "d" 
+                                     :object-id "d" 
                                      :widget-name "Standard text widget"
                                      :inner-html ["<p> Hi there </p>"]}
                              :sub {:widget-uid 001
-                         :object-id "e" 
+                                   :object-id "e" 
                                    :widget-name "Standard text widget"
                                    :inner-html ["<p> Hi there </p>"]}}]}
                     {:widget-uid 005
-                         :object-id "f" 
+                     :object-id "f" 
                      :widget-name "Standard text widget"
                      :inner-html ["<p> Hi there </p>"]}
                     {:widget-uid 006
-                         :object-id "g" 
+                     :object-id "g" 
                      :widget-name "Standard image widget"
                      :img "http://placekitten.com/800/400"}
                     {:widget-uid 007
-                         :object-id "h" 
+                     :object-id "h" 
                      :widget-name "Grid"
                      :imgs [{:id "entry-1"
                              :className "mega-entry"
@@ -55,140 +56,141 @@
                              :data-width "320"
                              :data-height "400"}]}]
  :edit-mode [false]
- :routes-map {:route-name "/"
-              :bg-img "home_page.jpg"
-              :nav-hint ["Architects"]
-              :nav-hint-style {:color "black"}
-              :widgets [{:widget-uid 001
-                         :object-id "a" 
-                         :widget-name "Standard text widget"
-                         :inner-html ["<p> Hi there lol</p>"]}
-                        {:widget-uid 2
-                         :object-id "asdfas"
-                         :imgs [{:object-id "dsafoijlsaf" 
-                                 :url "http://placekitten.com/900/600"} 
-                                {:object-id "asdfipwnelj" 
-                                 :url "http://placekitten.com/900/600"}]}]
-              :children [{:route-name "/for-you"
-                          :bg-img "home_page.jpg"
-                          :grey-bg? true
-                          :nav-hint ["For you"]
-                          :nav-hint-style {:color "white"}
-                          :widgets []
-                          :children [{:route-name "/all-projects"
-                                      :bg-img "#333"
-                                      :nav-hint ["All Projects"]
-                                      :nav-hint-style {:color "white"}
-                                      :widgets [{:widget-uid 001
-                                                 :object-id "b" 
-                                                 :widget-name "Standard text widget"
-                                                 :inner-html ["<p> Hi there </p>"]}
-                                                {:widget-uid 007
-                                                 :object-id "c" 
-                                                 :widget-name "Grid"
-                                                 :imgs [{:id "entry-1"
-                                                         :className "mega-entry"
-                                                         :data-src "http://solariarchitects.com/img/teampics/jsolari_everyday.jpg"
-                                                         :data-width "320"
-                                                         :data-height "400"}
-                                                        {:id "entry-1-1"
-                                                         :className "mega-entry"
-                                                         :title "WE HAVE A LAUGH"
-                                                         :text "Cue James in a bald cap, need I say more?"
-                                                         :data-width "320"
-                                                         :data-height "400"}]}]
-                                      :children [{:route-name "/aproject"
-                                                  :bg-img "from_uss.jpg"
-                                                  :grey-bg? true
-                                                  :nav-hint ["Faqs"]
-                                                  :nav-hint-style {:color "white"}
-                                                  :widgets [{:widget-uid 001
-                                                             :object-id "d" 
-                                                             :widget-name "Standard text widget"
-                                                             :inner-html ["<p> Hi there </p>"]}
-                                                            {:widget-uid 004
+ :route-widget {:route-widget-id 1
+                :routes-map {:route-name "/"
+                             :bg-img "home_page.jpg"
+                             :nav-hint ["Architects"]
+                             :nav-hint-style {:color "black"}
+                             :widgets [{:widget-uid 001
+                                        :object-id "a" 
+                                        :widget-name "Standard text widget"
+                                        :inner-html ["<p> Hi there lol</p>"]}
+                                       {:widget-uid 2
+                                        :object-id "asdfas"
+                                        :imgs [{:object-id "dsafoijlsaf" 
+                                                :url "http://placekitten.com/900/600"} 
+                                               {:object-id "asdfipwnelj" 
+                                                :url "http://placekitten.com/900/600"}]}]
+                             :children [{:route-name "/for-you"
+                                         :bg-img "home_page.jpg"
+                                         :grey-bg? true
+                                         :nav-hint ["For you"]
+                                         :nav-hint-style {:color "white"}
+                                         :widgets []
+                                         :children [{:route-name "/all-projects"
+                                                     :bg-img "#333"
+                                                     :nav-hint ["All Projects"]
+                                                     :nav-hint-style {:color "white"}
+                                                     :widgets [{:widget-uid 001
+                                                                :object-id "b" 
+                                                                :widget-name "Standard text widget"
+                                                                :inner-html ["<p> Hi there </p>"]}
+                                                               {:widget-uid 007
+                                                                :object-id "c" 
+                                                                :widget-name "Grid"
+                                                                :imgs [{:id "entry-1"
+                                                                        :className "mega-entry"
+                                                                        :data-src "http://solariarchitects.com/img/teampics/jsolari_everyday.jpg"
+                                                                        :data-width "320"
+                                                                        :data-height "400"}
+                                                                       {:id "entry-1-1"
+                                                                        :className "mega-entry"
+                                                                        :title "WE HAVE A LAUGH"
+                                                                        :text "Cue James in a bald cap, need I say more?"
+                                                                        :data-width "320"
+                                                                        :data-height "400"}]}]
+                                                     :children [{:route-name "/aproject"
+                                                                 :bg-img "from_uss.jpg"
+                                                                 :grey-bg? true
+                                                                 :nav-hint ["Faqs"]
+                                                                 :nav-hint-style {:color "white"}
+                                                                 :widgets [{:widget-uid 001
+                                                                            :object-id "d" 
+                                                                            :widget-name "Standard text widget"
+                                                                            :inner-html ["<p> Hi there </p>"]}
+                                                                           {:widget-uid 004
 
-                                                             :object-id "e" 
-                                                             :widget-name "Accordion"
-                                                             :text [{:title {:widget-uid 001
-                                                                             :object-id "f" 
-                                                                             :widget-name "Standard text widget"
-                                                                             :inner-html ["<p> Hi there </p>"]}
-                                                                     :sub {:widget-uid 001
+                                                                            :object-id "e" 
+                                                                            :widget-name "Accordion"
+                                                                            :text [{:title {:widget-uid 001
+                                                                                            :object-id "f" 
+                                                                                            :widget-name "Standard text widget"
+                                                                                            :inner-html ["<p> Hi there </p>"]}
+                                                                                    :sub {:widget-uid 001
 
-                                                                           :object-id "g" 
-                                                                           :widget-name "Standard text widget"
-                                                                           :inner-html ["<p> Hi there </p>"]}}]}]
-                                                  :children []}]}
-                                     {:route-name "/residential"
-                                      :bg-img "#333"
-                                      :nav-hint ["Residential"]
-                                      :nav-hint-style {:color "white"}
-                                      :widgets [{:widget-uid 001
-                                                 :object-id "h" 
-                                                 :widget-name "Standard text widget"
-                                                 :inner-html ["<p> Hi there </p>"]}
-                                                {:widget-uid 007
-                                                 :object-id "8" 
-                                                 :widget-name "Grid"
-                                                 :imgs [{:id "entry-1"
-                                                         :className "mega-entry"
-                                                         :data-src "http://solariarchitects.com/img/teampics/jsolari_everyday.jpg"
-                                                         :data-width "320"
-                                                         :data-height "400"}
-                                                        {:id "entry-1-1"
-                                                         :className "mega-entry"
-                                                         :title "WE HAVE A LAUGH"
-                                                         :text "Cue James in a bald cap, need I say more?"
-                                                         :data-width "320"
-                                                         :data-height "400"}]}]
-                                      :children []}
-                                     {:route-name "/multi-unit"
-                                      :bg-img "#333"
-                                      :nav-hint ["Multi Unit"]
-                                      :nav-hint-style {:color "white"}
-                                      :widgets [{:widget-uid 001
-                                                 :object-id "j" 
-                                                 :widget-name "Standard text widget"
-                                                 :inner-html ["<p> Hi there </p>"]}
-                                                {:widget-uid 007
-                                                 :object-id "k" 
-                                                 :widget-name "Grid"
-                                                 :imgs [{:id "entry-1"
-                                                         :className "mega-entry"
-                                                         :data-src "http://solariarchitects.com/img/teampics/jsolari_everyday.jpg"
-                                                         :data-width "320"
-                                                         :data-height "400"}
-                                                        {:id "entry-1-1"
-                                                         :className "mega-entry"
-                                                         :title "WE HAVE A LAUGH"
-                                                         :text "Cue James in a bald cap, need I say more?"
-                                                         :data-width "320"
-                                                         :data-height "400"}]}]
-                                      :children []}
-                                     {:route-name "/commercial"
-                                      :bg-img "#333"
-                                      :nav-hint ["Commercial"]
-                                      :nav-hint-style {:color "white"}
-                                      :widgets [{:widget-uid 001
-                                                 :object-id "l" 
-                                                 :widget-name "Standard text widget"
-                                                 :inner-html ["<p> Hi there </p>"]}
-                                                {:widget-uid 007
-                                                 :object-id "m" 
-                                                 :widget-name "Grid"
-                                                 :imgs [{:id "entry-1"
-                                                         :className "mega-entry"
-                                                         :data-src "http://solariarchitects.com/img/teampics/jsolari_everyday.jpg"
-                                                         :data-width "320"
-                                                         :data-height "400"}
-                                                        {:id "entry-1-1"
-                                                         :className "mega-entry"
-                                                         :title "WE HAVE A LAUGH"
-                                                         :text "Cue James in a bald cap, need I say more?"
-                                                         :data-width "320"
-                                                         :data-height "400"}]}]
-                                      :children []}
+                                                                                          :object-id "g" 
+                                                                                          :widget-name "Standard text widget"
+                                                                                          :inner-html ["<p> Hi there </p>"]}}]}]
+                                                                 :children []}]}
+                                                    {:route-name "/residential"
+                                                     :bg-img "#333"
+                                                     :nav-hint ["Residential"]
+                                                     :nav-hint-style {:color "white"}
+                                                     :widgets [{:widget-uid 001
+                                                                :object-id "h" 
+                                                                :widget-name "Standard text widget"
+                                                                :inner-html ["<p> Hi there </p>"]}
+                                                               {:widget-uid 007
+                                                                :object-id "8" 
+                                                                :widget-name "Grid"
+                                                                :imgs [{:id "entry-1"
+                                                                        :className "mega-entry"
+                                                                        :data-src "http://solariarchitects.com/img/teampics/jsolari_everyday.jpg"
+                                                                        :data-width "320"
+                                                                        :data-height "400"}
+                                                                       {:id "entry-1-1"
+                                                                        :className "mega-entry"
+                                                                        :title "WE HAVE A LAUGH"
+                                                                        :text "Cue James in a bald cap, need I say more?"
+                                                                        :data-width "320"
+                                                                        :data-height "400"}]}]
+                                                     :children []}
+                                                    {:route-name "/multi-unit"
+                                                     :bg-img "#333"
+                                                     :nav-hint ["Multi Unit"]
+                                                     :nav-hint-style {:color "white"}
+                                                     :widgets [{:widget-uid 001
+                                                                :object-id "j" 
+                                                                :widget-name "Standard text widget"
+                                                                :inner-html ["<p> Hi there </p>"]}
+                                                               {:widget-uid 007
+                                                                :object-id "k" 
+                                                                :widget-name "Grid"
+                                                                :imgs [{:id "entry-1"
+                                                                        :className "mega-entry"
+                                                                        :data-src "http://solariarchitects.com/img/teampics/jsolari_everyday.jpg"
+                                                                        :data-width "320"
+                                                                        :data-height "400"}
+                                                                       {:id "entry-1-1"
+                                                                        :className "mega-entry"
+                                                                        :title "WE HAVE A LAUGH"
+                                                                        :text "Cue James in a bald cap, need I say more?"
+                                                                        :data-width "320"
+                                                                        :data-height "400"}]}]
+                                                     :children []}
+                                                    {:route-name "/commercial"
+                                                     :bg-img "#333"
+                                                     :nav-hint ["Commercial"]
+                                                     :nav-hint-style {:color "white"}
+                                                     :widgets [{:widget-uid 001
+                                                                :object-id "l" 
+                                                                :widget-name "Standard text widget"
+                                                                :inner-html ["<p> Hi there </p>"]}
+                                                               {:widget-uid 007
+                                                                :object-id "m" 
+                                                                :widget-name "Grid"
+                                                                :imgs [{:id "entry-1"
+                                                                        :className "mega-entry"
+                                                                        :data-src "http://solariarchitects.com/img/teampics/jsolari_everyday.jpg"
+                                                                        :data-width "320"
+                                                                        :data-height "400"}
+                                                                       {:id "entry-1-1"
+                                                                        :className "mega-entry"
+                                                                        :title "WE HAVE A LAUGH"
+                                                                        :text "Cue James in a bald cap, need I say more?"
+                                                                        :data-width "320"
+                                                                        :data-height "400"}]}]
+                                                     :children []}
 {:route-name "/our-process"
  :bg-img "from_uss.jpg"
  :grey-bg? true
@@ -491,4 +493,4 @@
              :nav-hint ["Info"]
              :nav-hint-style {:color "white"}
              :widgets []
-             :children []}]}]}}
+             :children []}]}]}}}
