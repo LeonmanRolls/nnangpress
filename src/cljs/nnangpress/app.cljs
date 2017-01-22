@@ -40,7 +40,18 @@
     (render-state [_ {:keys [add-widget remove-widget] :as state}]
       (let [all-widgets-data-obs (om/observe owner (mn/all-widgets-data))
             edit-mode-obs (om/observe owner (mn/edit-mode))
-            main-view-style-obs (om/observe owner (mn/main-view-style))]
+            main-view-style-obs (om/observe owner (mn/main-view-style))
+            routes-map-obs (om/observe owner (mn/routes-map))
+            current-route-obs (om/observe owner (mn/current-route))]
+
+        (println 
+          "current widgets: "
+          (type (mn/current-widgets 
+                  (clojure.string/split (first @current-route-obs) #"/")
+                  routes-map-obs))         
+          )
+
+
 
         (dom/div (clj->js (merge @main-view-style-obs {:className "main-view"})) 
 
@@ -95,8 +106,7 @@
     (render-state [_ {:keys [flatten-routes set-bg-img get-active-route] :as state}]
       (let [{:keys [:bg-img :widgets] :as fresh-active-route} (get-active-route
                                                                 (flatten-routes 
-                                                                  (:routes-map 
-                                                                    route-widget))
+                                                                  (:routes-map route-widget))
                                                                 current-route)]
 
         (om/update! active-route @fresh-active-route)
@@ -105,9 +115,10 @@
           (:grey-bg? fresh-active-route)
           (-> (js/$ "body") (.addClass "grey-out"))
           (-> (js/$ "body") (.removeClass "grey-out")))
-        
-                 (println "data: " data)
 
+        (println "main render widgets: " widgets)
+        (println "main render widgets type: " (type widgets))
+        
         (dom/div nil
                  (om/build wgt/admin-toolbar {})                                   
                  (om/build main-view widgets)
@@ -120,7 +131,8 @@
                                                        (.dir js/console user)
                                                        false)}
                       :signInFlow "popup"
-                      :signInOptions (array #js {:provider js/firebase.auth.EmailAuthProvider.PROVIDER_ID})
+                      :signInOptions (array 
+                                       #js {:provider js/firebase.auth.EmailAuthProvider.PROVIDER_ID})
                       :tosUrl "https://google.com"
                       :credentialHelper js/firebaseui.auth.CredentialHelper.NONE}
         ui (js/firebaseui.auth.AuthUI. (js/firebase.auth))

@@ -1,500 +1,500 @@
-  (widget-data 9)
-(str 
-    (defmethod widget-data 9 [_]
-      {:widget-uid 9
-       :widget-name "Right Nav"
-       :imgs []}))
-(str 
-    '(defmethod widget-data 9 [_]
-      {:widget-uid 9
-       :widget-name "Right Nav"
-       :imgs []}))
-(rdr/read-string 
-    (str 
-      '(defmethod widget-data 9 [_]
-         {:widget-uid 9
-          :widget-name "Right Nav"
-          :imgs []}))  
-    )
-(rdr/read-string 
-    (str 
-      (defmethod widget-data 9 [_]
-         {:widget-uid 9
-          :widget-name "Right Nav"
-          :imgs []}))  
-    )
-  (widget-data 9)
-(rdr/read-string 
-    (str 
-      (defmethod widget-data 10 [_]
-         {:widget-uid 10 
-          :widget-name "Right Nav"
-          :imgs []}))  
-    )
-  (widget-data 10)
-  (replumb/read-eval-call
-    {:preloads {:use '#{nnangpress.app}}}
-    (fn [rslt] rslt)
-    "(nnangpress.app/widget-data 1)"
+                                  (:children routes-map)
+                                  (index-of 
+                                    (vec (map :route-name (:children routes-map))) 
+                                            (str "/" fxs))
+                                  ))
+      :else (recur xs (get (:children routes-map) idx))
+      ))
   )
-(str (.log js/console "hi there"))
-(replumb/read-eval-call
-    {:preloads {:use '#{nnangpress.app}}}
-    (fn [rslt] rslt)
-    (str (.log js/console "hi there"))
+(loop [route (clojure.string/split "/" #"/")
+       routes-map (-> @mon :route-widget :routes-map)]
+  (let [x (first route)
+        xs (rest route)
+        fxs (first xs) 
+        idx (index-of (vec (map :route-name (:children routes-map))) x)]
+    (println "routes-map: " routes-map)
+    (cond 
+      (empty? xs) (:widgets routes-map)
+      (= "" x) (recur (rest xs) (get 
+                                  (:children routes-map)
+                                  (index-of 
+                                    (vec (map :route-name (:children routes-map))) 
+                                            (str "/" fxs))
+                                  ))
+      :else (recur xs (get (:children routes-map) idx))
+      ))
   )
-(replumb/read-eval-call
-    {:preloads {:use '#{nnangpress.app}}}
-    (fn [rslt] rslt)
-    (str (.log js/console "hi there"))
+(loop [route (clojure.string/split "/" #"/")
+       routes-map (-> @mon :route-widget :routes-map)]
+  (let [x (first route)
+        xs (rest route)
+        fxs (first xs) 
+        idx (index-of (vec (map :route-name (:children routes-map))) x)]
+    (println "routes-map: " routes-map)
+    (cond 
+      (empty? xs) (:widgets routes-map)
+      (= "" x) (recur (rest xs) (get 
+                                  (:children routes-map)
+                                  (index-of 
+                                    (vec (map :route-name (:children routes-map))) 
+                                            (str "/" fxs))
+                                  ))
+      :else (recur xs (get (:children routes-map) idx))
+      ))
   )
-(str (def ))
-(str '(def ))
-(str '(def this "that"))
-(replumb/read-eval-call
-      {:preloads {:use '#{nnangpress.app}}}
-      (fn [rslt] rslt)
-      (str '(def this "that")))
-this
-(replumb/read-eval-call
-      {:preloads {:use '#{nnangpress.app}}}
-      (fn [rslt] rslt)
-      (str '(def nnangpress.app/this "that")))
-this
-(replumb/read-eval-call
-      {:preloads {:use '#{nnangpress.app}}}
-      (fn [rslt] rslt)
-      (str '(def this "that")))
-cljs.user/this
-nnangpress.app/this
-    (replumb/read-eval-call
-      {:preloads {:use '#{nnangpress.app}}}
-      (fn [rslt] rslt)
-      (str '(def this "that")))
-    (replumb/read-eval-call
-      {:init-fn! (fn [bla] (println bla))
-       :preloads {:use '#{nnangpress.app}}}
-      (fn [rslt] rslt)
-      (str '(def this "that")))
-  (replumb/read-eval-call
-    {:preloads {:use '#{nnangpress.app}}}
-    (fn [rslt] rslt)
-    (str '(+ 10 10)) 
-    )
-(replumb/read-eval-call
-    {:preloads {:use '#{nnangpress.app}}}
-    (fn [rslt] rslt)
-    (str '(defmethod nnangpress.app/widget-data 10 [_]
-            {:widget-uid 10 
-             :widget-name "Right Nav"
-             :imgs []})) 
-    )
-  (widget-data 10)
-(replumb/read-eval-call
-    {:preloads {:use '#{nnangpress.app}}}
-    (fn [rslt] rslt)
-    (str '(defmethod nnangpress.app/widget-data 10 [_]
-            {:widget-uid 10 
-             :widget-name "Right Nav lol"
-             :imgs []})) 
-    )
-  (widget-data 10)
-(replumb/read-eval-call
-      {:preloads {:use '#{nnangpress.app}}}
-      (fn [rslt] 
-        rslt
-        (println (widget-data 10)))
-      (str '(defmethod nnangpress.app/widget-data 10 [_]
-              {:widget-uid 10 
-               :widget-name "Right Nav lol"
-               :imgs []})) 
-      )
-(replumb/read-eval-call
-    {:preloads {:use '#{nnangpress.app}}}
-    (fn [rslt] rslt)
-    (str '(defmethod widget 000 [data owner]
-            (reify
-              om/IInitState
-              (init-state [_]
-                {:uuid (random-uuid)})
-              om/IRenderState
-              (render-state [_ {:keys [uuid] :as state}]
-                (dom/div nil "Skeleton Widget"))))) 
-    )
-(replumb/read-eval-call
-    {:preloads {:use '#{nnangpress.app}}}
-    (fn [rslt] rslt)
-    (str '(defmethod nnangpress.app/widget 000 [data owner]
-            (reify
-              om/IInitState
-              (init-state [_]
-                {:uuid (random-uuid)})
-              om/IRenderState
-              (render-state [_ {:keys [uuid] :as state}]
-                (dom/div nil "Skeleton Widget"))))) 
-    )
-(replumb/read-eval-call
-    {:preloads {:require '#{nnangpress.app
-                            [om.dom :as dom]}
-                }}
-    (fn [rslt] rslt)
-    (str '(defmethod nnangpress.app/widget 000 [data owner]
-            (reify
-              om/IInitState
-              (init-state [_]
-                {:uuid (random-uuid)})
-              om/IRenderState
-              (render-state [_ {:keys [uuid] :as state}]
-                (dom/div nil "Skeleton Widget"))))) 
-    )
-(replumb/read-eval-call
-    {:preloads {:require '#{nnangpress.app
-                            [om.dom :as dom]}
-                }}
-    (fn [rslt] rslt)
-    (str '(defmethod nnangpress.app/widget 000 [data owner]
-            (reify
-              om/IInitState
-              (init-state [_]
-                {:uuid (random-uuid)})
-              om/IRenderState
-              (render-state [_ {:keys [uuid] :as state}]
-                (om.dom/div nil "Skeleton Widget"))))) 
-    )
-(replumb/read-eval-call
-    {:preloads {:require '#{nnangpress.app
-                            [om.dom :as dom :include-macros true]}
-                }}
-    (fn [rslt] rslt)
-    (str '(defmethod nnangpress.app/widget 000 [data owner]
-            (reify
-              om/IInitState
-              (init-state [_]
-                {:uuid (random-uuid)})
-              om/IRenderState
-              (render-state [_ {:keys [uuid] :as state}]
-                (om.dom/div nil "Skeleton Widget"))))) 
-    )
-(replumb/read-eval-call
-    {:preloads {:require '#{nnangpress.app
-                            [om.dom :as dom :include-macros true]}
-                }}
-    (fn [rslt] rslt)
-    (str '(defmethod nnangpress.app/widget 000 [data owner]
-            (reify
-              om/IInitState
-              (init-state [_]
-                {:uuid (random-uuid)})
-              om/IRenderState
-              (render-state [_ {:keys [uuid] :as state}]
-                (dom/div nil "Skeleton Widget"))))) 
-    )
-(replumb/read-eval-call
-    {:preloads {:require '#{nnangpress.app}
-                }}
-    (fn [rslt] rslt)
-    (str '(defmethod nnangpress.app/widget 000 [data owner]
-            (reify
-              om/IInitState
-              (init-state [_]
-                {:uuid (random-uuid)})
-              om/IRenderState
-              (render-state [_ {:keys [uuid] :as state}]
-                (dom/div nil "Skeleton Widget"))))) 
-    )
-(replumb/read-eval-call
-    {:preloads {:use '#{nnangpress.app}}}
-    (fn [rslt] rslt)
-    (str '(defmethod nnangpress.app/widget-data 10 [_]
-            {:widget-uid 10 
-             :widget-name "Right Nav lol"
-             :imgs []})) 
-    )
-(replumb/read-eval-call
-    {:preloads {:use '#{nnangpress.app}}}
-    (fn [rslt] rslt)
-    (str '(defmethod nnangpress.app/widget-data 10 [_]
-            {:widget-uid 10 
-             :widget-name "Right Nav lol"
-             :imgs []})) 
-    )
-(rdr/read-string 
-    (str 
-      (defmethod widget-data 10 [_]
-        {:widget-uid 10 
-         :widget-name "Right Nav"
-         :imgs []}))  
-    )
-(rdr/read-string 
-    (str 
-      '(defmethod widget-data 10 [_]
-        {:widget-uid 10 
-         :widget-name "Right Nav"
-         :imgs []}))  
-    )
-(str 
-      '(defmethod widget-data 10 [_]
-        {:widget-uid 10 
-         :widget-name "Right Nav"
-         :imgs []}))
-(str 
-      (defmethod widget-data 10 [_]
-        {:widget-uid 10 
-         :widget-name "Right Nav"
-         :imgs []}))
-(rdr/read-string 
-    (str 
-      '(defmethod widget-data 10 [_]
-        {:widget-uid 10 
-         :widget-name "Right Nav"
-         :imgs []}))  
-    )
-(rdr/read-string 
-    (str 
-      '(+ 1 2))  
-    )
-(rdr/read-string 
-    (str 
-      (+ 1 2))  
-    )
-(rdr/read-string 
-  "(+ 1 2)"
-    )
-(replumb/read-eval-call
-    {:preloads {:require '#{nnangpress.app}
-                }}
-    (fn [rslt] rslt)
-    (str '(defmethod nnangpress.app/widget 000 [data owner]
-            (reify
-              om/IInitState
-              (init-state [_]
-                {:uuid (random-uuid)})
-              om/IRenderState
-              (render-state [_ {:keys [uuid] :as state}]
-                (dom/div nil "Skeleton Widget"))))) 
-    )
-(replumb/read-eval-call
-    {:preloads {:require '#{nnangpress.app}
-                }}
-    (fn [rslt] rslt)
-    (str '(defmethod nnangpress.app/widget 000 [data owner]
-            (reify
-              om/IInitState
-              (init-state [_]
-                {:uuid (random-uuid)})
-              om/IRenderState
-              (render-state [_ {:keys [uuid] :as state}]
-                (dom/div nil "Skeleton Widget"))))) 
-    )
-(replumb/read-eval-call
-    {:preloads {:use '#{nnangpress.app}}}
-    (fn [rslt] rslt)
-    (str '(defmethod nnangpress.app/widget-data 10 [_]
-            {:widget-uid 10 
-             :widget-name "Right Nav lol"
-             :imgs []})) 
-    )
-(replumb/read-eval-call
-    {:preloads {:require '#{nnangpress.app}
-                }}
-    (fn [rslt] rslt)
-    (str 
-      '(ns nnangpress.app
-        (:import [goog.history Html5History EventType])
-        (:require-macros [cljs.core.async.macros :refer  [go go-loop]])
-        (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
-                  [om.dom :as dom :include-macros true]
-                  [clojure.spec :as s]
-                  [cljs.core.async :as cas :refer [>! <! put! chan pub sub close!]]
-                  [cljs.reader :as rdr]
-                  [goog.events :as ev]
-                  [goog.dom :as gdom]
-                  [ajax.core :refer [GET POST]]
-                  [replumb.core :as replumb]))
-      ) 
-    )
-(replumb/read-eval-call
-    {:preloads {:require '#{nnangpress.app}
-                }}
-    (fn [rslt] rslt)
-    (str 
-      '(ns nnangpress.app
-        (:require-macros [cljs.core.async.macros :refer  [go go-loop]])
-        )
-      ) 
-    )
-(replumb/read-eval-call
-    {:preloads {:require '#{nnangpress.app}}
-     :src-paths ["js/app.js"]}
-    (fn [rslt] rslt)
-    (str '(defmethod nnangpress.app/widget 000 [data owner]
-            (reify
-              om/IInitState
-              (init-state [_]
-                {:uuid (random-uuid)})
-              om/IRenderState
-              (render-state [_ {:keys [uuid] :as state}]
-                (dom/div nil "Skeleton Widget"))))) 
-    )
-(replumb/read-eval-call
-    {:preloads {:require '#{nnangpress.app}}
-     :src-paths ["js/app.js"]}
-    (fn [rslt] rslt)
-    (str '(defmethod nnangpress.app/widget 000 [data owner]
-            (reify
-              om/IInitState
-              (init-state [_]
-                {:uuid (random-uuid)})
-              om/IRenderState
-              (render-state [_ {:keys [uuid] :as state}]
-                (om.dom/div nil "Skeleton Widget"))))) 
-    )
-(replumb/read-eval-call
-    {:preloads {:require '#{nnangpress.app}}
-     :src-paths ["js/app.js"]}
-    (fn [rslt] rslt)
-    (str '(defmethod nnangpress.app/widget 000 [data owner]
-            (reify
-              om/IInitState
-              (init-state [_]
-                {:uuid (random-uuid)})
-              om/IRenderState
-              (render-state [_ {:keys [uuid] :as state}]
-                (om.dom/div nil "Skeleton Widget"))))) 
-    )
-(replumb/read-eval-call
-    {:preloads {:require '#{[om.dom :as dom :include-macros true]}}
-     :src-paths ["js/app.js"]}
-    (fn [rslt] rslt)
-    (str '()) 
-    )
-(replumb/read-eval-call
-    {:preloads {:require '#{[om.dom :as dom :include-macros true]}}
-     :src-paths ["js/app.js"]}
-    (fn [rslt] rslt)
-    (str 'dom/div) 
-    )
-(replumb/read-eval-call
-    {:preloads {:require '#{[om.dom :as dom :include-macros true]}}
-     :src-paths ["js/app.js"]}
-    (fn [rslt] rslt)
-    (str 'om.dom/div) 
-    )
-(replumb/read-eval-call
-    {:preloads {:require '#{}}
-     :src-paths ["js/app.js"]}
-    (fn [rslt] rslt)
-    (str 'om.dom/div) 
-    )
-(replumb/read-eval-call
-    {:preloads {:require '#{}}
-     :src-paths ["js/app.js"]}
-    (fn [rslt] rslt)
-    (str 'om.dom/div) 
-    )
-(replumb/read-eval-call
-    {:preloads {:require '#{nnangpress.app}}
-     :src-paths ["js/app.js"]}
-    (fn [rslt] rslt)
-    (str '(defmethod nnangpress.app/widget 000 [data owner]
-            (reify
-              om/IInitState
-              (init-state [_]
-                {:uuid (random-uuid)})
-              om/IRenderState
-              (render-state [_ {:keys [uuid] :as state}]
-                (om.dom/div nil "Skeleton Widget"))))) 
-    )
-(replumb/read-eval-call
-      {:preloads {:require '#{nnangpress.app}
-                  }}
-      (fn [rslt] (println rslt))
-      (str '(require '[om.dom :as dom :include-macros true])) 
-      )
-(replumb/read-eval-call
-      (merge (replumb/browser-options ["/js" "/js/app.out"]
-                                      io/fetch-file!)
-             {:warning-as-error true}
-             (fn [rslt] (println rslt))
-             (str '(require '[om.dom :as dom :include-macros true])) 
-             )
-      )
-(replumb/read-eval-call
-      (merge (replumb/browser-options ["/js" "/js/app.out"]
-                                      io/fetch-file!)
-             {:warning-as-error true}
-             )
-      (fn [rslt] (println rslt))
-      (str '(require '[om.dom :as dom :include-macros true]))
-      )
-(replumb/browser-options ["/js" "/js/app.out"]
-                                      io/fetch-file!)
-(ns nnangpress.app
-  (:import [goog.history Html5History EventType])
-  (:require-macros [cljs.core.async.macros :refer  [go go-loop]])
-  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
-            [om.dom :as dom :include-macros true]
-            [clojure.spec :as s]
-            [cljs.core.async :as cas :refer [>! <! put! chan pub sub close!]]
-            [cljs.reader :as rdr]
-            [goog.events :as ev]
-            [goog.dom :as gdom]
-            [ajax.core :refer [GET POST]]
-            [replumb.core :as replumb]
-            [replumb.browser.io :as io]))
-(ns nnangpress.app
-  (:import [goog.history Html5History EventType])
-  (:require-macros [cljs.core.async.macros :refer  [go go-loop]])
-  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
-            [om.dom :as dom :include-macros true]
-            [clojure.spec :as s]
-            [cljs.core.async :as cas :refer [>! <! put! chan pub sub close!]]
-            [cljs.reader :as rdr]
-            [goog.events :as ev]
-            [goog.dom :as gdom]
-            [ajax.core :refer [GET POST]]
-            [replumb.core :as replumb]
-            [replumb.browser.io :as io]))
-(str 
-'(require '[om.dom :as dom :include-macros true])
-'(defmethod nnangpress.app/widget 1 [data owner]
-             (reify
-               om/IInitState
-               (init-state [_]
-                 {:uuid (random-uuid)})
-               om/IRenderState
-               (render-state [_ {:keys [uuid] :as state}]
-                 (om.dom/div nil "Skeleton Widget"))))
-        )
-(ns nnangpress.app
-  (:import [goog.history Html5History EventType])
-  (:require-macros [cljs.core.async.macros :refer  [go go-loop]])
-  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
-            [om.dom :as dom :include-macros true]
-            [clojure.spec :as s]
-            [cljs.core.async :as cas :refer [>! <! put! chan pub sub close!]]
-            [cljs.reader :as rdr]
-            [goog.events :as ev]
-            [goog.dom :as gdom]
-            [ajax.core :refer [GET POST]]
-            [replumb.core :as replumb]))
-(start-repl)
-(ns nnangpress.app
-  (:import [goog.history Html5History EventType])
-  (:require-macros [cljs.core.async.macros :refer  [go go-loop]])
-  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
-            [om.dom :as dom :include-macros true]
-            [clojure.spec :as s]
-            [cljs.core.async :as cas :refer [>! <! put! chan pub sub close!]]
-            [cljs.reader :as rdr]
-            [goog.events :as ev]
-            [goog.dom :as gdom]
-            [ajax.core :refer [GET POST]]
-            [replumb.core :as replumb]))
-(uid)
-(take 3 (uid))
-(concat (take 3 (uid)))
-(str (take 3 (uid)))
-(merge (take 3 (uid)))
-(concat (take 3 (uid)))
-(subs (uid) 0 3)
+(loop [route (clojure.string/split "/" #"/")
+       routes-map (-> @mon :route-widget :routes-map)]
+  (let [x (first route)
+        xs (rest route)
+        fxs (first xs) 
+        idx (index-of (vec (map :route-name (:children routes-map))) x)]
+    (println "routes-map: " routes-map)
+    (cond 
+      (empty? xs) (:widgets routes-map)
+      (= "" x) (recur (rest xs) (get 
+                                  (:children routes-map)
+                                  (index-of 
+                                    (vec (map :route-name (:children routes-map))) 
+                                            (str "/" fxs))
+                                  ))
+      :else (recur xs (get (:children routes-map) idx))
+      ))
+  )
+(loop [route (clojure.string/split "/routea" #"/")
+       routes-map (-> @mon :route-widget :routes-map)]
+  (let [x (first route)
+        xs (rest route)
+        fxs (first xs) 
+        idx (index-of (vec (map :route-name (:children routes-map))) x)]
+    (println "routes-map: " routes-map)
+    (cond 
+      (empty? xs) (:widgets routes-map)
+      (= "" x) (recur (rest xs) (get 
+                                  (:children routes-map)
+                                  (index-of 
+                                    (vec (map :route-name (:children routes-map))) 
+                                            (str "/" fxs))
+                                  ))
+      :else (recur xs (get (:children routes-map) idx))
+      ))
+  )
+(loop [route (clojure.string/split "/routea/routeaa" #"/")
+       routes-map (-> @mon :route-widget :routes-map)]
+  (let [x (first route)
+        xs (rest route)
+        fxs (first xs) 
+        idx (index-of (vec (map :route-name (:children routes-map))) x)]
+    (println "routes-map: " routes-map)
+    (cond 
+      (empty? xs) (:widgets routes-map)
+      (= "" x) (recur (rest xs) (get 
+                                  (:children routes-map)
+                                  (index-of 
+                                    (vec (map :route-name (:children routes-map))) 
+                                            (str "/" fxs))
+                                  ))
+      :else (recur xs (get (:children routes-map) idx))
+      ))
+  )
+monolith
+  (def mon monolith)
+mon
+(loop [route (clojure.string/split "/routea/routeaa" #"/")
+       routes-map (-> @mon :route-widget :routes-map)]
+  (let [x (first route)
+        xs (rest route)
+        fxs (first xs) 
+        idx (index-of (vec (map :route-name (:children routes-map))) x)]
+    (println "routes-map: " routes-map)
+    (cond 
+      (empty? xs) (:widgets routes-map)
+      (= "" x) (recur (rest xs) (get 
+                                  (:children routes-map)
+                                  (index-of 
+                                    (vec (map :route-name (:children routes-map))) 
+                                            (str "/" fxs))
+                                  ))
+      :else (recur xs (get (:children routes-map) idx))
+      ))
+  )
+(loop [route (clojure.string/split "/routea/routeaa" #"/")
+       routes-map (-> @mon :route-widget :routes-map)]
+  (let [x (first route)
+        xs (rest route)
+        fxs (first xs) 
+        idx (index-of (vec (map :route-name (:children routes-map))) x)]
+    (println "routes-map: " routes-map)
+    (cond 
+      (empty? xs) (:widgets routes-map)
+      (= "" x) (recur xs (get 
+                           (:children routes-map)
+                           (index-of 
+                             (vec (map :route-name (:children routes-map))) 
+                             (str "/" fxs))
+                           ))
+     
+      ))
+  )
+(loop [route (clojure.string/split "/routea/routeaa" #"/")
+       routes-map (-> @mon :route-widget :routes-map)]
+  (let [x (first route)
+        xs (rest route)
+        fxs (first xs) 
+        idx (index-of (vec (map :route-name (:children routes-map))) x)]
+    (println "routes-map: " routes-map)
+    (cond 
+      (empty? xs) (:widgets routes-map)
+      (= "" x) (recur xs (get 
+                           (:children routes-map)
+                           (index-of 
+                             (vec (map :route-name (:children routes-map))) 
+                             (str "/" fxs))
+                           ))
+     
+      ))
+  )
+(loop [route (clojure.string/split "/routea/routeaa" #"/")
+       routes-map (-> @mon :route-widget :routes-map)]
+  (let [x (first route)
+        xs (rest route)
+        fxs (first xs) 
+        idx (index-of (vec (map :route-name (:children routes-map))) x)]
+    (println "routes-map: " routes-map)
+    (cond 
+      (empty? xs) (:widgets routes-map)
+      (= "" x) (recur xs (get 
+                           (:children routes-map)
+                           (index-of 
+                             (vec (map :route-name (:children routes-map))) 
+                             (str "/" fxs))
+                           ))
+      :else (recur xs (get (:children routes-map) idx))
+      ))
+  )
+(loop [route (clojure.string/split "/routea/routeaa" #"/")
+       routes-map (-> @mon :route-widget :routes-map)]
+  (let [x (first route)
+        xs (rest route)
+        fxs (first xs) 
+        idx (index-of (vec (map :route-name (:children routes-map))) x)]
+    (println "routes-map: " routes-map)
+    (cond 
+      (empty? xs) (:widgets routes-map)
+      (= "" x) (recur xs (get 
+                           (:children routes-map)
+                           (index-of 
+                             (vec (map :route-name (:children routes-map))) 
+                             (str "/" fxs))
+                           ))
+      :else (recur xs (get (:children routes-map) idx))
+      ))
+  )
+(loop [route (clojure.string/split "/routea/routeaa" #"/")
+       routes-map (-> @mon :route-widget :routes-map)]
+  (let [x (first route)
+        xs (rest route)
+        fxs (first xs) 
+        idx (index-of (vec (map :route-name (:children routes-map))) x)]
+    (println "routes-map: " routes-map)
+    (println "xs: " xs)
+    (cond 
+      (empty? xs) (:widgets routes-map)
+      (= "" x) (recur xs (get 
+                           (:children routes-map)
+                           (index-of 
+                             (vec (map :route-name (:children routes-map))) 
+                             (str "/" fxs))
+                           ))
+      :else (recur xs (get (:children routes-map) idx))
+      ))
+  )
+(loop [route (clojure.string/split "/routea/routeaa" #"/")
+       routes-map (-> @mon :route-widget :routes-map)]
+  (let [x (first route)
+        xs (rest route)
+        fxs (first xs) 
+        idx (index-of (vec (map :route-name (:children routes-map))) x)]
+    (println "xs: " xs)
+    (println "routes-map: " routes-map)
+    (cond 
+      (empty? xs) (:widgets routes-map)
+      (= "" x) (recur xs (get 
+                           (:children routes-map)
+                           (index-of 
+                             (vec (map :route-name (:children routes-map))) 
+                             (str "/" fxs))
+                           ))
+      :else (recur xs (get (:children routes-map) idx))
+      ))
+  )
+(loop [route (clojure.string/split "/routea/routeaa" #"/")
+       routes-map (-> @mon :route-widget :routes-map)]
+  (let [x (first route)
+        xs (rest route)
+        fxs (first xs) 
+        idx (index-of (vec (map :route-name (:children routes-map))) x)]
+    (println "x: " x)
+    (println "xs: " xs)
+    (println "routes-map: " routes-map)
+    (cond 
+      (empty? xs) (:widgets routes-map)
+      (= "" x) (recur xs (get 
+                           (:children routes-map)
+                           (index-of 
+                             (vec (map :route-name (:children routes-map))) 
+                             (str "/" fxs))
+                           ))
+      :else (recur xs (get (:children routes-map) idx))
+      ))
+  )
+(loop [route (clojure.string/split "/routea/routeaa" #"/")
+       routes-map (-> @mon :route-widget :routes-map)]
+  (let [x (first route)
+        xs (rest route)
+        fxs (first xs) 
+        idx (index-of (vec (map :route-name (:children routes-map))) x)]
+    (println "x: " x)
+    (println "xs: " xs)
+    (println "routes-map: " routes-map)
+    (cond 
+      (empty? xs) (:widgets routes-map)
+      (= "" x) (recur xs (get 
+                           (:children routes-map)
+                           (index-of 
+                             (vec (map :route-name (:children routes-map))) 
+                             (str "/" fxs))
+                           ))
+      :else (recur xs (get 
+                           (:children routes-map)
+                           (index-of 
+                             (vec (map :route-name (:children routes-map))) 
+                             (str "/" fxs))))
+      ))
+  )
+(loop [route (clojure.string/split "/routea" #"/")
+       routes-map (-> @mon :route-widget :routes-map)]
+  (let [x (first route)
+        xs (rest route)
+        fxs (first xs) 
+        idx (index-of (vec (map :route-name (:children routes-map))) x)]
+    (println "x: " x)
+    (println "xs: " xs)
+    (println "routes-map: " routes-map)
+    (cond 
+      (empty? xs) (:widgets routes-map)
+      (= "" x) (recur xs (get 
+                           (:children routes-map)
+                           (index-of 
+                             (vec (map :route-name (:children routes-map))) 
+                             (str "/" fxs))
+                           ))
+      :else (recur xs (get 
+                           (:children routes-map)
+                           (index-of 
+                             (vec (map :route-name (:children routes-map))) 
+                             (str "/" fxs))))
+      ))
+  )
+(loop [route (clojure.string/split "/" #"/")
+       routes-map (-> @mon :route-widget :routes-map)]
+  (let [x (first route)
+        xs (rest route)
+        fxs (first xs) 
+        idx (index-of (vec (map :route-name (:children routes-map))) x)]
+    (println "x: " x)
+    (println "xs: " xs)
+    (println "routes-map: " routes-map)
+    (cond 
+      (empty? xs) (:widgets routes-map)
+      (= "" x) (recur xs (get 
+                           (:children routes-map)
+                           (index-of 
+                             (vec (map :route-name (:children routes-map))) 
+                             (str "/" fxs))
+                           ))
+      :else (recur xs (get 
+                           (:children routes-map)
+                           (index-of 
+                             (vec (map :route-name (:children routes-map))) 
+                             (str "/" fxs))))
+      ))
+  )
+(loop [route (clojure.string/split "/routea/routeaa" #"/")
+       routes-map (-> @mon :route-widget :routes-map)]
+  (let [x (first route)
+        xs (rest route)
+        fxs (first xs) 
+        idx (index-of (vec (map :route-name (:children routes-map))) x)]
+    (println "x: " x)
+    (println "xs: " xs)
+    (println "routes-map: " routes-map)
+    (cond 
+      (empty? xs) (:widgets routes-map)
+      (= "" x) (recur xs (get 
+                           (:children routes-map)
+                           (index-of 
+                             (vec (map :route-name (:children routes-map))) 
+                             (str "/" fxs))
+                           ))
+      :else (recur xs (get 
+                           (:children routes-map)
+                           (index-of 
+                             (vec (map :route-name (:children routes-map))) 
+                             (str "/" fxs))))
+      ))
+  )
+(loop [route (clojure.string/split "/routea/routeaa" #"/")
+       routes-map (-> @mon :route-widget :routes-map)]
+  (let [x (first route)
+        xs (rest route)
+        fxs (first xs) 
+        idx (index-of 
+                             (vec (map :route-name (:children routes-map))) 
+                             (str "/" fxs))]
+    (println "x: " x)
+    (println "xs: " xs)
+    (println "routes-map: " routes-map)
+    (cond 
+      (empty? xs) (:widgets routes-map)
+      (= "" x) (recur xs (get 
+                           (:children routes-map)
+                          idx 
+                           ))
+      :else (recur xs (get 
+                        (:children routes-map)
+                        idx)))))
+(loop [route (clojure.string/split "/routea" #"/")
+       routes-map (-> @mon :route-widget :routes-map)]
+  (let [x (first route)
+        xs (rest route)
+        fxs (first xs) 
+        idx (index-of 
+                             (vec (map :route-name (:children routes-map))) 
+                             (str "/" fxs))]
+    (println "x: " x)
+    (println "xs: " xs)
+    (println "routes-map: " routes-map)
+    (cond 
+      (empty? xs) (:widgets routes-map)
+      (= "" x) (recur xs (get 
+                           (:children routes-map)
+                          idx 
+                           ))
+      :else (recur xs (get 
+                        (:children routes-map)
+                        idx)))))
+(loop [route (clojure.string/split "/" #"/")
+       routes-map (-> @mon :route-widget :routes-map)]
+  (let [x (first route)
+        xs (rest route)
+        fxs (first xs) 
+        idx (index-of 
+                             (vec (map :route-name (:children routes-map))) 
+                             (str "/" fxs))]
+    (println "x: " x)
+    (println "xs: " xs)
+    (println "routes-map: " routes-map)
+    (cond 
+      (empty? xs) (:widgets routes-map)
+      (= "" x) (recur xs (get 
+                           (:children routes-map)
+                          idx 
+                           ))
+      :else (recur xs (get 
+                        (:children routes-map)
+                        idx)))))
+(loop [route (clojure.string/split "/routea/routeaa" #"/")
+       routes-map (-> @mon :route-widget :routes-map)]
+  (let [x (first route)
+        xs (rest route)
+        fxs (first xs) 
+        idx (index-of 
+                             (vec (map :route-name (:children routes-map))) 
+                             (str "/" fxs))]
+    (println "x: " x)
+    (println "xs: " xs)
+    (println "routes-map: " routes-map)
+    (cond 
+      (empty? xs) (:widgets routes-map)
+      (= "" x) (recur xs (get 
+                           (:children routes-map)
+                          idx 
+                           ))
+      :else (recur xs (get 
+                        (:children routes-map)
+                        idx)))))
+(loop [route (clojure.string/split "/routea/routeaa" #"/")
+       routes-map (-> @mon :route-widget :routes-map)]
+  (let [x (first route)
+        xs (rest route)
+        fxs (first xs) 
+        idx (index-of (vec (map :route-name (:children routes-map))) (str "/" fxs))]
+    (println "x: " x)
+    (println "xs: " xs)
+    (println "routes-map: " routes-map)
+    (cond 
+      (empty? xs) (:widgets routes-map)
+      :else (recur xs (get (:children routes-map) idx)))))
+(loop [route (clojure.string/split "/routea" #"/")
+       routes-map (-> @mon :route-widget :routes-map)]
+  (let [x (first route)
+        xs (rest route)
+        fxs (first xs) 
+        idx (index-of (vec (map :route-name (:children routes-map))) (str "/" fxs))]
+    (println "x: " x)
+    (println "xs: " xs)
+    (println "routes-map: " routes-map)
+    (cond 
+      (empty? xs) (:widgets routes-map)
+      :else (recur xs (get (:children routes-map) idx)))))
+(loop [route (clojure.string/split "/" #"/")
+       routes-map (-> @mon :route-widget :routes-map)]
+  (let [x (first route)
+        xs (rest route)
+        fxs (first xs) 
+        idx (index-of (vec (map :route-name (:children routes-map))) (str "/" fxs))]
+    (println "x: " x)
+    (println "xs: " xs)
+    (println "routes-map: " routes-map)
+    (cond 
+      (empty? xs) (:widgets routes-map)
+      :else (recur xs (get (:children routes-map) idx)))))
+(loop [route (clojure.string/split "/routea/routeaa" #"/")
+       routes-map (-> @mon :route-widget :routes-map)]
+  (let [x (first route)
+        xs (rest route)
+        fxs (first xs) 
+        idx (index-of (vec (map :route-name (:children routes-map))) (str "/" fxs))]
+    (println "x: " x)
+    (println "xs: " xs)
+    (println "routes-map: " routes-map)
+    (cond 
+      (empty? xs) (:widgets routes-map)
+      :else (recur xs (get (:children routes-map) idx)))))
+(loop [route (clojure.string/split "/routea" #"/")
+       routes-map (-> @mon :route-widget :routes-map)]
+  (let [x (first route)
+        xs (rest route)
+        fxs (first xs) 
+        idx (index-of (vec (map :route-name (:children routes-map))) (str "/" fxs))]
+    (println "x: " x)
+    (println "xs: " xs)
+    (println "routes-map: " routes-map)
+    (cond 
+      (empty? xs) (:widgets routes-map)
+      :else (recur xs (get (:children routes-map) idx)))))
+(defn current-widgets [route routes-map]
+  (let [xs (rest route)
+        fxs (first xs) 
+        idx (index-of (vec (map :route-name (:children routes-map))) (str "/" fxs))]
+    (cond 
+      (empty? xs) (:widgets routes-map)
+      :else (current-widgets xs (get (:children routes-map) idx)))))
+(current-widgets 
+  (clojure.string/split "/routea/routeaa" #"/")
+(-> @mon :route-widget :routes-map)
+  )
+(current-widgets 
+  (clojure.string/split "/routea" #"/")
+  (-> @mon :route-widget :routes-map)
+  )

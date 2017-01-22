@@ -338,11 +338,15 @@
       (let [advertise? (om/get-state owner :advertise?)
             edit-mode-obs (om/observe owner (mn/edit-mode))]
 
+        (println "simple image data: " data)
+        (println "simple image data type: " (type data))
+        (println "simple image data img type: " (type img))
+
         (dom/div nil
                  (dom/img #js {:style #js {:width "100%"}
-                               :src img})
+                               :src (:img data)})
                  (when (and (first @edit-mode-obs) (not advertise?)) 
-                   (dom/input #js {:value img
+                   (dom/input #js {:value (:img data) 
                                    :style #js {:width "100%"}
                                    :onChange (fn [e]
                                                (om/update! data :img (.. e -target -value)))})))))))
@@ -562,5 +566,6 @@
                                                   (vec
                                                     (remove #(= (:object-id %) object-id) x)))))} 
                                "Delete"))
+                 (println "all-widget-wrapper type: " (type data))
                  (om/build widget data))))))
 
