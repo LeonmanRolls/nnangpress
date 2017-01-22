@@ -544,20 +544,18 @@
   (reify 
     om/IRender
     (render [_]
-      (let [routes-map-obs (mn/routes-map)
-            current-route-obs (mn/current-route)
+      (let [routes-map-obs (om/observe owner (mn/routes-map))
+            current-route-obs (om/observe owner (mn/current-route))
             current-widgets (mn/current-widgets 
                               (clojure.string/split (first @current-route-obs) #"/")
-                              routes-map-obs)
-            current-widgets-ref (om/observe owner (mn/current-widgets-ref))]
+                              routes-map-obs)]
 
         (dom/div #js {:className "selectWidget"} 
                  widget-name 
                  (dom/button #js {:onClick (fn [_] (om/transact! 
-                                                     (mn/current-widgets-ref)
+                                                     current-widgets
                                                      (fn [x] 
-                                                       (conj x 
-                                                             (widget-data widget-uid)))))} 
+                                                       (conj x (widget-data widget-uid)))))} 
                              "Add widget")
                  (om/build widget data {:init-state {:advertise? true}}))))))
 
@@ -577,9 +575,7 @@
                                               (om/transact! 
                                                 current-widgets 
                                                 (fn [x]
-                                                  (vec
-                                                    (remove #(= (:object-id %) object-id) x)))))} 
+                                                  (vec (remove #(= (:object-id %) object-id) x)))))} 
                                "Delete"))
-                 
                  (om/build widget data))))))
 

@@ -44,14 +44,6 @@
             routes-map-obs (om/observe owner (mn/routes-map))
             current-route-obs (om/observe owner (mn/current-route))]
 
-        (println 
-          "current widgets: "
-          (type (mn/current-widgets 
-                  (clojure.string/split (first @current-route-obs) #"/")
-                  routes-map-obs))         
-          )
-
-
         (dom/div (clj->js (merge @main-view-style-obs {:className "main-view"})) 
 
                  (apply dom/div nil
@@ -60,10 +52,9 @@
                  (when (first @edit-mode-obs)
                    (dom/div #js {:className "edit"}
                             (apply dom/div nil 
-                                   (om/build-all wgt/select-widget-wrapper all-widgets-data-obs
-                                                 ))))
-                 
-                 )))))
+                                   (om/build-all 
+                                     wgt/select-widget-wrapper 
+                                     all-widgets-data-obs)))))))))
 
 (defn master [{:keys [:route-widget :current-route :active-route] 
                :as data} owner]
@@ -119,9 +110,6 @@
           (:grey-bg? fresh-active-route)
           (-> (js/$ "body") (.addClass "grey-out"))
           (-> (js/$ "body") (.removeClass "grey-out")))
-
-        (println "main render widgets: " current-widgets)
-        (println "main render widgets type: " (type current-widgets))
         
         (dom/div nil
                  (om/build wgt/admin-toolbar {})                                   

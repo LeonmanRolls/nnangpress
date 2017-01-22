@@ -184,12 +184,6 @@
 
 (defn ref-cursor-init [monolith]
 
-  (defn current-widgets-ref []
-    (om/ref-cursor 
-      (current-widgets 
-        (:current-route (om/root-cursor monolith))
-        (:routes-map (:route-widget (om/root-cursor monolith))))))
-
   (defn main-view-style []
     (om/ref-cursor (-> (om/root-cursor monolith) :route-widget :main-view-style)))
 
