@@ -52,19 +52,18 @@
           )
 
 
-
         (dom/div (clj->js (merge @main-view-style-obs {:className "main-view"})) 
 
                  (apply dom/div nil
-                        (om/build-all wgt/all-widget-wrapper data
-                                      {:state {:current-widgets data}}))
+                        (om/build-all wgt/all-widget-wrapper data))
 
                  (when (first @edit-mode-obs)
                    (dom/div #js {:className "edit"}
-
                             (apply dom/div nil 
                                    (om/build-all wgt/select-widget-wrapper all-widgets-data-obs
-                                                 {:state {:cursor data}})))))))))
+                                                 ))))
+                 
+                 )))))
 
 (defn master [{:keys [:route-widget :current-route :active-route] 
                :as data} owner]
@@ -107,7 +106,12 @@
       (let [{:keys [:bg-img :widgets] :as fresh-active-route} (get-active-route
                                                                 (flatten-routes 
                                                                   (:routes-map route-widget))
-                                                                current-route)]
+                                                                current-route)
+            routes-map-obs (om/observe owner (mn/routes-map))
+            current-route-obs (om/observe owner (mn/current-route))
+            current-widgets (mn/current-widgets 
+                              (clojure.string/split (first current-route) #"/")
+                              (:routes-map route-widget))]
 
         (om/update! active-route @fresh-active-route)
         (set-bg-img bg-img)
@@ -116,12 +120,12 @@
           (-> (js/$ "body") (.addClass "grey-out"))
           (-> (js/$ "body") (.removeClass "grey-out")))
 
-        (println "main render widgets: " widgets)
-        (println "main render widgets type: " (type widgets))
+        (println "main render widgets: " current-widgets)
+        (println "main render widgets type: " (type current-widgets))
         
         (dom/div nil
                  (om/build wgt/admin-toolbar {})                                   
-                 (om/build main-view widgets)
+                 (om/build main-view current-widgets)
                  (om/build nv/navbar (:route-widget data)))))))
 
 (defn init []

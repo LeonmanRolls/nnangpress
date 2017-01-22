@@ -326,7 +326,7 @@
    :img "http://solariarchitects.com/img/leaderboards/group_photo_everyday_zoomed.jpg"})
 
 ;Simple Image
-(defmethod widget 006 [{:keys [img] :as data} owner]
+(defmethod widget 006 [{:keys [img object-id] :as data} owner]
   (reify
     om/IInitState
     (init-state [_]
@@ -338,17 +338,16 @@
       (let [advertise? (om/get-state owner :advertise?)
             edit-mode-obs (om/observe owner (mn/edit-mode))]
 
-        (println "simple image data: " data)
-        (println "simple image data type: " (type data))
-        (println "simple image data img type: " (type img))
+        (println "object-id" object-id)
 
         (dom/div nil
                  (dom/img #js {:style #js {:width "100%"}
                                :src (:img data)})
-                 (when (and (first @edit-mode-obs) (not advertise?)) 
+                 (when (and (first @edit-mode-obs) #_(not advertise?)) 
                    (dom/input #js {:value (:img data) 
                                    :style #js {:width "100%"}
                                    :onChange (fn [e]
+                                               (println "target" (.. e -target -value))
                                                (om/update! data :img (.. e -target -value)))})))))))
 
 (defmethod widget-data 007 [_]
@@ -541,22 +540,39 @@
                                                  [(not (first dabool))] )))}
                              "Toogle edit mode"))))))
 
-(defn select-widget-wrapper [{:keys [widget-name] :as data} owner]
+(defn select-widget-wrapper [{:keys [widget-name widget-uid] :as data} owner]
   (reify 
-    om/IRenderState 
-    (render-state [_ {:keys [cursor] :as state}]
-      (dom/div #js {:className "selectWidget"} 
-               widget-name 
-               (dom/button #js {:onClick (fn [_] (om/transact! 
-                                                   cursor 
-                                                   (fn [x] (conj x data))))} "Add widget")
-               (om/build widget data {:init-state {:advertise? true}})))))
+    om/IRender
+    (render [_]
+      (let [routes-map-obs (mn/routes-map)
+            current-route-obs (mn/current-route)
+            current-widgets (mn/current-widgets 
+                              (clojure.string/split (first @current-route-obs) #"/")
+                              routes-map-obs)]
+
+        (println "select widget wrapper data: " data)
+
+        (dom/div #js {:className "selectWidget"} 
+                 widget-name 
+                 (dom/button #js {:onClick (fn [_] (om/transact! 
+                                                     current-widgets
+                                                     (fn [x] 
+                                                       (conj x 
+                                                             (widget-data widget-uid)))))} 
+                             "Add widget")
+                 (om/build widget data {:init-state {:advertise? true}}))))))
+;should be conjing from multi-method
 
 (defn all-widget-wrapper [{:keys [object-id] :as data} owner]
   (reify 
-    om/IRenderState 
-    (render-state [_ {:keys [current-widgets] :as state}]
-      (let [edit-mode-obs (om/observe owner (mn/edit-mode))]
+    om/IRender
+    (render [_ ]
+      (let [edit-mode-obs (om/observe owner (mn/edit-mode))
+            routes-map-obs (om/observe owner (mn/routes-map))
+            current-route-obs (om/observe owner (mn/current-route))
+            current-widgets (mn/current-widgets 
+                              (clojure.string/split (first @current-route-obs) #"/")
+                              routes-map-obs)]
         (dom/div nil 
                  (when (first @edit-mode-obs)
                    (dom/button #js{:onClick (fn [_] 
@@ -566,6 +582,6 @@
                                                   (vec
                                                     (remove #(= (:object-id %) object-id) x)))))} 
                                "Delete"))
-                 (println "all-widget-wrapper type: " (type data))
+                 
                  (om/build widget data))))))
 
