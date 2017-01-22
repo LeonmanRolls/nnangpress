@@ -554,8 +554,8 @@
     (render-state [_ {:keys [current-widgets] :as state}]
       (let [edit-mode-obs (om/observe owner (mn/edit-mode))]
         (dom/div nil 
-                 #_(when (first @edit-mode-obs)
-                   #_(dom/button #js{:onClick (fn [_] 
+                 (when (first @edit-mode-obs)
+                   (dom/button #js{:onClick (fn [_] 
                                               (om/transact! 
                                                 current-widgets 
                                                 (fn [x]

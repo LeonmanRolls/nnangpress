@@ -17,6 +17,7 @@
                           js/window.location.host))
     (.setUseFragment false)))
 
+;This is probably why state is not responsing to url change anymore
 (defn handle-url-change [e])
 
 (defonce history (doto (make-history)
