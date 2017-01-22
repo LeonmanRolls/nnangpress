@@ -20,104 +20,6 @@
 
 (declare edit-mode widget active-route)
 
-;Utils Start -----
-(defn tree-seq-path [branch? children root & [node-fn]]
-  (let [node-fn (or node-fn identity)
-        walk (fn walk  [path node]
-               (let [new-path (conj path (node-fn node))]
-                 (lazy-seq
-                   (cons new-path
-                         (when (branch? node)
-                           (mapcat (partial walk new-path) (children node)))))))]
-    (walk [] root)))
-
-(defn string-contains? [x y]
-  (not= -1 (.indexOf x y)))
-
-(defn vec-remove
-  "remove elem in coll"
-  [coll pos]
-  (vec  (concat  (subvec coll 0 pos)  (subvec coll  (inc pos)))))
-
-(defn uid []
-  (.toString (random-uuid)))
-;Utils End -----
-
-;Core Start -----
-(defn basic-route [] {:route-name (str "/parent" (subs (uid) 0 3))
-                      :bg-img "from_uss.jpg"
-                      :grey-bg? true
-                      :nav-hint ["nav hint"]
-                      :nav-hint-style {:color "white"}
-                      :widgets [{:widget-uid 001
-                                 :object-id (uid) 
-                                 :widget-name "Standard text widget"
-                                 :inner-html ["<p> Hi there </p>"]}]
-                      :children [{:route-name (str "/child" (subs (uid) 0 3))
-                                  :bg-img "from_uss.jpg"
-                                  :grey-bg? true
-                                  :nav-hint ["nav hint"]
-                                  :nav-hint-style {:color "white"}
-                                  :widgets [{:widget-uid 001
-                                             :object-id (uid) 
-                                             :widget-name "Standard text widget"
-                                             :inner-html ["<p> Hi there </p>"]}]
-                                  :children []}]})
-
-(defn remove-element
-  "Requires label to be passed in as state"
-  [data owner]
-  (reify
-    om/IRenderState
-    (render-state [_ {:keys [label] :as state}]
-      (let [ref-id (uid)]
-        (dom/div #js {:style #js {:marginTop "20px"}
-                      :className "edit"}
-                 (str label ": ")
-                 (dom/input #js {:ref ref-id})
-                 (dom/button
-                   #js {:onClick (fn [_]
-                                   (let [widget-pos (js/parseInt
-                                                      (.-value
-                                                        (om/get-node owner ref-id)))]
-                                     (om/transact! data (fn [x]
-                                                          (vec-remove x widget-pos)))))}
-                   "Submit"))))))
-
-(defn simple-input-cursor [value cursor korks]
-  (dom/input #js {:value value
-                  :style #js {:width "100%"}
-                  :onChange (fn [e]
-                              (om/update! cursor korks (.. e -target -value)))}))
-
-(defn select-widget-wrapper [{:keys [widget-name] :as data} owner]
-  (reify 
-    om/IRenderState 
-    (render-state [_ {:keys [cursor] :as state}]
-      (dom/div #js {:className "selectWidget"} 
-               widget-name 
-               (dom/button #js {:onClick (fn [_] (om/transact! 
-                                                   cursor 
-                                                   (fn [x] (conj x data))))} "Add widget")
-               (om/build widget data {:init-state {:advertise? true}})))))
-
-(defn all-widget-wrapper [{:keys [object-id] :as data} owner]
-  (reify 
-    om/IRenderState 
-    (render-state [_ {:keys [current-widgets] :as state}]
-      (let [edit-mode-obs (om/observe owner (edit-mode))]
-        (dom/div nil 
-                 (when (first @edit-mode-obs)
-                   (dom/button #js{:onClick (fn [_] 
-                                              (om/transact! 
-                                                current-widgets 
-                                                (fn [x]
-                                                  (vec
-                                                    (remove #(= (:object-id %) object-id) x)))))} 
-                               "Delete"))
-                 (om/build widget data))))))
-;Core End -----
-
 ;Routing
 (defn get-token []
   (str js/window.location.pathname js/window.location.search))
@@ -199,7 +101,7 @@
     om/IRenderState
     (render-state [_ {:keys [depth max-depth str-beautify] :as state}]
       (let [curr-route (first (om/observe owner (mn/current-route)))
-            active? (string-contains? curr-route route-name)
+            active? (u/string-contains? curr-route route-name)
             routes-map-obs (om/observe owner (mn/routes-map))
             edit-mode-obs (om/observe owner (mn/edit-mode))]
 
@@ -213,8 +115,8 @@
                                                   (om/transact! 
                                                     children 
                                                     (fn [children]
-                                                      (conj children (basic-route)))))} "Add route")
-                      (om/build remove-element children 
+                                                      (conj children (nv/basic-route)))))} "Add route")
+                      (om/build cre/remove-element children 
                                 {:state {:label "remove nth route"}})])))
 
           (and (not (empty? children)) (> depth (if (first @edit-mode-obs) 2 1)))
@@ -244,9 +146,9 @@
                                                              (om/transact! 
                                                                children 
                                                                (fn [children]
-                                                                 (conj children (basic-route)))))} 
+                                                                 (conj children (nv/basic-route)))))} 
                                              "Add route")
-                                 (om/build remove-element children 
+                                 (om/build cre/remove-element children 
                                            {:state {:label "remove nth route"}})])))))
 
           :else
@@ -275,7 +177,7 @@
 
 (defmethod widget-data 001 [_]
   {:widget-uid 001
-   :object-id (uid)
+   :object-id (u/uid)
    :widget-name "Standard text widget"
    :inner-html ["<p> Hi there </p>"]})
 
@@ -329,22 +231,22 @@
 
 (defmethod widget-data 2 [_]
   {:widget-uid 2
-   :object-id (uid)
-   :imgs [{:object-id (uid) 
+   :object-id (u/uid)
+   :imgs [{:object-id (u/uid) 
            :url "http://placekitten.com/900/600"} 
-          {:object-id (uid)
+          {:object-id (u/uid)
            :url "http://placekitten.com/900/600"}]})
 
 (defmethod widget 002 [{:keys [imgs] :as data} owner]
   (reify
     om/IInitState
     (init-state [_]
-      {:uid (uid)
+      {:uid (u/uid)
        :advertise? false
        :img-partial (fn [{:keys [url] :as data}] 
                       (str "<img class=\"rsImg\" src=\"" url "\"/>"))
        :default-img (fn []  
-                      {:object-id (uid)
+                      {:object-id (u/uid)
                        :url "http://placekitten.com/900/600"})
        :slider-init (fn [uid]
                       (println "slider-init: " uid)
@@ -391,7 +293,7 @@
                                          om/IRender
                                          (render [_]
                                            (dom/div nil 
-                                                    (simple-input-cursor (:url data) data :url)     
+                                                    (cre/simple-input-cursor (:url data) data :url)     
                                                     (dom/button 
                                                       #js {:onClick (fn [_]
                                                                       (om/transact! 
@@ -413,7 +315,7 @@
 
 (defmethod widget-data 003 [_]
   {:widget-uid 003
-   :object-id (uid)
+   :object-id (u/uid)
    :widget-name "Standard text widget"
    :inner-html ["<p> Hi there </p>"]})
 
@@ -467,7 +369,7 @@
 
 (defmethod widget-data 004 [_]
   {:widget-uid 004
-   :object-id (uid)
+   :object-id (u/uid)
    :widget-name "Accordion"
    :text [{:title {:widget-uid 001
                    :widget-name "Standard text widget"
@@ -526,12 +428,12 @@
                                                        (conj text {:title (widget-data 001)
                                                                    :sub (widget-data 001)}))))}
                               "Add Section")
-                            (om/build remove-element text 
+                            (om/build cre/remove-element text 
                                       {:state {:label "remove accordion section"}}))))))))
 
 (defmethod widget-data 005 [_]
   {:widget-uid 005
-   :object-id (uid)
+   :object-id (u/uid)
    :widget-name "Standard text widget"
    :inner-html ["<p> Hi there </p>"]})
 
@@ -583,7 +485,7 @@
 
 (defmethod widget-data 006 [_]
   {:widget-uid 006
-   :object-id (uid)
+   :object-id (u/uid)
    :widget-name "Standard image widget"
    :img "http://solariarchitects.com/img/leaderboards/group_photo_everyday_zoomed.jpg"})
 
@@ -611,7 +513,7 @@
 
 (defmethod widget-data 007 [_]
   {:widget-uid 007
-   :object-id (uid)
+   :object-id (u/uid)
    :widget-name "Grid"
    :imgs [{:id "entry-1"
            :className "mega-entry"
@@ -696,9 +598,9 @@
                                     (render [_]
                                       (if (contains? data :text)
                                         (dom/div nil
-                                                 (simple-input-cursor (:title data) data :title)
-                                                 (simple-input-cursor (:text data) data :text))
-                                        (simple-input-cursor (:data-src data) data :data-src)))))}))
+                                                 (cre/simple-input-cursor (:title data) data :title)
+                                                 (cre/simple-input-cursor (:text data) data :text))
+                                        (cre/simple-input-cursor (:data-src data) data :data-src)))))}))
 
     om/IDidUpdate
     (did-update  [this prev-props prev-state]
@@ -755,12 +657,12 @@
                                                           (fn [x] (conj x (default-text)))))}
                                         "Add text")
 
-                            (om/build remove-element imgs 
+                            (om/build cre/remove-element imgs 
                                       {:state {:label "remove nth element"}}))))))))
 
 (defmethod widget-data 8 [_]
   {:widget-uid 8
-   :object-id (uid)
+   :object-id (u/uid)
    :widget-name "Right Nav"
    :imgs []})
 
@@ -800,7 +702,7 @@
                                            (.-value
                                              (om/get-node owner "remove-widget")))]
                           (om/transact! cursor (fn [x]
-                                                 (vec-remove x widget-pos)))))})
+                                                 (u/vec-remove x widget-pos)))))})
 
     om/IRenderState
     (render-state [_ {:keys [add-widget remove-widget] :as state}]
@@ -816,7 +718,7 @@
                    (dom/div #js {:className "edit"}
 
                             (apply dom/div nil 
-                                   (om/build-all select-widget-wrapper all-widgets-data-obs
+                                   (om/build-all wgt/select-widget-wrapper all-widgets-data-obs
                                                  {:state {:cursor data}})))))))))
 
 (defn master [{:keys [:route-widget :current-route :active-route] 
@@ -833,13 +735,13 @@
 
          :set-bg-img (fn [bg-img]
                        (cond
-                         (string-contains? bg-img "#")
+                         (u/string-contains? bg-img "#")
                          (do
                            (set! (-> js/document .-body .-background) "")
                            (set!
                              (-> js/document .-body .-style .-backgroundColor)
                              bg-img))
-                         (string-contains? bg-img "linear")
+                         (u/string-contains? bg-img "linear")
                          (set! (-> js/document .-body .-background) bg-img)
                          :file
                          (set!
