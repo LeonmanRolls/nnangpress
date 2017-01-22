@@ -39,19 +39,21 @@
     om/IRenderState
     (render-state [_ {:keys [add-widget remove-widget] :as state}]
       (let [all-widgets-data-obs (om/observe owner (mn/all-widgets-data))
-            edit-mode-obs (om/observe owner (mn/edit-mode))]
-        (dom/div #js {:className "main-view"}
+            edit-mode-obs (om/observe owner (mn/edit-mode))
+            main-view-style-obs (om/observe owner (mn/main-view-style))]
+
+        (dom/div (clj->js (merge @main-view-style-obs {:className "main-view"})) 
 
                  (apply dom/div nil
                         (om/build-all wgt/all-widget-wrapper data
                                       {:state {:current-widgets data}}))
 
                  (when (first @edit-mode-obs)
-                     (dom/div #js {:className "edit"}
+                   (dom/div #js {:className "edit"}
 
-                              (apply dom/div nil 
-                                     (om/build-all wgt/select-widget-wrapper all-widgets-data-obs
-                                                   {:state {:cursor data}})))))))))
+                            (apply dom/div nil 
+                                   (om/build-all wgt/select-widget-wrapper all-widgets-data-obs
+                                                 {:state {:cursor data}})))))))))
 
 (defn master [{:keys [:route-widget :current-route :active-route] 
                :as data} owner]
@@ -103,6 +105,9 @@
           (:grey-bg? fresh-active-route)
           (-> (js/$ "body") (.addClass "grey-out"))
           (-> (js/$ "body") (.removeClass "grey-out")))
+        
+                 (println "data: " data)
+
         (dom/div nil
                  (om/build wgt/admin-toolbar {})                                   
                  (om/build main-view widgets)

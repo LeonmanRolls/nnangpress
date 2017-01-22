@@ -20,6 +20,9 @@
                               :data  (pr-str @monolith)}))))))
 
 (defn ref-cursor-init [monolith]
+  (defn main-view-style []
+    (om/ref-cursor (-> (om/root-cursor monolith) :route-widget :main-view-style)))
+
   (defn edit-mode []
     (om/ref-cursor (:edit-mode (om/root-cursor monolith))))
 

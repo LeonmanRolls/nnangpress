@@ -12,6 +12,7 @@
 ;navbar 0 ---
 (defmethod navbar-data 0 [_]
   {:route-widget-id 0
+   :main-view-style {:style {}} 
    :roues-map {:route-name "/"
                :bg-img "home_page.jpg"
                :nav-hint ["Architects"]
@@ -33,6 +34,7 @@
 ;navbar 1 ---
 (defmethod navbar-data 1 [_]
   {:route-widget-id 1
+   :main-view-style {:style {:paddingLeft "320px"}} 
    :routes-map {:route-name "/"
                 :bg-img "home_page.jpg"
                 :nav-hint ["Architects"]
