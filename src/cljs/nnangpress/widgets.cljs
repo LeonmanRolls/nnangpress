@@ -548,20 +548,18 @@
             current-route-obs (mn/current-route)
             current-widgets (mn/current-widgets 
                               (clojure.string/split (first @current-route-obs) #"/")
-                              routes-map-obs)]
-
-        (println "select widget wrapper data: " data)
+                              routes-map-obs)
+            current-widgets-ref (om/observe owner (mn/current-widgets-ref))]
 
         (dom/div #js {:className "selectWidget"} 
                  widget-name 
                  (dom/button #js {:onClick (fn [_] (om/transact! 
-                                                     current-widgets
+                                                     (mn/current-widgets-ref)
                                                      (fn [x] 
                                                        (conj x 
                                                              (widget-data widget-uid)))))} 
                              "Add widget")
                  (om/build widget data {:init-state {:advertise? true}}))))))
-;should be conjing from multi-method
 
 (defn all-widget-wrapper [{:keys [object-id] :as data} owner]
   (reify 
