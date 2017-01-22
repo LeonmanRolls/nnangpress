@@ -1,273 +1,12 @@
-(ns nnangpress.app
-  (:import [goog.history Html5History EventType])
-  (:require-macros [cljs.core.async.macros :refer  [go go-loop]])
-  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
-            [om.dom :as dom :include-macros true]
-            [nnangpress.monolith :as mn]
-            [nnangpress.navbars :as nv]
-            [nnangpress.widgets :as wgt]
-            [nnangpress.core :as cre]
-            [nnangpress.utils :as u]
-            [clojure.spec :as s]
-            [cljs.core.async :as cas :refer [>! <! put! chan pub sub close!]]
-            [cljs.reader :as rdr]
-            [goog.events :as ev]
-            [goog.dom :as gdom]
-            [ajax.core :refer [GET POST]]
-            [replumb.core :as replumb]))
-
-(enable-console-print!)
-
-(declare edit-mode widget active-route)
-
-;Utils Start -----
-(defn tree-seq-path [branch? children root & [node-fn]]
-  (let [node-fn (or node-fn identity)
-        walk (fn walk  [path node]
-               (let [new-path (conj path (node-fn node))]
-                 (lazy-seq
-                   (cons new-path
-                         (when (branch? node)
-                           (mapcat (partial walk new-path) (children node)))))))]
-    (walk [] root)))
-
-(defn string-contains? [x y]
-  (not= -1 (.indexOf x y)))
-
-(defn vec-remove
-  "remove elem in coll"
-  [coll pos]
-  (vec  (concat  (subvec coll 0 pos)  (subvec coll  (inc pos)))))
-
-(defn uid []
-  (.toString (random-uuid)))
-;Utils End -----
-
-;Core Start -----
-(defn basic-route [] {:route-name (str "/parent" (subs (uid) 0 3))
-                      :bg-img "from_uss.jpg"
-                      :grey-bg? true
-                      :nav-hint ["nav hint"]
-                      :nav-hint-style {:color "white"}
-                      :widgets [{:widget-uid 001
-                                 :object-id (uid) 
-                                 :widget-name "Standard text widget"
-                                 :inner-html ["<p> Hi there </p>"]}]
-                      :children [{:route-name (str "/child" (subs (uid) 0 3))
-                                  :bg-img "from_uss.jpg"
-                                  :grey-bg? true
-                                  :nav-hint ["nav hint"]
-                                  :nav-hint-style {:color "white"}
-                                  :widgets [{:widget-uid 001
-                                             :object-id (uid) 
-                                             :widget-name "Standard text widget"
-                                             :inner-html ["<p> Hi there </p>"]}]
-                                  :children []}]})
-
-(defn remove-element
-  "Requires label to be passed in as state"
-  [data owner]
-  (reify
-    om/IRenderState
-    (render-state [_ {:keys [label] :as state}]
-      (let [ref-id (uid)]
-        (dom/div #js {:style #js {:marginTop "20px"}
-                      :className "edit"}
-                 (str label ": ")
-                 (dom/input #js {:ref ref-id})
-                 (dom/button
-                   #js {:onClick (fn [_]
-                                   (let [widget-pos (js/parseInt
-                                                      (.-value
-                                                        (om/get-node owner ref-id)))]
-                                     (om/transact! data (fn [x]
-                                                          (vec-remove x widget-pos)))))}
-                   "Submit"))))))
-
-(defn simple-input-cursor [value cursor korks]
-  (dom/input #js {:value value
-                  :style #js {:width "100%"}
-                  :onChange (fn [e]
-                              (om/update! cursor korks (.. e -target -value)))}))
-
-(defn select-widget-wrapper [{:keys [widget-name] :as data} owner]
-  (reify 
-    om/IRenderState 
-    (render-state [_ {:keys [cursor] :as state}]
-      (dom/div #js {:className "selectWidget"} 
-               widget-name 
-               (dom/button #js {:onClick (fn [_] (om/transact! 
-                                                   cursor 
-                                                   (fn [x] (conj x data))))} "Add widget")
-               (om/build widget data {:init-state {:advertise? true}})))))
-
-(defn all-widget-wrapper [{:keys [object-id] :as data} owner]
-  (reify 
-    om/IRenderState 
-    (render-state [_ {:keys [current-widgets] :as state}]
-      (let [edit-mode-obs (om/observe owner (edit-mode))]
-        (dom/div nil 
-                 (when (first @edit-mode-obs)
-                   (dom/button #js{:onClick (fn [_] 
-                                              (om/transact! 
-                                                current-widgets 
-                                                (fn [x]
-                                                  (vec
-                                                    (remove #(= (:object-id %) object-id) x)))))} 
-                               "Delete"))
-                 (om/build widget data))))))
-;Core End -----
-
-;Routing
-(defn get-token []
-  (str js/window.location.pathname js/window.location.search))
-
-(defn make-history []
-  (doto  (Html5History.)
-    (.setPathPrefix  (str js/window.location.protocol
-                          "//"
-                          js/window.location.host))
-    (.setUseFragment false)))
-
-(defn handle-url-change [e])
-
-(defonce history (doto (make-history)
-                   (goog.events/listen EventType.NAVIGATE #(handle-url-change %))
-                   (.setEnabled true)))
-
-(defn nav! [token routes-map]
-  (let [paths (u/tree-seq-path
-                #(contains? % :children)
-                #(:children %)
-                routes-map
-                #(:route-name %))
-        active-path  (first (filter (fn [x] (= (last x) token)) paths))
-        new-path (if
-                   (= 1 (count active-path))
-                   "/"
-                   (->>
-                     active-path
-                     (drop 1)
-                     clojure.string/join))]
-
-    (when (not (empty? new-path))
-      (om/update! (mn/current-route) [new-path]))
-    (.setToken history new-path)))
-
-(defn js-link [routes-map route-name e]
-  (do
-    (.preventDefault e)
-    (nav! route-name routes-map)))
-
-(defmulti navbar (fn [x] (:route-widget-id x)))
-
-;Solari navbar start ---------------------------
-(defn nav-hint [data owner]
-  (reify
-    om/IRender
-    (render [_]
-      (let [{:keys [:nav-hint :nav-hint-style]} (om/observe owner (active-route))]
-        (dom/div #js {:className "nav-hint-outer"}
-                 (dom/div #js {:className "nav-hint-inner"
-                               :style (clj->js nav-hint-style)}
-                          (first nav-hint)))))))
-
-(defn nav-menu-logo
-  [data owner]
-  (reify
-    om/IRender
-    (render [_]
-      (let [logo-text-obs (om/observe owner (mn/logo-text))
-            routes-map-obs (om/observe owner (mn/routes-map))]
-        (dom/h1 #js {:className "logo"
-                     :onClick (partial js-link @routes-map-obs "/")}
-                (first logo-text-obs))))))
-
-(defn nav-menu
-  [{:keys [:route-name :background :widgets :children] :as all} owner]
-
-  (reify
-    om/IInitState
-    (init-state  [_]
-      {:depth 0
-       :max-depth 3
-       :str-beautify (fn [s]
-                       (->
-                         (subs s 1)
-                         (clojure.string/replace #"-" " ")))})
-
-    om/IRenderState
-    (render-state [_ {:keys [depth max-depth str-beautify] :as state}]
-      (let [curr-route (first (om/observe owner (mn/current-route)))
-            active? (string-contains? curr-route route-name)
-            routes-map-obs (om/observe owner (mn/routes-map))
-            edit-mode-obs (om/observe owner (mn/edit-mode))]
-
-        (cond
-          (= "/" route-name)
-          (apply dom/ul #js {}
-                 (concat 
-                   (om/build-all nav-menu children {:state {:depth (inc depth)}})
-                   (when (first @edit-mode-obs)
-                     [(dom/button #js {:onClick (fn [_]   
-                                                  (om/transact! 
-                                                    children 
-                                                    (fn [children]
-                                                      (conj children (basic-route)))))} "Add route")
-                      (om/build remove-element children 
-                                {:state {:label "remove nth route"}})])))
-
-          (and (not (empty? children)) (> depth (if (first @edit-mode-obs) 2 1)))
-          (dom/div #js {:style #js {:position "relative"}}
-
-                   (dom/li #js {:className (str "sub-nav-li ")
-                                :onClick (partial js-link @routes-map-obs route-name)}
-
-                           (dom/div #js {:className (str (when active? "active-text"))}
-                                    (str-beautify route-name))))
-
-          (not (empty? children))
-          (dom/div #js {:style #js {:position "relative"}}
-
-                   (dom/li #js {:className (str "nav-li " (when active? "active-li"))
-                                :onClick (partial js-link @routes-map-obs route-name)}
-
-                           (dom/div #js {:className (str (when active? "active-text"))}
-                                    (str-beautify route-name)))
-
-                   (when active?
-                     (apply dom/ul #js {:className "nav-ul"}
-                            (concat 
-                              (om/build-all nav-menu children {:state {:depth (inc depth)}})
-                              (when (first @edit-mode-obs)
-                                [(dom/button #js {:onClick (fn [_]   
-                                                             (om/transact! 
-                                                               children 
-                                                               (fn [children]
-                                                                 (conj children (basic-route)))))} 
-                                             "Add route")
-                                 (om/build remove-element children 
-                                           {:state {:label "remove nth route"}})])))))
-
-          :else
-          (dom/li #js {:className (str "sub-nav-li " (when active? "active-text"))
-                       :onClick (partial js-link @routes-map-obs route-name)}
-
-                  (str-beautify route-name)))))))
-
-(defmethod navbar 1 [{:keys [:routes-map] :as data} owner]
-  (reify
-    om/IRender
-    (render [this]
-      (dom/div #js {:id "the-nav" :className "main-nav"}
-
-               (dom/div #js {:className "nav-aux"}
-                        (om/build nav-hint {}))
-
-               (dom/div #js {:className "nav-menu"}
-                        (om/build nav-menu-logo {})
-                        (om/build nav-menu routes-map))))))
-;Solari navbar end ---------------------------
+(ns nnangpress.widgets
+  (:require 
+    [om.core :as om :include-macros true :refer [set-state! update-state!]]
+    [om.dom :as dom :include-macros true]
+    [nnangpress.utils :as u]
+    [nnangpress.monolith :as mn]
+    [nnangpress.core :as cre]
+    [nnangpress.routing :as rt]
+    [goog.dom :as gdom]))
 
 (defmulti widget-data (fn [x] x))
 
@@ -275,7 +14,7 @@
 
 (defmethod widget-data 001 [_]
   {:widget-uid 001
-   :object-id (uid)
+   :object-id (u/uid)
    :widget-name "Standard text widget"
    :inner-html ["<p> Hi there </p>"]})
 
@@ -291,7 +30,7 @@
     (did-mount [_]
       (let [uuid (.toString (om/get-state owner :uuid))
             advertise? (om/get-state owner :advertise?)
-            edit-mode-obs (om/observe owner (edit-mode))]
+            edit-mode-obs (om/observe owner (mn/edit-mode))]
 
         (when (and (first @edit-mode-obs) (not advertise?))
           (js/Medium. #js {:element (.getElementById js/document uuid)
@@ -307,7 +46,7 @@
     (did-update [_ _ _]
       (let [uuid (.toString (om/get-state owner :uuid))
             advertise? (om/get-state owner :advertise?)
-            edit-mode-obs (om/observe owner (edit-mode))]
+            edit-mode-obs (om/observe owner (mn/edit-mode))]
 
         (when (and (first @edit-mode-obs) (not advertise?))
           (js/Medium. #js {:element (.getElementById js/document uuid)
@@ -321,7 +60,7 @@
 
     om/IRenderState
     (render-state [_ {:keys [uuid] :as state}]
-      (let [edit-mode-obs (om/observe owner (edit-mode))]
+      (let [edit-mode-obs (om/observe owner (mn/edit-mode))]
 
         (dom/div #js {:id (.toString uuid)
                       :style #js {:color "black"}
@@ -329,25 +68,24 @@
 
 (defmethod widget-data 2 [_]
   {:widget-uid 2
-   :object-id (uid)
-   :imgs [{:object-id (uid) 
+   :object-id (u/uid)
+   :imgs [{:object-id (u/uid) 
            :url "http://placekitten.com/900/600"} 
-          {:object-id (uid)
+          {:object-id (u/uid)
            :url "http://placekitten.com/900/600"}]})
 
 (defmethod widget 002 [{:keys [imgs] :as data} owner]
   (reify
     om/IInitState
     (init-state [_]
-      {:uid (uid)
+      {:uid (u/uid)
        :advertise? false
        :img-partial (fn [{:keys [url] :as data}] 
                       (str "<img class=\"rsImg\" src=\"" url "\"/>"))
        :default-img (fn []  
-                      {:object-id (uid)
+                      {:object-id (u/uid)
                        :url "http://placekitten.com/900/600"})
        :slider-init (fn [uid]
-                      (println "slider-init: " uid)
                       (->
                         (js/$ (str "#" uid))
                         (.royalSlider #js {:keyboardNavEnabled true :controlNavigation "bullets"
@@ -371,7 +109,7 @@
 
     om/IRenderState
     (render-state [_ {:keys [uid img-partial default-img advertise?] :as state}]
-      (let [edit-mode-obs (om/observe owner (edit-mode))]
+      (let [edit-mode-obs (om/observe owner (mn/edit-mode))]
         (dom/div nil 
                  (dom/div #js {:style #js {:color "black"}
                                :dangerouslySetInnerHTML 
@@ -391,7 +129,7 @@
                                          om/IRender
                                          (render [_]
                                            (dom/div nil 
-                                                    (simple-input-cursor (:url data) data :url)     
+                                                    (cre/simple-input-cursor (:url data) data :url)     
                                                     (dom/button 
                                                       #js {:onClick (fn [_]
                                                                       (om/transact! 
@@ -413,7 +151,7 @@
 
 (defmethod widget-data 003 [_]
   {:widget-uid 003
-   :object-id (uid)
+   :object-id (u/uid)
    :widget-name "Standard text widget"
    :inner-html ["<p> Hi there </p>"]})
 
@@ -429,7 +167,7 @@
     (did-mount [_]
       (let [uuid (.toString (om/get-state owner :uuid))
             advertise? (om/get-state owner :advertise?)
-            edit-mode-obs (om/observe owner (edit-mode))]
+            edit-mode-obs (om/observe owner (mn/edit-mode))]
 
         (when (and (first @edit-mode-obs) (not advertise?))
           (js/Medium. #js {:element (.getElementById js/document uuid)
@@ -445,7 +183,7 @@
     (did-update [_ _ _]
       (let [uuid (.toString (om/get-state owner :uuid))
             advertise? (om/get-state owner :advertise?)
-            edit-mode-obs (om/observe owner (edit-mode))]
+            edit-mode-obs (om/observe owner (mn/edit-mode))]
 
         (when (and (first @edit-mode-obs) (not advertise?)) 
           (js/Medium. #js {:element (.getElementById js/document uuid)
@@ -459,7 +197,7 @@
 
     om/IRenderState
     (render-state [_ {:keys [uuid] :as state}]
-      (let [edit-mode-obs (om/observe owner (edit-mode))]
+      (let [edit-mode-obs (om/observe owner (mn/edit-mode))]
 
         (dom/div #js {:id (.toString uuid)
                       :className "box-paragraph"
@@ -467,7 +205,7 @@
 
 (defmethod widget-data 004 [_]
   {:widget-uid 004
-   :object-id (uid)
+   :object-id (u/uid)
    :widget-name "Accordion"
    :text [{:title {:widget-uid 001
                    :widget-name "Standard text widget"
@@ -512,7 +250,7 @@
     om/IRenderState
     (render-state [_ {:keys [accordion-sub] :as state}]
       (let [advertise? (om/get-state owner :advertise?)
-            edit-mode-obs (om/observe owner (edit-mode))]
+            edit-mode-obs (om/observe owner (mn/edit-mode))]
         (dom/div nil
                  (dom/div #js {:className "accordion"}
                           (apply dom/dl nil (om/build-all accordion-sub text)))
@@ -526,12 +264,12 @@
                                                        (conj text {:title (widget-data 001)
                                                                    :sub (widget-data 001)}))))}
                               "Add Section")
-                            (om/build remove-element text 
+                            (om/build cre/remove-element text 
                                       {:state {:label "remove accordion section"}}))))))))
 
 (defmethod widget-data 005 [_]
   {:widget-uid 005
-   :object-id (uid)
+   :object-id (u/uid)
    :widget-name "Standard text widget"
    :inner-html ["<p> Hi there </p>"]})
 
@@ -547,7 +285,7 @@
     (did-mount [_]
       (let [uuid (.toString (om/get-state owner :uuid)) 
             advertise? (om/get-state owner :advertise?)
-            edit-mode-obs (om/observe owner (edit-mode))]
+            edit-mode-obs (om/observe owner (mn/edit-mode))]
 
         (when (and (first @edit-mode-obs) (not advertise?))
           (js/Medium. #js {:element (.getElementById js/document uuid)
@@ -563,7 +301,7 @@
     (did-update [_ _ _]
       (let [uuid (.toString (om/get-state owner :uuid)) 
             advertise? (om/get-state owner :advertise?)
-            edit-mode-obs (om/observe owner (edit-mode))]
+            edit-mode-obs (om/observe owner (mn/edit-mode))]
 
         (when (and (first @edit-mode-obs) (not advertise?))
           (js/Medium. #js {:element (.getElementById js/document uuid)
@@ -583,7 +321,7 @@
 
 (defmethod widget-data 006 [_]
   {:widget-uid 006
-   :object-id (uid)
+   :object-id (u/uid)
    :widget-name "Standard image widget"
    :img "http://solariarchitects.com/img/leaderboards/group_photo_everyday_zoomed.jpg"})
 
@@ -598,7 +336,7 @@
     om/IRenderState
     (render-state [_ {:keys [uuid] :as state}]
       (let [advertise? (om/get-state owner :advertise?)
-            edit-mode-obs (om/observe owner (edit-mode))]
+            edit-mode-obs (om/observe owner (mn/edit-mode))]
 
         (dom/div nil
                  (dom/img #js {:style #js {:width "100%"}
@@ -611,7 +349,7 @@
 
 (defmethod widget-data 007 [_]
   {:widget-uid 007
-   :object-id (uid)
+   :object-id (u/uid)
    :widget-name "Grid"
    :imgs [{:id "entry-1"
            :className "mega-entry"
@@ -696,9 +434,9 @@
                                     (render [_]
                                       (if (contains? data :text)
                                         (dom/div nil
-                                                 (simple-input-cursor (:title data) data :title)
-                                                 (simple-input-cursor (:text data) data :text))
-                                        (simple-input-cursor (:data-src data) data :data-src)))))}))
+                                                 (cre/simple-input-cursor (:title data) data :title)
+                                                 (cre/simple-input-cursor (:text data) data :text))
+                                        (cre/simple-input-cursor (:data-src data) data :data-src)))))}))
 
     om/IDidUpdate
     (did-update  [this prev-props prev-state]
@@ -713,7 +451,7 @@
         (->
           (js/$ ".megafolio-container")
           (.click (fn [event]
-                    (js-link
+                    (rt/js-link
                       @routes-map-obs
                       (first (clojure.string/split (-> event .-target .-id) #"--"))
                       event))))
@@ -724,7 +462,7 @@
     om/IRenderState
     (render-state [_ {:keys [edit-fn widget-img widget-text text-or-img default-img default-text advertise?]
                       :as state}]
-      (let [edit-mode-obs (om/observe owner (edit-mode))]
+      (let [edit-mode-obs (om/observe owner (mn/edit-mode))]
         (dom/div nil
                  (dom/div #js {:className "container"}
                           (dom/div #js {:className "megafolio-container"
@@ -755,12 +493,12 @@
                                                           (fn [x] (conj x (default-text)))))}
                                         "Add text")
 
-                            (om/build remove-element imgs 
+                            (om/build cre/remove-element imgs 
                                       {:state {:label "remove nth element"}}))))))))
 
 (defmethod widget-data 8 [_]
   {:widget-uid 8
-   :object-id (uid)
+   :object-id (u/uid)
    :widget-name "Right Nav"
    :imgs []})
 
@@ -775,7 +513,7 @@
                om/IRenderState
                (render-state [_ {:keys [routes-map] :as state}]
                  (dom/li #js {:className "right-nav-li"
-                              :onClick (partial js-link routes-map route) }
+                              :onClick (partial rt/js-link routes-map route) }
                          (dom/div #js {:className (when active? "active-text")}
                                   label)))))})
 
@@ -785,139 +523,44 @@
         (apply dom/ul #js {:className "right-nav"}
                (om/build-all li lis {:state {:routes-map routes-map-obs}}))))))
 
-(defn main-view [data owner]
-  (reify
-    om/IInitState
-    (init-state [_]
-      {:add-widget (fn [cursor]
-                     (let [widget-id (js/parseInt
-                                       (.-value
-                                         (om/get-node owner "add-widget")))]
-                       (om/transact! cursor (fn [x]
-                                              (conj x (widget-data widget-id))))))
-       :remove-widget (fn [cursor]
-                        (let [widget-pos (js/parseInt
-                                           (.-value
-                                             (om/get-node owner "remove-widget")))]
-                          (om/transact! cursor (fn [x]
-                                                 (vec-remove x widget-pos)))))})
+(defn admin-toolbar [data owner]
+  (reify 
+    om/IRender
+    (render [_]
+      (let []
+        (dom/div #js{:className "admin-toolbar"} 
+                 (dom/b nil "Welcome to Nnangpress alpha ")
+                 (dom/button #js {:onClick (fn [_] 
+                                             (om/transact! 
+                                               (mn/edit-mode) 
+                                               (fn [dabool]
+                                                 [(not (first dabool))] )))}
+                             "Toogle edit mode"))))))
 
-    om/IRenderState
-    (render-state [_ {:keys [add-widget remove-widget] :as state}]
-      (let [all-widgets-data-obs (om/observe owner (mn/all-widgets-data))
-            edit-mode-obs (om/observe owner (mn/edit-mode))]
-        (dom/div #js {:className "main-view"}
+(defn select-widget-wrapper [{:keys [widget-name] :as data} owner]
+  (reify 
+    om/IRenderState 
+    (render-state [_ {:keys [cursor] :as state}]
+      (dom/div #js {:className "selectWidget"} 
+               widget-name 
+               (dom/button #js {:onClick (fn [_] (om/transact! 
+                                                   cursor 
+                                                   (fn [x] (conj x data))))} "Add widget")
+               (om/build widget data {:init-state {:advertise? true}})))))
 
-                 (apply dom/div nil
-                        (om/build-all wgt/all-widget-wrapper data
-                                      {:state {:current-widgets data}}))
-
+(defn all-widget-wrapper [{:keys [object-id] :as data} owner]
+  (reify 
+    om/IRenderState 
+    (render-state [_ {:keys [current-widgets] :as state}]
+      (let [edit-mode-obs (om/observe owner (mn/edit-mode))]
+        (dom/div nil 
                  #_(when (first @edit-mode-obs)
-                   (dom/div #js {:className "edit"}
-
-                            (apply dom/div nil 
-                                   (om/build-all select-widget-wrapper all-widgets-data-obs
-                                                 {:state {:cursor data}})))))))))
-
-(defn master [{:keys [:route-widget :current-route :active-route] 
-               :as data} owner]
-  (reify
-    om/IInitState
-    (init-state [_]
-      (let [splitter (fn [x] (last (clojure.string/split x #"/")))]
-        {:flatten-routes (fn [routes-map]
-                           (tree-seq
-                             #(contains? % :children)
-                             #(:children %)
-                             routes-map))
-
-         :set-bg-img (fn [bg-img]
-                       (cond
-                         (string-contains? bg-img "#")
-                         (do
-                           (set! (-> js/document .-body .-background) "")
-                           (set!
-                             (-> js/document .-body .-style .-backgroundColor)
-                             bg-img))
-                         (string-contains? bg-img "linear")
-                         (set! (-> js/document .-body .-background) bg-img)
-                         :file
-                         (set!
-                           (-> js/document .-body .-background)
-                           (str "/img/backgrounds/" bg-img))))
-
-         :get-active-route (fn [flat-routes current-route]
-                             (->>
-                               flat-routes
-                               (filter
-                                 #(=
-                                    (splitter (first current-route))
-                                    (splitter (:route-name %))))
-                               first))}))
-
-    om/IRenderState
-    (render-state [_ {:keys [flatten-routes set-bg-img get-active-route] :as state}]
-      (let [{:keys [:bg-img :widgets] :as fresh-active-route} (get-active-route
-                                                                (flatten-routes 
-                                                                  (:routes-map 
-                                                                    route-widget))
-                                                                current-route)]
-
-        (om/update! active-route @fresh-active-route)
-        (set-bg-img bg-img)
-        (if
-          (:grey-bg? fresh-active-route)
-          (-> (js/$ "body") (.addClass "grey-out"))
-          (-> (js/$ "body") (.removeClass "grey-out")))
-        (dom/div nil
-                 (om/build wgt/admin-toolbar {})                                   
-                 (om/build main-view widgets)
-                 (om/build nv/navbar (:route-widget data)))))))
-
-(defn init []
-  (let [uid "SGXvf26OEpeVDQ79XIH2V71fVnT2"
-        uiconfig #js {:callbacks #js {:signInSuccess (fn [user credential redirectUrl]
-                                                       (println "sucessful sign in")
-                                                       (.dir js/console user)
-                                                       false)}
-                      :signInFlow "popup"
-                      :signInOptions (array #js {:provider js/firebase.auth.EmailAuthProvider.PROVIDER_ID})
-                      :tosUrl "https://google.com"
-                      :credentialHelper js/firebaseui.auth.CredentialHelper.NONE}
-        ui (js/firebaseui.auth.AuthUI. (js/firebase.auth))
-        user-data-ref (->
-                        (js/firebase.database)
-                        (.ref (str "users/" uid)))]
-
-    (mn/ref-cursor-init mn/monolith)
-
-    #_(->
-        (js/firebase.database)
-        (.ref (str "users/" uid))
-        (.once "value")
-        (.then (fn [snapshot]
-                 (reset! mn/monolith (rdr/read-string (.-data (.val snapshot))))
-                 (om/root master mn/monolith
-                          {:target (. js/document (getElementById "super-container"))}))))
-
-    (GET "/edn/defaultdata.edn"
-           {:handler (fn [resp]
-                       (reset! mn/monolith (rdr/read-string resp))
-                       (om/root master mn/monolith
-                                {:target (. js/document
-                                            (getElementById "super-container"))}))})))
-
-(comment
-
-  (defmethod widget 000 [data owner]
-    (reify
-      om/IInitState
-      (init-state [_]
-        {:uuid (random-uuid)})
-
-      om/IRenderState
-      (render-state [_ {:keys [uuid] :as state}]
-        (dom/div nil "Skeleton Widget"))))
-
-  )
+                   #_(dom/button #js{:onClick (fn [_] 
+                                              (om/transact! 
+                                                current-widgets 
+                                                (fn [x]
+                                                  (vec
+                                                    (remove #(= (:object-id %) object-id) x)))))} 
+                               "Delete"))
+                 (om/build widget data))))))
 
