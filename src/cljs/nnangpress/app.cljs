@@ -42,7 +42,13 @@
             edit-mode-obs (om/observe owner (mn/edit-mode))
             main-view-style-obs (om/observe owner (mn/main-view-style))
             routes-map-obs (om/observe owner (mn/routes-map))
-            current-route-obs (om/observe owner (mn/current-route))]
+            current-route-obs (om/observe owner (mn/current-route))
+            current-route-map (mn/current-route-map 
+                              (clojure.string/split (first @current-route-obs) #"/")
+                              routes-map-obs)]
+
+        (println "current-route-map type: " (type current-route-map))
+        (println "current-route-map: " current-route-map)
 
         (dom/div (clj->js (merge @main-view-style-obs {:className "main-view"})) 
 
@@ -51,6 +57,17 @@
 
                  (when (first @edit-mode-obs)
                    (dom/div #js {:className "edit"}
+
+                            (dom/div nil 
+                            "Background Image: "         
+                            (dom/input #js {:value (:bg-img @current-route-map) 
+                                            :style #js {:width "100%"}
+                                            :onChange (fn [e]
+                                                        (om/update! 
+                                                          current-route-map 
+                                                          :bg-img 
+                                                          (.. e -target -value)))}))
+
                             (apply dom/div nil 
                                    (om/build-all 
                                      wgt/select-widget-wrapper 
@@ -81,7 +98,7 @@
                          :file
                          (set!
                            (-> js/document .-body .-background)
-                           (str "/img/backgrounds/" bg-img))))
+                           bg-img)))
 
          :get-active-route (fn [flat-routes current-route]
                              (->>
