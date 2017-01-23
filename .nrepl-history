@@ -1,27 +1,3 @@
-                                  (index-of 
-                                    (vec (map :route-name (:children routes-map))) 
-                                            (str "/" fxs))
-                                  ))
-      :else (recur xs (get (:children routes-map) idx))
-      ))
-  )
-(loop [route (clojure.string/split "/" #"/")
-       routes-map (-> @mon :route-widget :routes-map)]
-  (let [x (first route)
-        xs (rest route)
-        fxs (first xs) 
-        idx (index-of (vec (map :route-name (:children routes-map))) x)]
-    (println "routes-map: " routes-map)
-    (cond 
-      (empty? xs) (:widgets routes-map)
-      (= "" x) (recur (rest xs) (get 
-                                  (:children routes-map)
-                                  (index-of 
-                                    (vec (map :route-name (:children routes-map))) 
-                                            (str "/" fxs))
-                                  ))
-      :else (recur xs (get (:children routes-map) idx))
-      ))
   )
 (loop [route (clojure.string/split "/" #"/")
        routes-map (-> @mon :route-widget :routes-map)]
@@ -498,3 +474,27 @@ mon
   (-> @mon :route-widget :routes-map)
   )
 mon
+(in-ns 'nnangpress.app)
+(->
+                                     (js/firebase.database)
+                                     (.ref (str "users/" uid)))
+(let [uid "SGXvf26OEpeVDQ79XIH2V71fVnT2"
+                     user-data-ref (->
+                                     (js/firebase.database)
+                                     (.ref (str "users/" uid)))]
+                 (prn "-- Atom Changed --")
+                 (->
+                   user-data-ref
+                   (.set #js {:username "wellwell"
+                              :email "leon.talbert@gmail.com"
+                              :data  (pr-str @monolith)})))
+(let [uid "SGXvf26OEpeVDQ79XIH2V71fVnT2"
+        user-data-ref (->
+                        (js/firebase.database)
+                        (.ref (str "users/" uid)))]
+    (prn "-- Atom Changed --")
+    (->
+      user-data-ref
+      (.set #js {:username "wellwell"
+                 :email "leon.talbert@gmail.com"
+                 :data  (pr-str @mn/monolith)})))

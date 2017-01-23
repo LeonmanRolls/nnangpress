@@ -20,18 +20,13 @@
                               :email "leon.talbert@gmail.com"
                               :data  (pr-str @monolith)}))))))
 
-(comment 
-
-
-  )
-
 (defn current-route-map [route routes-map]
   (let [xs (rest route)
         fxs (first xs) 
         idx (u/index-of (vec (map :route-name (:children routes-map))) (str "/" fxs))]
     (cond 
       (empty? xs) routes-map 
-      :else (current-widgets xs (get (:children routes-map) idx)))))
+      :else (current-route-map xs (get (:children routes-map) idx)))))
 
 (defn current-widgets [route routes-map]
   (let [xs (rest route)

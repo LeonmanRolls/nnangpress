@@ -47,9 +47,6 @@
                               (clojure.string/split (first @current-route-obs) #"/")
                               routes-map-obs)]
 
-        (println "current-route-map type: " (type current-route-map))
-        (println "current-route-map: " current-route-map)
-
         (dom/div (clj->js (merge @main-view-style-obs {:className "main-view"})) 
 
                  (apply dom/div nil
@@ -151,23 +148,49 @@
 
     (mn/ref-cursor-init mn/monolith)
 
-    #_(->
-        (js/firebase.database)
-        (.ref (str "users/" uid))
-        (.once "value")
-        (.then (fn [snapshot]
-                 (reset! mn/monolith (rdr/read-string (.-data (.val snapshot))))
-                 (om/root master mn/monolith
-                          {:target (. js/document (getElementById "super-container"))}))))
+    (->
+      (js/firebase.database)
+      (.ref (str "users/" uid))
+      (.once "value")
+      (.then (fn [snapshot]
+               (reset! mn/monolith (rdr/read-string (.-data (.val snapshot))))
+               (mn/monolith-watcher-init mn/monolith)
+               (om/root master mn/monolith
+                        {:target (. js/document (getElementById "super-container"))}))))
 
-    (GET "/edn/defaultdata.edn"
+    #_(GET "/edn/defaultdata.edn"
          {:handler (fn [resp]
                      (reset! mn/monolith (rdr/read-string resp))
+                     (mn/monolith-watcher-init mn/monolith)
                      (om/root master mn/monolith
                               {:target (. js/document
                                           (getElementById "super-container"))}))})))
 
 (comment
+
+  (let [uid "SGXvf26OEpeVDQ79XIH2V71fVnT2"
+        user-data-ref (->
+                        (js/firebase.database)
+                        (.ref (str "users/" uid)))]
+    (prn "-- Atom Changed --")
+    (->
+      user-data-ref
+      (.set #js {:username "wellwell"
+                 :email "leon.talbert@gmail.com"
+                 :data  (pr-str @mn/monolith)})))
+
+   (add-watch monolith :watcher
+             (fn  [key atom old-state new-state]
+               (let [uid "SGXvf26OEpeVDQ79XIH2V71fVnT2"
+                     user-data-ref (->
+                                     (js/firebase.database)
+                                     (.ref (str "users/" uid)))]
+                 (prn "-- Atom Changed --")
+                 (->
+                   user-data-ref
+                   (.set #js {:username "wellwell"
+                              :email "leon.talbert@gmail.com"
+                              :data  (pr-str @monolith)})))))   
 
   (defmethod widget 000 [data owner]
     (reify

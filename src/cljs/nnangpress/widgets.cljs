@@ -338,16 +338,13 @@
       (let [advertise? (om/get-state owner :advertise?)
             edit-mode-obs (om/observe owner (mn/edit-mode))]
 
-        (println "object-id" object-id)
-
         (dom/div nil
                  (dom/img #js {:style #js {:width "100%"}
                                :src (:img data)})
-                 (when (and (first @edit-mode-obs) #_(not advertise?)) 
+                 (when (and (first @edit-mode-obs) (not advertise?)) 
                    (dom/input #js {:value (:img data) 
                                    :style #js {:width "100%"}
                                    :onChange (fn [e]
-                                               (println "target" (.. e -target -value))
                                                (om/update! data :img (.. e -target -value)))})))))))
 
 (defmethod widget-data 007 [_]

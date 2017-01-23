@@ -27,8 +27,9 @@
   (reify
     om/IRender
     (render [this]
-      (dom/div #js {:id "the-nav" :className "main-nav"}
-               "Default navbar"))))
+      (let [edit-mode-obs (om/observe owner (mn/edit-mode))]
+        (dom/div #js {:id "the-nav" :className "main-nav"}
+                 (when (first @edit-mode-obs) "Default navbar"))))))
 ;navbar 0 ---
 
 ;navbar 1 ---
