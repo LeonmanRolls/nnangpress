@@ -38,6 +38,9 @@
 
 (defn ref-cursor-init [monolith]
 
+  (defn all-data []
+    (om/ref-cursor (om/root-cursor monolith)))
+
   (defn main-view-style []
     (om/ref-cursor (-> (om/root-cursor monolith) :route-widget :main-view-style)))
 

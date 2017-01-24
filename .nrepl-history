@@ -1,93 +1,3 @@
-  )
-(loop [route (clojure.string/split "/" #"/")
-       routes-map (-> @mon :route-widget :routes-map)]
-  (let [x (first route)
-        xs (rest route)
-        fxs (first xs) 
-        idx (index-of (vec (map :route-name (:children routes-map))) x)]
-    (println "routes-map: " routes-map)
-    (cond 
-      (empty? xs) (:widgets routes-map)
-      (= "" x) (recur (rest xs) (get 
-                                  (:children routes-map)
-                                  (index-of 
-                                    (vec (map :route-name (:children routes-map))) 
-                                            (str "/" fxs))
-                                  ))
-      :else (recur xs (get (:children routes-map) idx))
-      ))
-  )
-(loop [route (clojure.string/split "/" #"/")
-       routes-map (-> @mon :route-widget :routes-map)]
-  (let [x (first route)
-        xs (rest route)
-        fxs (first xs) 
-        idx (index-of (vec (map :route-name (:children routes-map))) x)]
-    (println "routes-map: " routes-map)
-    (cond 
-      (empty? xs) (:widgets routes-map)
-      (= "" x) (recur (rest xs) (get 
-                                  (:children routes-map)
-                                  (index-of 
-                                    (vec (map :route-name (:children routes-map))) 
-                                            (str "/" fxs))
-                                  ))
-      :else (recur xs (get (:children routes-map) idx))
-      ))
-  )
-(loop [route (clojure.string/split "/routea" #"/")
-       routes-map (-> @mon :route-widget :routes-map)]
-  (let [x (first route)
-        xs (rest route)
-        fxs (first xs) 
-        idx (index-of (vec (map :route-name (:children routes-map))) x)]
-    (println "routes-map: " routes-map)
-    (cond 
-      (empty? xs) (:widgets routes-map)
-      (= "" x) (recur (rest xs) (get 
-                                  (:children routes-map)
-                                  (index-of 
-                                    (vec (map :route-name (:children routes-map))) 
-                                            (str "/" fxs))
-                                  ))
-      :else (recur xs (get (:children routes-map) idx))
-      ))
-  )
-(loop [route (clojure.string/split "/routea/routeaa" #"/")
-       routes-map (-> @mon :route-widget :routes-map)]
-  (let [x (first route)
-        xs (rest route)
-        fxs (first xs) 
-        idx (index-of (vec (map :route-name (:children routes-map))) x)]
-    (println "routes-map: " routes-map)
-    (cond 
-      (empty? xs) (:widgets routes-map)
-      (= "" x) (recur (rest xs) (get 
-                                  (:children routes-map)
-                                  (index-of 
-                                    (vec (map :route-name (:children routes-map))) 
-                                            (str "/" fxs))
-                                  ))
-      :else (recur xs (get (:children routes-map) idx))
-      ))
-  )
-monolith
-  (def mon monolith)
-mon
-(loop [route (clojure.string/split "/routea/routeaa" #"/")
-       routes-map (-> @mon :route-widget :routes-map)]
-  (let [x (first route)
-        xs (rest route)
-        fxs (first xs) 
-        idx (index-of (vec (map :route-name (:children routes-map))) x)]
-    (println "routes-map: " routes-map)
-    (cond 
-      (empty? xs) (:widgets routes-map)
-      (= "" x) (recur (rest xs) (get 
-                                  (:children routes-map)
-                                  (index-of 
-                                    (vec (map :route-name (:children routes-map))) 
-                                            (str "/" fxs))
                                   ))
       :else (recur xs (get (:children routes-map) idx))
       ))
@@ -498,3 +408,93 @@ mon
       (.set #js {:username "wellwell"
                  :email "leon.talbert@gmail.com"
                  :data  (pr-str @mn/monolith)})))
+(defn new-route [route data]
+    (->
+      (js/firebase.database)
+      (.ref route)
+      (.set data)))
+@mn/monolith
+(ns nnangpress.app
+  (:import [goog.history Html5History EventType])
+  (:require-macros [cljs.core.async.macros :refer  [go go-loop]])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [nnangpress.monolith :as mn]
+            [nnangpress.navbars :as nv]
+            [nnangpress.widgets :as wgt]
+            [nnangpress.core :as cre]
+            [nnangpress.utils :as u]
+            [nnangpress.routing :as rt]
+            [clojure.spec :as s]
+            [cljs.core.async :as cas :refer [>! <! put! chan pub sub close!]]
+            [cljs.reader :as rdr]
+            [goog.events :as ev]
+            [goog.dom :as gdom]
+            [ajax.core :refer [GET POST]]
+            [replumb.core :as replumb]))
+mn
+mn/monolith
+(pr-str @mn/monolith)
+(new-route 
+    "defaultdata/"
+    #js {:data (pr-str @mn/monolith)})
+@mn/monolith
+(clj->js @mn/monolith)
+(let [uid "testing"
+        user-data-ref (->
+                        (js/firebase.database)
+                        (.ref (str "users/" uid)))]
+    (->
+      user-data-ref
+      (.set #js {:username "wellwell"
+                 :email "leon.talbert@gmail.com"
+                 :data  (clj->js @mn/monolith)})))
+(defn load-user-data [uid]
+    (->
+      (js/firebase.database)
+      (.ref (str "users/" uid))
+      (.once "value")
+      (.then (fn [snapshot]
+               (println "snapshot: " snapshot)
+               ))))
+    (load-user-data "testing")
+(defn load-user-data [uid]
+    (->
+      (js/firebase.database)
+      (.ref (str "users/" uid))
+      (.once "value")
+      (.then (fn [snapshot]
+               (println "snapshot: " (.val snapshot))
+               ))))
+    (load-user-data "testing")
+(defn load-user-data [uid]
+    (->
+      (js/firebase.database)
+      (.ref (str "users/" uid))
+      (.once "value")
+      (.then (fn [snapshot]
+               (println "snapshot: " (js->clj (.val snapshot)))
+               ))))
+    (load-user-data "testing")
+mn/monolith
+@mn/monolith
+(new-route "defaultdata/" #js {:data (pr-str @mn/monolith)})
+(defn new-route [route data]
+    (->
+      (js/firebase.database)
+      (.ref route)
+      (.set data)))
+(new-route "defaultdata/" #js {:data (pr-str @mn/monolith)})
+(defn new-route [route data]
+    (->
+      (js/firebase.database)
+      (.ref route)
+      (.set data)))
+(new-route "defaultdata/" #js {:data (pr-str @mn/monolith)})
+@mn/monolith
+(defn new-route [route data]
+    (->
+      (js/firebase.database)
+      (.ref route)
+      (.set data)))
+(new-route (str "users/" "SGXvf26OEpeVDQ79XIH2V71fVnT2") #js {:data (pr-str @mn/monolith)})

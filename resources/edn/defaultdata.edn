@@ -56,10 +56,10 @@
                              :data-width "320"
                              :data-height "400"}]}]
  :edit-mode [false]
- :route-widget {:route-widget-id 0
-                :main-view-style {:style {}} 
+ :route-widget {:route-widget-id 1
+                :main-view-style {:style {:marginLeft "160px"}} 
                 :routes-map {:route-name "/"
-                             :bg-img "home_page.jpg"
+                             :bg-img "http://solariarchitects.com/img/home_page.jpg"
                              :nav-hint ["Architects"]
                              :nav-hint-style {:color "black"}
                              :widgets [{:widget-uid 001
@@ -71,7 +71,7 @@
                                         :widget-name "Standard image widget"
                                         :img "http://solariarchitects.com/img/leaderboards/group_photo_everyday_zoomed.jpg"}]
                              :children [{:route-name "/routea"
-                                         :bg-img "home_page.jpg"
+                                         :bg-img "http://solariarchitects.com/img/for_architects.jpg"
                                          :nav-hint ["Architects"]
                                          :nav-hint-style {:color "black"}
                                          :widgets [{:widget-uid 001
@@ -83,7 +83,7 @@
                                                     :widget-name "Standard image widget"
                                                     :img "http://solariarchitects.com/img/leaderboards/group_photo_everyday_zoomed.jpg"}]
                                          :children [{:route-name "/routeaa"
-                                                     :bg-img "home_page.jpg"
+                                                     :bg-img "http://solariarchitects.com/img/your_career.jpg"
                                                      :nav-hint ["Architects"]
                                                      :nav-hint-style {:color "black"}
                                                      :widgets [{:widget-uid 001
@@ -96,7 +96,7 @@
                                                                 :img "http://solariarchitects.com/img/leaderboards/group_photo_everyday_zoomed.jpg"}]
                                                      :children []}]}
                                         {:route-name "/routeb"
-                                         :bg-img "home_page.jpg"
+                                         :bg-img "http://solariarchitects.com/img/from_us.jpg"
                                          :nav-hint ["Architects"]
                                          :nav-hint-style {:color "black"}
                                          :widgets [{:widget-uid 001
@@ -108,7 +108,7 @@
                                                     :widget-name "Standard image widget"
                                                     :img "http://solariarchitects.com/img/leaderboards/group_photo_everyday_zoomed.jpg"}]
                                          :children [{:route-name "/routeba"
-                                                     :bg-img "home_page.jpg"
+                                                     :bg-img "http://solariarchitects.com/img/home_page.jpg"
                                                      :nav-hint ["Architects"]
                                                      :nav-hint-style {:color "black"}
                                                      :widgets [{:widget-uid 001

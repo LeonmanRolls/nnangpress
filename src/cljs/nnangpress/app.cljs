@@ -131,53 +131,81 @@
                  (om/build nv/navbar (:route-widget data)))))))
 
 (defn init []
-  (let [uid "SGXvf26OEpeVDQ79XIH2V71fVnT2"
-        uiconfig #js {:callbacks #js {:signInSuccess (fn [user credential redirectUrl]
-                                                       (println "sucessful sign in")
-                                                       (.dir js/console user)
-                                                       false)}
-                      :signInFlow "popup"
-                      :signInOptions (array 
-                                       #js {:provider js/firebase.auth.EmailAuthProvider.PROVIDER_ID})
-                      :tosUrl "https://google.com"
-                      :credentialHelper js/firebaseui.auth.CredentialHelper.NONE}
-        ui (js/firebaseui.auth.AuthUI. (js/firebase.auth))
-        user-data-ref (->
-                        (js/firebase.database)
-                        (.ref (str "users/" uid)))]
+  (let [uid "SGXvf26OEpeVDQ79XIH2V71fVnT2"]
 
     (mn/ref-cursor-init mn/monolith)
 
+    #_(.start ui "#firebase" uiconfig)
+
+    (->
+      (js/firebase.database)
+      (.ref (str "defaultdata/"))
+      (.once "value")
+      (.then (fn [snapshot]
+               (println (js->clj (.-data (.val snapshot)) :keywordize-keys true))
+               #_(reset! mn/monolith (js->clj (.-data (.val snapshot)) :keywordize-keys true))
+               (reset! mn/monolith (rdr/read-string (.-data (.val snapshot))))
+               #_(mn/monolith-watcher-init mn/monolith)
+               (om/root master mn/monolith
+                        {:target (. js/document (getElementById "super-container"))}))))
+
+    #_(GET "/edn/defaultdata.edn"
+           {:handler (fn [resp]
+                       (reset! mn/monolith (rdr/read-string resp))
+                       #_(mn/monolith-watcher-init mn/monolith)
+                       (om/root master mn/monolith
+                                {:target (. js/document
+                                            (getElementById "super-container"))}))})))
+
+(comment
+
+  uid "SGXvf26OEpeVDQ79XIH2V71fVnT2"
+  uiconfig #js {:callbacks #js {:signInSuccess (fn [user credential redirectUrl]
+                                                 (println "sucessful sign in")
+                                                 (.dir js/console user)
+                                                 false)}
+                :signInFlow "popup"
+                :signInOptions (array 
+                                 #js {:provider js/firebase.auth.EmailAuthProvider.PROVIDER_ID})
+                :tosUrl "https://google.com"
+                :credentialHelper js/firebaseui.auth.CredentialHelper.NONE}
+  ui (js/firebaseui.auth.AuthUI. (js/firebase.auth))
+  user-data-ref (->
+                  (js/firebase.database)
+                  (.ref (str "users/" uid)))
+
+"SGXvf26OEpeVDQ79XIH2V71fVnT2"
+(rdr/read-string (.-data (.val snapshot)))
+
+  (defn new-route [route data]
+    (->
+      (js/firebase.database)
+      (.ref route)
+      (.set data)))
+  (new-route (str "users/" "SGXvf26OEpeVDQ79XIH2V71fVnT2") #js {:data (pr-str @mn/monolith)})
+
+  (defn save-user-monolith []
+    (let [uid "testing"
+          user-data-ref (->
+                          (js/firebase.database)
+                          (.ref (str "users/" uid)))]
+      (->
+        user-data-ref
+        (.set #js {:username "wellwell"
+                   :email "leon.talbert@gmail.com"
+                   :data  (clj->js @mn/monolith :keywordize-keys true)}))))    
+  (save-user-monolith)
+  
+  (defn load-user-data [uid]
     (->
       (js/firebase.database)
       (.ref (str "users/" uid))
       (.once "value")
       (.then (fn [snapshot]
-               (reset! mn/monolith (rdr/read-string (.-data (.val snapshot))))
-               (mn/monolith-watcher-init mn/monolith)
-               (om/root master mn/monolith
-                        {:target (. js/document (getElementById "super-container"))}))))
-
-    #_(GET "/edn/defaultdata.edn"
-         {:handler (fn [resp]
-                     (reset! mn/monolith (rdr/read-string resp))
-                     (mn/monolith-watcher-init mn/monolith)
-                     (om/root master mn/monolith
-                              {:target (. js/document
-                                          (getElementById "super-container"))}))})))
-
-(comment
-
-  (let [uid "SGXvf26OEpeVDQ79XIH2V71fVnT2"
-        user-data-ref (->
-                        (js/firebase.database)
-                        (.ref (str "users/" uid)))]
-    (prn "-- Atom Changed --")
-    (->
-      user-data-ref
-      (.set #js {:username "wellwell"
-                 :email "leon.talbert@gmail.com"
-                 :data  (pr-str @mn/monolith)})))
+               (println "snapshot: " (js->clj (.val snapshot)))
+               (reset! mn/monolith (rdr/read-string resp))
+               ))))
+    (load-user-data "testing")
 
    (add-watch monolith :watcher
              (fn  [key atom old-state new-state]

@@ -2,6 +2,7 @@
   (:require 
     [om.core :as om :include-macros true :refer [set-state! update-state!]]
     [om.dom :as dom :include-macros true]
+    [cljs.reader :as rdr]
     [nnangpress.utils :as u]
     [nnangpress.monolith :as mn]
     [nnangpress.core :as cre]
@@ -523,18 +524,67 @@
         (apply dom/ul #js {:className "right-nav"}
                (om/build-all li lis {:state {:routes-map routes-map-obs}}))))))
 
+(defmethod widget-data 9 [_]
+  {:widget-uid 9
+   :object-id (u/uid)
+   :widget-name "Sign in widget"})
+
+(defmethod widget 9 [data owner]
+  (reify 
+    om/IInitState 
+    (init-state [_]
+      {:advertise? false})
+
+    om/IRender 
+    (render [_]
+      (let [all-data (om/observe owner (mn/all-data)) 
+            uiconfig #js {:callbacks 
+                          #js {:signInSuccess (fn [user credential redirectUrl]
+                                                (println "sucessful sign in")
+                                                (.dir js/console user)
+                                                (->
+                                                  (js/firebase.database)
+                                                  (.ref (str "users/" (.-uid user)))
+                                                  (.once "value")
+                                                  (.then (fn [snapshot]
+                                                           (println (js->clj (.-data (.val snapshot)) :keywordize-keys true))
+                                                           (om/update! all-data (rdr/read-string (.-data (.val snapshot))))
+                                                           #_(reset! mn/monolith (js->clj (.-data (.val snapshot)) :keywordize-keys true))
+                                                           #_(reset! mn/monolith (rdr/read-string (.-data (.val snapshot))))
+                                                           #_(mn/monolith-watcher-init mn/monolith)
+                                                           #_(om/root master mn/monolith
+                                                                    {:target (. js/document (getElementById "super-container"))}))))
+
+                                                false)}
+                          :signInFlow "popup"
+                          :signInOptions (array 
+                                           #js {:provider 
+                                                js/firebase.auth.EmailAuthProvider.PROVIDER_ID})
+                          :tosUrl "https://google.com"
+                          :credentialHelper js/firebaseui.auth.CredentialHelper.NONE}]
+
+        (dom/div #js {:style #js {:textAlign "center"}} 
+                 "hi there"
+                 (dom/div #js {:id "#firebase"} "")
+                 (dom/button 
+                   #js {:onClick (fn [_] (.start 
+                                           (js/firebaseui.auth.AuthUI. (js/firebase.auth))
+                                           "#firebase" 
+                                           uiconfig))} 
+                   "Sign in"))))))
+
 (defn admin-toolbar [data owner]
   (reify 
     om/IRender
     (render [_]
       (let []
-        (dom/div #js{:className "admin-toolbar"} 
+        (dom/div #js {:className "admin-toolbar"} 
                  (dom/b nil "Welcome to Nnangpress alpha ")
                  (dom/button #js {:onClick (fn [_] 
                                              (om/transact! 
                                                (mn/edit-mode) 
                                                (fn [dabool]
-                                                 [(not (first dabool))] )))}
+                                                 [(not (first dabool))])))}
                              "Toogle edit mode"))))))
 
 (defn select-widget-wrapper [{:keys [widget-name widget-uid] :as data} owner]
@@ -559,7 +609,7 @@
 (defn all-widget-wrapper [{:keys [object-id] :as data} owner]
   (reify 
     om/IRender
-    (render [_ ]
+    (render [_]
       (let [edit-mode-obs (om/observe owner (mn/edit-mode))
             routes-map-obs (om/observe owner (mn/routes-map))
             current-route-obs (om/observe owner (mn/current-route))
@@ -575,4 +625,6 @@
                                                   (vec (remove #(= (:object-id %) object-id) x)))))} 
                                "Delete"))
                  (om/build widget data))))))
+
+
 
