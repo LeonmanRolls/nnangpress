@@ -2,6 +2,18 @@
 
 - Make sure boot is using clojure version 1.8.0
 
+#Running and deploying
+
+## Dev mode
+- boot dev
+
+## REPL
+- boot repl --client
+- (start-repl)
+
+## Deploy
+- boot production build target
+
 #Application architecture
 
 -All the data is in a single atom
@@ -45,8 +57,8 @@ current route. Current route of the app is part of application state.
 
 ## Jquery plugins
 
-- In general the html these should be rendered with dangerouslysetinnerhtml. 
-We are looking to essentially sidestep react, ideally there should be no 
+- In general the html these should be rendered with dangerouslysetinnerhtml.
+We are looking to essentially sidestep react, ideally there should be no
 jquery plugins.
 
 ## Namespace architecture
