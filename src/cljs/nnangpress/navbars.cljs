@@ -12,13 +12,13 @@
 ;navbar 0 ---
 (defmethod navbar-data 0 [_]
   {:route-widget-id 0
-   :main-view-style {:style {}} 
+   :main-view-style {:style {}}
    :roues-map {:route-name "/"
                :bg-img "home_page.jpg"
                :nav-hint ["Architects"]
                :nav-hint-style {:color "black"}
                :widgets [{:widget-uid 001
-                          :object-id "a" 
+                          :object-id "a"
                           :widget-name "Standard text widget"
                           :inner-html ["<p> Hi there lol</p>"]}]
                :children []}})
@@ -35,13 +35,13 @@
 ;navbar 1 ---
 (defmethod navbar-data 1 [_]
   {:route-widget-id 1
-   :main-view-style {:style {:paddingLeft "320px"}} 
+   :main-view-style {:style {:paddingLeft "320px"}}
    :routes-map {:route-name "/"
                 :bg-img "home_page.jpg"
                 :nav-hint ["Architects"]
                 :nav-hint-style {:color "black"}
                 :widgets [{:widget-uid 001
-                           :object-id "a" 
+                           :object-id "a"
                            :widget-name "Standard text widget"
                            :inner-html ["<p> Hi there lol</p>"]}]
                 :children [{:route-name "/for-you"
@@ -55,11 +55,11 @@
                                         :nav-hint ["All Projects"]
                                         :nav-hint-style {:color "white"}
                                         :widgets [{:widget-uid 001
-                                                   :object-id "b" 
+                                                   :object-id "b"
                                                    :widget-name "Standard text widget"
                                                    :inner-html ["<p> Hi there </p>"]}
                                                   {:widget-uid 007
-                                                   :object-id "c" 
+                                                   :object-id "c"
                                                    :widget-name "Grid"
                                                    :imgs [{:id "entry-1"
                                                            :className "mega-entry"
@@ -74,14 +74,14 @@
                                                            :data-height "400"}]}]
                                         :children []}]}]}})
 
-(defn basic-route [] 
+(defn basic-route []
   {:route-name (str "/parent" (subs (u/uid) 0 3))
    :bg-img "from_uss.jpg"
    :grey-bg? true
    :nav-hint ["nav hint"]
    :nav-hint-style {:color "white"}
    :widgets [{:widget-uid 001
-              :object-id (u/uid) 
+              :object-id (u/uid)
               :widget-name "Standard text widget"
               :inner-html ["<p> Hi there </p>"]}]
    :children [{:route-name (str "/child" (subs (u/uid) 0 3))
@@ -90,7 +90,7 @@
                :nav-hint ["nav hint"]
                :nav-hint-style {:color "white"}
                :widgets [{:widget-uid 001
-                          :object-id (u/uid) 
+                          :object-id (u/uid)
                           :widget-name "Standard text widget"
                           :inner-html ["<p> Hi there </p>"]}]
                :children []}]})
@@ -99,11 +99,10 @@
   (reify
     om/IRender
     (render [_]
-      (let [{:keys [:nav-hint :nav-hint-style]} (om/observe owner (mn/active-route))]
+      (let []
         (dom/div #js {:className "nav-hint-outer"}
-                 (dom/div #js {:className "nav-hint-inner"
-                               :style (clj->js nav-hint-style)}
-                          (first nav-hint)))))))
+                 (dom/div #js {:className "nav-hint-inner"}
+                          "nav hint"))))))
 
 (defn nav-menu-logo
   [data owner]
@@ -139,15 +138,15 @@
         (cond
           (= "/" route-name)
           (apply dom/ul #js {}
-                 (concat 
+                 (concat
                    (om/build-all nav-menu children {:state {:depth (inc depth)}})
                    (when (first @edit-mode-obs)
-                     [(dom/button #js {:onClick (fn [_]   
-                                                  (om/transact! 
-                                                    children 
+                     [(dom/button #js {:onClick (fn [_]
+                                                  (om/transact!
+                                                    children
                                                     (fn [children]
                                                       (conj children (basic-route)))))} "Add route")
-                      (om/build cre/remove-element children 
+                      (om/build cre/remove-element children
                                 {:state {:label "remove nth route"}})])))
 
           (and (not (empty? children)) (> depth (if (first @edit-mode-obs) 2 1)))
@@ -170,16 +169,16 @@
 
                    (when active?
                      (apply dom/ul #js {:className "nav-ul"}
-                            (concat 
+                            (concat
                               (om/build-all nav-menu children {:state {:depth (inc depth)}})
                               (when (first @edit-mode-obs)
-                                [(dom/button #js {:onClick (fn [_]   
-                                                             (om/transact! 
-                                                               children 
+                                [(dom/button #js {:onClick (fn [_]
+                                                             (om/transact!
+                                                               children
                                                                (fn [children]
-                                                                 (conj children (basic-route)))))} 
+                                                                 (conj children (basic-route)))))}
                                              "Add route")
-                                 (om/build cre/remove-element children 
+                                 (om/build cre/remove-element children
                                            {:state {:label "remove nth route"}})])))))
 
           :else

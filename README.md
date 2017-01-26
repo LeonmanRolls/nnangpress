@@ -63,3 +63,6 @@ jquery plugins.
 
 ## Namespace architecture
 
+# Javascript interop noted
+
+- When going js -> clj don't have any empty maps. display inherit for style maps

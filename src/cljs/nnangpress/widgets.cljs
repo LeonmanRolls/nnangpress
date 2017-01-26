@@ -1,5 +1,5 @@
 (ns nnangpress.widgets
-  (:require 
+  (:require
     [om.core :as om :include-macros true :refer [set-state! update-state!]]
     [om.dom :as dom :include-macros true]
     [cljs.reader :as rdr]
@@ -70,8 +70,8 @@
 (defmethod widget-data 2 [_]
   {:widget-uid 2
    :object-id (u/uid)
-   :imgs [{:object-id (u/uid) 
-           :url "http://placekitten.com/900/600"} 
+   :imgs [{:object-id (u/uid)
+           :url "http://placekitten.com/900/600"}
           {:object-id (u/uid)
            :url "http://placekitten.com/900/600"}]})
 
@@ -81,9 +81,9 @@
     (init-state [_]
       {:uid (u/uid)
        :advertise? false
-       :img-partial (fn [{:keys [url] :as data}] 
+       :img-partial (fn [{:keys [url] :as data}]
                       (str "<img class=\"rsImg\" src=\"" url "\"/>"))
-       :default-img (fn []  
+       :default-img (fn []
                       {:object-id (u/uid)
                        :url "http://placekitten.com/900/600"})
        :slider-init (fn [uid]
@@ -102,7 +102,7 @@
             slider-init (om/get-state owner :slider-init)]
         (slider-init uid)))
 
-    om/IDidUpdate 
+    om/IDidUpdate
     (did-update [_ _ _]
       (let [uid (om/get-state owner :uid)
             slider-init (om/get-state owner :slider-init)]
@@ -111,34 +111,34 @@
     om/IRenderState
     (render-state [_ {:keys [uid img-partial default-img advertise?] :as state}]
       (let [edit-mode-obs (om/observe owner (mn/edit-mode))]
-        (dom/div nil 
+        (dom/div nil
                  (dom/div #js {:style #js {:color "black"}
-                               :dangerouslySetInnerHTML 
-                               #js {:__html 
-                                    (str 
+                               :dangerouslySetInnerHTML
+                               #js {:__html
+                                    (str
                                       "<div id=\"" uid "\" class=\"royalSlider rsDefault\">"
                                       (apply str (map img-partial imgs))
-                                      "</div>")}})        
+                                      "</div>")}})
 
-                 (when (and (first @edit-mode-obs) (not advertise?))  
+                 (when (and (first @edit-mode-obs) (not advertise?))
 
-                   (dom/div nil 
+                   (dom/div nil
                             (apply dom/div nil
                                    (om/build-all
                                      (fn [{:keys [url object-id] :as data} owner]
                                        (reify
                                          om/IRender
                                          (render [_]
-                                           (dom/div nil 
-                                                    (cre/simple-input-cursor (:url data) data :url)     
-                                                    (dom/button 
+                                           (dom/div nil
+                                                    (cre/simple-input-cursor (:url data) data :url)
+                                                    (dom/button
                                                       #js {:onClick (fn [_]
-                                                                      (om/transact! 
+                                                                      (om/transact!
                                                                         imgs
                                                                         (fn [x]
-                                                                          (vec 
+                                                                          (vec
                                                                             (remove
-                                                                              #(= 
+                                                                              #(=
                                                                                  (:object-id %)
                                                                                  object-id) x)))))}
                                                       "Delete")))))
@@ -186,7 +186,7 @@
             advertise? (om/get-state owner :advertise?)
             edit-mode-obs (om/observe owner (mn/edit-mode))]
 
-        (when (and (first @edit-mode-obs) (not advertise?)) 
+        (when (and (first @edit-mode-obs) (not advertise?))
           (js/Medium. #js {:element (.getElementById js/document uuid)
                            :mode js/Medium.richMode
                            :placeholder "Your Text here"
@@ -257,7 +257,7 @@
                           (apply dom/dl nil (om/build-all accordion-sub text)))
 
                  (when (and (first @edit-mode-obs) (not advertise?))
-                   (dom/div nil 
+                   (dom/div nil
                             (dom/button
                               #js{:onClick (fn [_] (om/transact!
                                                      text
@@ -265,7 +265,7 @@
                                                        (conj text {:title (widget-data 001)
                                                                    :sub (widget-data 001)}))))}
                               "Add Section")
-                            (om/build cre/remove-element text 
+                            (om/build cre/remove-element text
                                       {:state {:label "remove accordion section"}}))))))))
 
 (defmethod widget-data 005 [_]
@@ -284,7 +284,7 @@
 
     om/IDidMount
     (did-mount [_]
-      (let [uuid (.toString (om/get-state owner :uuid)) 
+      (let [uuid (.toString (om/get-state owner :uuid))
             advertise? (om/get-state owner :advertise?)
             edit-mode-obs (om/observe owner (mn/edit-mode))]
 
@@ -298,9 +298,9 @@
                                                   :inner-html
                                                   [(.-innerHTML (gdom/getElement uuid))]))}}))))
 
-    om/IDidUpdate 
+    om/IDidUpdate
     (did-update [_ _ _]
-      (let [uuid (.toString (om/get-state owner :uuid)) 
+      (let [uuid (.toString (om/get-state owner :uuid))
             advertise? (om/get-state owner :advertise?)
             edit-mode-obs (om/observe owner (mn/edit-mode))]
 
@@ -342,8 +342,8 @@
         (dom/div nil
                  (dom/img #js {:style #js {:width "100%"}
                                :src (:img data)})
-                 (when (and (first @edit-mode-obs) (not advertise?)) 
-                   (dom/input #js {:value (:img data) 
+                 (when (and (first @edit-mode-obs) (not advertise?))
+                   (dom/input #js {:value (:img data)
                                    :style #js {:width "100%"}
                                    :onChange (fn [e]
                                                (om/update! data :img (.. e -target -value)))})))))))
@@ -428,7 +428,7 @@
                         (if (contains? data :text)
                           (widget-text data)
                           (widget-img data)))
-         
+
          :edit-fn (fn [data owner]
                                   (reify
                                     om/IRender
@@ -477,8 +477,8 @@
 
                  (when (and (first @edit-mode-obs) (not advertise?))
 
-                   (dom/div nil 
-                            (apply 
+                   (dom/div nil
+                            (apply
                               dom/div nil
                               (om/build-all edit-fn imgs))
 
@@ -494,7 +494,7 @@
                                                           (fn [x] (conj x (default-text)))))}
                                         "Add text")
 
-                            (om/build cre/remove-element imgs 
+                            (om/build cre/remove-element imgs
                                       {:state {:label "remove nth element"}}))))))))
 
 (defmethod widget-data 8 [_]
@@ -503,7 +503,7 @@
    :widget-name "Right Nav"
    :imgs []})
 
-;Small right nav 
+;Small right nav
 (defmethod widget 8 [{:keys [lis] :as data} owner]
   (reify
     om/IInitState
@@ -529,16 +529,17 @@
    :object-id (u/uid)
    :widget-name "Sign in widget"})
 
+;Sign in
 (defmethod widget 9 [data owner]
-  (reify 
-    om/IInitState 
+  (reify
+    om/IInitState
     (init-state [_]
       {:advertise? false})
 
-    om/IRender 
+    om/IRender
     (render [_]
-      (let [all-data (om/observe owner (mn/all-data)) 
-            uiconfig #js {:callbacks 
+      (let [all-data (om/observe owner (mn/all-data))
+            uiconfig #js {:callbacks
                           #js {:signInSuccess (fn [user credential redirectUrl]
                                                 (println "sucessful sign in")
                                                 (.dir js/console user)
@@ -548,83 +549,100 @@
                                                   (.once "value")
                                                   (.then (fn [snapshot]
                                                            (println (js->clj (.-data (.val snapshot)) :keywordize-keys true))
-                                                           (om/update! all-data (rdr/read-string (.-data (.val snapshot))))
-                                                           #_(reset! mn/monolith (js->clj (.-data (.val snapshot)) :keywordize-keys true))
-                                                           #_(reset! mn/monolith (rdr/read-string (.-data (.val snapshot))))
-                                                           #_(mn/monolith-watcher-init mn/monolith)
-                                                           #_(om/root master mn/monolith
-                                                                    {:target (. js/document (getElementById "super-container"))}))))
-
+                                                           (om/update! all-data (rdr/read-string (.-data (.val snapshot)))))))
                                                 false)}
                           :signInFlow "popup"
-                          :signInOptions (array 
-                                           #js {:provider 
+                          :signInOptions (array
+                                           #js {:provider
                                                 js/firebase.auth.EmailAuthProvider.PROVIDER_ID})
                           :tosUrl "https://google.com"
                           :credentialHelper js/firebaseui.auth.CredentialHelper.NONE}]
 
-        (dom/div #js {:style #js {:textAlign "center"}} 
+        (dom/div #js {:style #js {:textAlign "center"}}
                  "hi there"
                  (dom/div #js {:id "#firebase"} "")
-                 (dom/button 
-                   #js {:onClick (fn [_] (.start 
+                 (dom/button
+                   #js {:onClick (fn [_] (.start
                                            (js/firebaseui.auth.AuthUI. (js/firebase.auth))
-                                           "#firebase" 
-                                           uiconfig))} 
+                                           "#firebase"
+                                           uiconfig))}
                    "Sign in"))))))
 
+(defmethod widget-data 10 [_]
+  {:widget-uid 10
+   :object-id (u/uid)
+   :widget-name "Show your sites"
+   :user-sites [{:site-name "site1"
+                 }
+
+                ]})
+
+;Your sites
+(defmethod widget 10 [data owner]
+  (reify
+    om/IInitState
+    (init-state [_]
+      {:advertise? false})
+
+    om/IDidMount
+    (did-mount [_]
+      )
+
+    om/IRender
+    (render [_]
+      (dom/div nil "Show your sites widget")
+      )))
+
 (defn admin-toolbar [data owner]
-  (reify 
+  (reify
     om/IRender
     (render [_]
       (let []
-        (dom/div #js {:className "admin-toolbar"} 
+        (dom/div #js {:className "admin-toolbar"}
                  (dom/b nil "Welcome to Nnangpress alpha ")
-                 (dom/button #js {:onClick (fn [_] 
-                                             (om/transact! 
-                                               (mn/edit-mode) 
+                 (dom/button #js {:onClick (fn [_]
+                                             (om/transact!
+                                               (mn/edit-mode)
                                                (fn [dabool]
                                                  [(not (first dabool))])))}
                              "Toogle edit mode"))))))
 
 (defn select-widget-wrapper [{:keys [widget-name widget-uid] :as data} owner]
-  (reify 
+  (reify
     om/IRender
     (render [_]
       (let [routes-map-obs (om/observe owner (mn/routes-map))
             current-route-obs (om/observe owner (mn/current-route))
-            current-widgets (mn/current-widgets 
+            current-widgets (mn/current-widgets
                               (clojure.string/split (first @current-route-obs) #"/")
                               routes-map-obs)]
 
-        (dom/div #js {:className "selectWidget"} 
-                 widget-name 
-                 (dom/button #js {:onClick (fn [_] (om/transact! 
+        (dom/div #js {:className "selectWidget"}
+                 widget-name
+                 (dom/button #js {:onClick (fn [_] (om/transact!
                                                      current-widgets
-                                                     (fn [x] 
-                                                       (conj x (widget-data widget-uid)))))} 
+                                                     (fn [x]
+                                                       (conj x (widget-data widget-uid)))))}
                              "Add widget")
                  (om/build widget data {:init-state {:advertise? true}}))))))
 
 (defn all-widget-wrapper [{:keys [object-id] :as data} owner]
-  (reify 
+  (reify
     om/IRender
     (render [_]
       (let [edit-mode-obs (om/observe owner (mn/edit-mode))
             routes-map-obs (om/observe owner (mn/routes-map))
             current-route-obs (om/observe owner (mn/current-route))
-            current-widgets (mn/current-widgets 
+            current-widgets (mn/current-widgets
                               (clojure.string/split (first @current-route-obs) #"/")
                               routes-map-obs)]
-        (dom/div nil 
+        (dom/div nil
                  (when (first @edit-mode-obs)
-                   (dom/button #js{:onClick (fn [_] 
-                                              (om/transact! 
-                                                current-widgets 
+                   (dom/button #js{:onClick (fn [_]
+                                              (om/transact!
+                                                current-widgets
                                                 (fn [x]
-                                                  (vec (remove #(= (:object-id %) object-id) x)))))} 
+                                                  (vec (remove #(= (:object-id %) object-id) x)))))}
                                "Delete"))
                  (om/build widget data))))))
-
-
 

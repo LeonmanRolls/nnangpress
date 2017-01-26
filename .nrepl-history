@@ -1,320 +1,3 @@
-                                  ))
-      :else (recur xs (get (:children routes-map) idx))
-      ))
-  )
-(loop [route (clojure.string/split "/routea/routeaa" #"/")
-       routes-map (-> @mon :route-widget :routes-map)]
-  (let [x (first route)
-        xs (rest route)
-        fxs (first xs) 
-        idx (index-of (vec (map :route-name (:children routes-map))) x)]
-    (println "routes-map: " routes-map)
-    (cond 
-      (empty? xs) (:widgets routes-map)
-      (= "" x) (recur xs (get 
-                           (:children routes-map)
-                           (index-of 
-                             (vec (map :route-name (:children routes-map))) 
-                             (str "/" fxs))
-                           ))
-     
-      ))
-  )
-(loop [route (clojure.string/split "/routea/routeaa" #"/")
-       routes-map (-> @mon :route-widget :routes-map)]
-  (let [x (first route)
-        xs (rest route)
-        fxs (first xs) 
-        idx (index-of (vec (map :route-name (:children routes-map))) x)]
-    (println "routes-map: " routes-map)
-    (cond 
-      (empty? xs) (:widgets routes-map)
-      (= "" x) (recur xs (get 
-                           (:children routes-map)
-                           (index-of 
-                             (vec (map :route-name (:children routes-map))) 
-                             (str "/" fxs))
-                           ))
-     
-      ))
-  )
-(loop [route (clojure.string/split "/routea/routeaa" #"/")
-       routes-map (-> @mon :route-widget :routes-map)]
-  (let [x (first route)
-        xs (rest route)
-        fxs (first xs) 
-        idx (index-of (vec (map :route-name (:children routes-map))) x)]
-    (println "routes-map: " routes-map)
-    (cond 
-      (empty? xs) (:widgets routes-map)
-      (= "" x) (recur xs (get 
-                           (:children routes-map)
-                           (index-of 
-                             (vec (map :route-name (:children routes-map))) 
-                             (str "/" fxs))
-                           ))
-      :else (recur xs (get (:children routes-map) idx))
-      ))
-  )
-(loop [route (clojure.string/split "/routea/routeaa" #"/")
-       routes-map (-> @mon :route-widget :routes-map)]
-  (let [x (first route)
-        xs (rest route)
-        fxs (first xs) 
-        idx (index-of (vec (map :route-name (:children routes-map))) x)]
-    (println "routes-map: " routes-map)
-    (cond 
-      (empty? xs) (:widgets routes-map)
-      (= "" x) (recur xs (get 
-                           (:children routes-map)
-                           (index-of 
-                             (vec (map :route-name (:children routes-map))) 
-                             (str "/" fxs))
-                           ))
-      :else (recur xs (get (:children routes-map) idx))
-      ))
-  )
-(loop [route (clojure.string/split "/routea/routeaa" #"/")
-       routes-map (-> @mon :route-widget :routes-map)]
-  (let [x (first route)
-        xs (rest route)
-        fxs (first xs) 
-        idx (index-of (vec (map :route-name (:children routes-map))) x)]
-    (println "routes-map: " routes-map)
-    (println "xs: " xs)
-    (cond 
-      (empty? xs) (:widgets routes-map)
-      (= "" x) (recur xs (get 
-                           (:children routes-map)
-                           (index-of 
-                             (vec (map :route-name (:children routes-map))) 
-                             (str "/" fxs))
-                           ))
-      :else (recur xs (get (:children routes-map) idx))
-      ))
-  )
-(loop [route (clojure.string/split "/routea/routeaa" #"/")
-       routes-map (-> @mon :route-widget :routes-map)]
-  (let [x (first route)
-        xs (rest route)
-        fxs (first xs) 
-        idx (index-of (vec (map :route-name (:children routes-map))) x)]
-    (println "xs: " xs)
-    (println "routes-map: " routes-map)
-    (cond 
-      (empty? xs) (:widgets routes-map)
-      (= "" x) (recur xs (get 
-                           (:children routes-map)
-                           (index-of 
-                             (vec (map :route-name (:children routes-map))) 
-                             (str "/" fxs))
-                           ))
-      :else (recur xs (get (:children routes-map) idx))
-      ))
-  )
-(loop [route (clojure.string/split "/routea/routeaa" #"/")
-       routes-map (-> @mon :route-widget :routes-map)]
-  (let [x (first route)
-        xs (rest route)
-        fxs (first xs) 
-        idx (index-of (vec (map :route-name (:children routes-map))) x)]
-    (println "x: " x)
-    (println "xs: " xs)
-    (println "routes-map: " routes-map)
-    (cond 
-      (empty? xs) (:widgets routes-map)
-      (= "" x) (recur xs (get 
-                           (:children routes-map)
-                           (index-of 
-                             (vec (map :route-name (:children routes-map))) 
-                             (str "/" fxs))
-                           ))
-      :else (recur xs (get (:children routes-map) idx))
-      ))
-  )
-(loop [route (clojure.string/split "/routea/routeaa" #"/")
-       routes-map (-> @mon :route-widget :routes-map)]
-  (let [x (first route)
-        xs (rest route)
-        fxs (first xs) 
-        idx (index-of (vec (map :route-name (:children routes-map))) x)]
-    (println "x: " x)
-    (println "xs: " xs)
-    (println "routes-map: " routes-map)
-    (cond 
-      (empty? xs) (:widgets routes-map)
-      (= "" x) (recur xs (get 
-                           (:children routes-map)
-                           (index-of 
-                             (vec (map :route-name (:children routes-map))) 
-                             (str "/" fxs))
-                           ))
-      :else (recur xs (get 
-                           (:children routes-map)
-                           (index-of 
-                             (vec (map :route-name (:children routes-map))) 
-                             (str "/" fxs))))
-      ))
-  )
-(loop [route (clojure.string/split "/routea" #"/")
-       routes-map (-> @mon :route-widget :routes-map)]
-  (let [x (first route)
-        xs (rest route)
-        fxs (first xs) 
-        idx (index-of (vec (map :route-name (:children routes-map))) x)]
-    (println "x: " x)
-    (println "xs: " xs)
-    (println "routes-map: " routes-map)
-    (cond 
-      (empty? xs) (:widgets routes-map)
-      (= "" x) (recur xs (get 
-                           (:children routes-map)
-                           (index-of 
-                             (vec (map :route-name (:children routes-map))) 
-                             (str "/" fxs))
-                           ))
-      :else (recur xs (get 
-                           (:children routes-map)
-                           (index-of 
-                             (vec (map :route-name (:children routes-map))) 
-                             (str "/" fxs))))
-      ))
-  )
-(loop [route (clojure.string/split "/" #"/")
-       routes-map (-> @mon :route-widget :routes-map)]
-  (let [x (first route)
-        xs (rest route)
-        fxs (first xs) 
-        idx (index-of (vec (map :route-name (:children routes-map))) x)]
-    (println "x: " x)
-    (println "xs: " xs)
-    (println "routes-map: " routes-map)
-    (cond 
-      (empty? xs) (:widgets routes-map)
-      (= "" x) (recur xs (get 
-                           (:children routes-map)
-                           (index-of 
-                             (vec (map :route-name (:children routes-map))) 
-                             (str "/" fxs))
-                           ))
-      :else (recur xs (get 
-                           (:children routes-map)
-                           (index-of 
-                             (vec (map :route-name (:children routes-map))) 
-                             (str "/" fxs))))
-      ))
-  )
-(loop [route (clojure.string/split "/routea/routeaa" #"/")
-       routes-map (-> @mon :route-widget :routes-map)]
-  (let [x (first route)
-        xs (rest route)
-        fxs (first xs) 
-        idx (index-of (vec (map :route-name (:children routes-map))) x)]
-    (println "x: " x)
-    (println "xs: " xs)
-    (println "routes-map: " routes-map)
-    (cond 
-      (empty? xs) (:widgets routes-map)
-      (= "" x) (recur xs (get 
-                           (:children routes-map)
-                           (index-of 
-                             (vec (map :route-name (:children routes-map))) 
-                             (str "/" fxs))
-                           ))
-      :else (recur xs (get 
-                           (:children routes-map)
-                           (index-of 
-                             (vec (map :route-name (:children routes-map))) 
-                             (str "/" fxs))))
-      ))
-  )
-(loop [route (clojure.string/split "/routea/routeaa" #"/")
-       routes-map (-> @mon :route-widget :routes-map)]
-  (let [x (first route)
-        xs (rest route)
-        fxs (first xs) 
-        idx (index-of 
-                             (vec (map :route-name (:children routes-map))) 
-                             (str "/" fxs))]
-    (println "x: " x)
-    (println "xs: " xs)
-    (println "routes-map: " routes-map)
-    (cond 
-      (empty? xs) (:widgets routes-map)
-      (= "" x) (recur xs (get 
-                           (:children routes-map)
-                          idx 
-                           ))
-      :else (recur xs (get 
-                        (:children routes-map)
-                        idx)))))
-(loop [route (clojure.string/split "/routea" #"/")
-       routes-map (-> @mon :route-widget :routes-map)]
-  (let [x (first route)
-        xs (rest route)
-        fxs (first xs) 
-        idx (index-of 
-                             (vec (map :route-name (:children routes-map))) 
-                             (str "/" fxs))]
-    (println "x: " x)
-    (println "xs: " xs)
-    (println "routes-map: " routes-map)
-    (cond 
-      (empty? xs) (:widgets routes-map)
-      (= "" x) (recur xs (get 
-                           (:children routes-map)
-                          idx 
-                           ))
-      :else (recur xs (get 
-                        (:children routes-map)
-                        idx)))))
-(loop [route (clojure.string/split "/" #"/")
-       routes-map (-> @mon :route-widget :routes-map)]
-  (let [x (first route)
-        xs (rest route)
-        fxs (first xs) 
-        idx (index-of 
-                             (vec (map :route-name (:children routes-map))) 
-                             (str "/" fxs))]
-    (println "x: " x)
-    (println "xs: " xs)
-    (println "routes-map: " routes-map)
-    (cond 
-      (empty? xs) (:widgets routes-map)
-      (= "" x) (recur xs (get 
-                           (:children routes-map)
-                          idx 
-                           ))
-      :else (recur xs (get 
-                        (:children routes-map)
-                        idx)))))
-(loop [route (clojure.string/split "/routea/routeaa" #"/")
-       routes-map (-> @mon :route-widget :routes-map)]
-  (let [x (first route)
-        xs (rest route)
-        fxs (first xs) 
-        idx (index-of 
-                             (vec (map :route-name (:children routes-map))) 
-                             (str "/" fxs))]
-    (println "x: " x)
-    (println "xs: " xs)
-    (println "routes-map: " routes-map)
-    (cond 
-      (empty? xs) (:widgets routes-map)
-      (= "" x) (recur xs (get 
-                           (:children routes-map)
-                          idx 
-                           ))
-      :else (recur xs (get 
-                        (:children routes-map)
-                        idx)))))
-(loop [route (clojure.string/split "/routea/routeaa" #"/")
-       routes-map (-> @mon :route-widget :routes-map)]
-  (let [x (first route)
-        xs (rest route)
-        fxs (first xs) 
-        idx (index-of (vec (map :route-name (:children routes-map))) (str "/" fxs))]
-    (println "x: " x)
     (println "xs: " xs)
     (println "routes-map: " routes-map)
     (cond 
@@ -498,3 +181,320 @@ mn/monolith
       (.ref route)
       (.set data)))
 (new-route (str "users/" "SGXvf26OEpeVDQ79XIH2V71fVnT2") #js {:data (pr-str @mn/monolith)})
+(start-repl)
+(in-ns 'nnangpress.app)
+  (js/Firebase.)    
+  (js/Firebase. "sdfsdf")    
+  (js/firebase. "sdfsdf")    
+js/firebase
+js/Firebase
+ (-> js/firebase .auth .currentUser) 
+ (-> js/firebase .auth .-currentUser) 
+(.dir 
+    js/console 
+    (-> js/firebase .auth .-currentUser))
+(in-ns 'nnangpress.repl)
+mn/monolith
+(ns nnangpress.repl
+  (:require [nnangpress.monolith :as mn]
+            [cljs.reader :as rdr]))
+mn/monolith
+(start-repl)
+(in-ns 'nnangpress.repl)
+mn/monolith
+(ns nnangpress.repl
+  (:require [nnangpress.monolith :as mn]
+            [cljs.reader :as rdr]))
+mn/monolith
+@mn/monolith
+  @mn/monolith
+(new-route 
+    "SGXvf26OEpeVDQ79XIH2V71fVnT2/site1"
+    @mn/monolith)
+(defn new-route [route data]
+  (->
+    (js/firebase.database)
+    (.ref route)
+    (.set data)))
+(ns nnangpress.repl
+  (:require [nnangpress.monolith :as mn]
+            [cljs.reader :as rdr]))
+(defn new-route [route data]
+  (->
+    (js/firebase.database)
+    (.ref route)
+    (.set data)))
+(new-route 
+    "SGXvf26OEpeVDQ79XIH2V71fVnT2/site1"
+    @mn/monolith)
+(new-route 
+    "SGXvf26OEpeVDQ79XIH2V71fVnT2/site1"
+    (pr-str @mn/monolith))
+(new-route 
+    "users/SGXvf26OEpeVDQ79XIH2V71fVnT2/site1"
+    (pr-str @mn/monolith))
+(new-route 
+    "users/SGXvf26OEpeVDQ79XIH2V71fVnT2/site2"
+    (pr-str @mn/monolith))
+@mn/monolith
+  (clj->js @mn/monolith)
+@mn/monolith
+  (clj->js @mn/monolith :keywordize-keys true)
+  (clj->js @mn/monolith)
+(new-route 
+    "js-data/data"
+    (clj->js @mn/monolith))
+(defn new-route [route data]
+  (->
+    (js/firebase.database)
+    (.ref route)
+    (.set data)))
+(ns nnangpress.repl
+  (:require [nnangpress.monolith :as mn]
+            [cljs.reader :as rdr]))
+  (new-route 
+    "js-data/data"
+    (clj->js @mn/monolith))
+(defn new-route [route data]
+  (->
+    (js/firebase.database)
+    (.ref route)
+    (.set data)))
+(new-route 
+    "js-data/data"
+    (clj->js @mn/monolith))
+(defn load-data [route]
+  (->
+    (js/firebase.database)
+    (.ref route)
+    (.once "value")
+    (.then (fn [snapshot]
+             (println "snapshot: " (js->clj (.val snapshot)))))))
+  (load-data "js-data/data")
+  (println @mn/monolith)
+(defn load-data [route]
+  (->
+    (js/firebase.database)
+    (.ref route)
+    (.once "value")
+    (.then (fn [snapshot]
+             (println "snapshot: " (js->clj (.val snapshot) :keywordize-keys true))))))
+  (load-data "js-data/data")
+(defn load-data [route callback]
+  (->
+    (js/firebase.database)
+    (.ref route)
+    (.once "value")
+    (.then (fn [snapshot]
+             (println "snapshot: " (js->clj (.val snapshot) :keywordize-keys true))
+             (callback (js->clj (.val snapshot) :keywordize-keys true))))))
+load-data
+@mn/monolith
+(new-route
+    "js-data/data"
+    (clj->js @mn/monolith))
+(defn new-route [route data]
+  (->
+    (js/firebase.database)
+    (.ref route)
+    (.set data)))
+(ns nnangpress.repl
+  (:require [nnangpress.monolith :as mn]
+            [cljs.reader :as rdr]))
+(defn new-route [route data]
+  (->
+    (js/firebase.database)
+    (.ref route)
+    (.set data)))
+(new-route
+    "js-data/data"
+    (clj->js @mn/monolith))
+l
+(ns nnangpress.repl
+  (:require [nnangpress.monolith :as mn]
+            [cljs.reader :as rdr]))
+(defn new-route [route data]
+  (->
+    (js/firebase.database)
+    (.ref route)
+    (.set data)))
+@mn/monolith
+  (:test @mn/monolith)
+(new-route
+    "js-data/data"
+    (clj->js 
+      {:test ["/"]
+       :current-route ["/"],
+       :logo-text ["Solari"],
+       :all-widgets-data [{:widget-uid 1, :object-id "a", :widget-name "Standard text widget", :inner-html ["<p> Hi there </p>"]}
+                          {:widget-uid 2, :widget-name "Slider", :object-id "basdfafoi", :imgs [{:object-id "dsafoijlsaf", :url "http://placekitten.com/900/600"} {:object-id "asdfipwnelj", :url "http://placekitten.com/900/600"}]}
+                          {:widget-uid 3, :object-id "b", :widget-name "Standard text widget", :inner-html ["<p> Hi there </p>"]}
+                          {:widget-uid 4, :object-id "c", :widget-name "Accordion", :text [{:title {:widget-uid 1, :object-id "d", :widget-name "Standard text widget", :inner-html ["<p> Hi there </p>"]}, :sub {:widget-uid 1, :object-id "e", :widget-name "Standard text widget", :inner-html ["<p> Hi there </p>"]}}]}
+                          {:widget-uid 5, :object-id "f", :widget-name "Standard text widget", :inner-html ["<p> Hi there </p>"]}
+                          {:widget-uid 6, :object-id "g", :widget-name "Standard image widget", :img "http://placekitten.com/800/400"}
+                          {:widget-uid 7, :object-id "h", :widget-name "Grid", :imgs [{:id "entry-1", :className "mega-entry", :data-src "http://placekitten.com/300/301", :data-width "320", :data-height "400"} {:id "entry-1-1", :className "mega-entry", :title "WE HAVE A LAUGH", :text "Cue James in a bald cap, need I say more?", :data-width "320", :data-height "400"}]}
+                          {:widget-uid 9, :object-id "fdsaiwasasdfl", :widget-name "Sign in widget"}],
+       :edit-mode [false],
+       :route-widget {:route-widget-id 0,
+                      :main-view-style {:style {}},
+                      :routes-map {:route-name "/",
+                                   :bg-img "http://www.startupnetcon.org/img/startupnetcon.jpg",
+                                   :nav-hint ["Architects"], :nav-hint-style {:color "black"},
+                                   :widgets [{:widget-uid 6, :object-id "sdafoiuewq", :widget-name "Standard image widget", :img "http://i.imgur.com/yxKTvJJ.png"}
+                                             {:widget-uid 9, :object-id "90a48dde-a50f-46c8-9dd5-fa7f14ddd410", :widget-name "Sign in widget"}],
+                                   :children []}}}))
+(defn new-route [route data]
+  (->
+    (js/firebase.database)
+    (.ref route)
+    (.set data)))
+(ns nnangpress.repl
+  (:require [nnangpress.monolith :as mn]
+            [cljs.reader :as rdr]))
+(defn new-route [route data]
+  (->
+    (js/firebase.database)
+    (.ref route)
+    (.set data)))
+(new-route
+    "js-data/data"
+    (clj->js 
+      {:test ["/"]
+       :current-route ["/"],
+       :logo-text ["Solari"],
+       :all-widgets-data [{:widget-uid 1, :object-id "a", :widget-name "Standard text widget", :inner-html ["<p> Hi there </p>"]}
+                          {:widget-uid 2, :widget-name "Slider", :object-id "basdfafoi", :imgs [{:object-id "dsafoijlsaf", :url "http://placekitten.com/900/600"} {:object-id "asdfipwnelj", :url "http://placekitten.com/900/600"}]}
+                          {:widget-uid 3, :object-id "b", :widget-name "Standard text widget", :inner-html ["<p> Hi there </p>"]}
+                          {:widget-uid 4, :object-id "c", :widget-name "Accordion", :text [{:title {:widget-uid 1, :object-id "d", :widget-name "Standard text widget", :inner-html ["<p> Hi there </p>"]}, :sub {:widget-uid 1, :object-id "e", :widget-name "Standard text widget", :inner-html ["<p> Hi there </p>"]}}]}
+                          {:widget-uid 5, :object-id "f", :widget-name "Standard text widget", :inner-html ["<p> Hi there </p>"]}
+                          {:widget-uid 6, :object-id "g", :widget-name "Standard image widget", :img "http://placekitten.com/800/400"}
+                          {:widget-uid 7, :object-id "h", :widget-name "Grid", :imgs [{:id "entry-1", :className "mega-entry", :data-src "http://placekitten.com/300/301", :data-width "320", :data-height "400"} {:id "entry-1-1", :className "mega-entry", :title "WE HAVE A LAUGH", :text "Cue James in a bald cap, need I say more?", :data-width "320", :data-height "400"}]}
+                          {:widget-uid 9, :object-id "fdsaiwasasdfl", :widget-name "Sign in widget"}],
+       :edit-mode [false],
+       :route-widget {:route-widget-id 0,
+                      :main-view-style {:style {}},
+                      :routes-map {:route-name "/",
+                                   :bg-img "http://www.startupnetcon.org/img/startupnetcon.jpg",
+                                   :nav-hint ["Architects"], :nav-hint-style {:color "black"},
+                                   :widgets [{:widget-uid 6, :object-id "sdafoiuewq", :widget-name "Standard image widget", :img "http://i.imgur.com/yxKTvJJ.png"}
+                                             {:widget-uid 9, :object-id "90a48dde-a50f-46c8-9dd5-fa7f14ddd410", :widget-name "Sign in widget"}],
+                                   :children []}}}))
+(new-route
+    "js-data/data"
+    (clj->js 
+      {:test ["/"]
+       :current-route ["/"],
+       :logo-text ["Solari"],
+       :all-widgets-data [{:widget-uid 1, :object-id "a", :widget-name "Standard text widget", :inner-html ["<p> Hi there </p>"]}
+                          {:widget-uid 2, :widget-name "Slider", :object-id "basdfafoi", :imgs [{:object-id "dsafoijlsaf", :url "http://placekitten.com/900/600"} {:object-id "asdfipwnelj", :url "http://placekitten.com/900/600"}]}
+                          {:widget-uid 3, :object-id "b", :widget-name "Standard text widget", :inner-html ["<p> Hi there </p>"]}
+                          {:widget-uid 4, :object-id "c", :widget-name "Accordion", :text [{:title {:widget-uid 1, :object-id "d", :widget-name "Standard text widget", :inner-html ["<p> Hi there </p>"]}, :sub {:widget-uid 1, :object-id "e", :widget-name "Standard text widget", :inner-html ["<p> Hi there </p>"]}}]}
+                          {:widget-uid 5, :object-id "f", :widget-name "Standard text widget", :inner-html ["<p> Hi there </p>"]}
+                          {:widget-uid 6, :object-id "g", :widget-name "Standard image widget", :img "http://placekitten.com/800/400"}
+                          {:widget-uid 7, :object-id "h", :widget-name "Grid", :imgs [{:id "entry-1", :className "mega-entry", :data-src "http://placekitten.com/300/301", :data-width "320", :data-height "400"} {:id "entry-1-1", :className "mega-entry", :title "WE HAVE A LAUGH", :text "Cue James in a bald cap, need I say more?", :data-width "320", :data-height "400"}]}
+                          {:widget-uid 9, :object-id "fdsaiwasasdfl", :widget-name "Sign in widget"}],
+       :edit-mode [false],
+       :route-widget {:route-widget-id 0,
+                      :main-view-style {:style {}},
+                      :routes-map {:route-name "/",
+                                   :bg-img "http://www.startupnetcon.org/img/startupnetcon.jpg",
+                                   :nav-hint ["Architects"], :nav-hint-style {:color "black"},
+                                   :widgets [{:widget-uid 6, :object-id "sdafoiuewq", :widget-name "Standard image widget", :img "http://i.imgur.com/yxKTvJJ.png"}
+                                             {:widget-uid 9, :object-id "90a48dde-a50f-46c8-9dd5-fa7f14ddd410", :widget-name "Sign in widget"}],
+                                   :children []}}}))
+(new-route
+    "js-data/data/route-widget/main-nav-view-style"
+    (clj->js {:style {}}))
+(defn new-route [route data]
+  (->
+    (js/firebase.database)
+    (.ref route)
+    (.set data)))
+(ns nnangpress.repl
+  (:require [nnangpress.monolith :as mn]
+            [cljs.reader :as rdr]))
+(defn new-route [route data]
+  (->
+    (js/firebase.database)
+    (.ref route)
+    (.set data)))
+(new-route
+    "js-data/data/route-widget/main-nav-view-style"
+    (clj->js {:style {}}))
+(clj->js {:style {}})
+(new-route
+    "js-data/data/route-widget/main-nav-view-style"
+    (clj->js {:style {}}))
+(new-route
+    "js-data/data/route-widget/main-nav-view-style"
+    (clj->js {:style {}}))
+  (load-data "defaultdata/data")
+  (load-data "defaultdata/data" identity)
+(defn load-data [route callback]
+  (->
+    (js/firebase.database)
+    (.ref route)
+    (.once "value")
+    (.then (fn [snapshot]
+             #_(println "snapshot: " (js->clj (.val snapshot) :keywordize-keys true))
+             (callback (.val snapshot))))))
+(defn load-data [route callback]
+  (->
+    (js/firebase.database)
+    (.ref route)
+    (.once "value")
+    (.then (fn [snapshot]
+             #_(println "snapshot: " (js->clj (.val snapshot) :keywordize-keys true))
+             (callback (.val snapshot))))))
+(ns nnangpress.repl
+  (:require [nnangpress.monolith :as mn]
+            [cljs.reader :as rdr]))
+(defn load-data [route callback]
+  (->
+    (js/firebase.database)
+    (.ref route)
+    (.once "value")
+    (.then (fn [snapshot]
+             #_(println "snapshot: " (js->clj (.val snapshot) :keywordize-keys true))
+             (callback (.val snapshot))))))
+  (load-data "defaultdata/data" identity)
+  (load-data "defaultdata/data" (fn [x] (println x)))
+@mn/monolith
+(new-route
+    "users/eKWcekJm6GMc4klsRG7CNvteCQN2"
+    (clj->js @mn/monolith))
+(defn new-route [route data]
+  (->
+    (js/firebase.database)
+    (.ref route)
+    (.set data)))
+(ns nnangpress.repl
+  (:require [nnangpress.monolith :as mn]
+            [cljs.reader :as rdr]))
+(defn new-route [route data]
+  (->
+    (js/firebase.database)
+    (.ref route)
+    (.set data)))
+(new-route
+    "users/eKWcekJm6GMc4klsRG7CNvteCQN2"
+    (clj->js @mn/monolith))
+(new-route
+    "users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/site1"
+    (clj->js @mn/monolith))
+(new-route
+    "users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/site2"
+    (clj->js @mn/monolith))
+(new-route
+    "users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/site3"
+    (clj->js @mn/monolith))
+(new-route
+    "defaultdata/homepage"
+    (clj->js @mn/monolith))
+(new-route
+    "defaultdata/userhome"
+    (clj->js @mn/monolith))
+(:all-widgets-data @mn/monolith)
+(new-route
+    "defaultdata/all-widgets-data"
+    (clj->js (:all-widgets-data @mn/monolith)))
