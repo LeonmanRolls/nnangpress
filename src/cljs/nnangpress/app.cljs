@@ -9,8 +9,6 @@
             [nnangpress.core :as cre]
             [nnangpress.utils :as u]
             [nnangpress.routing :as rt]
-            [clojure.spec :as s]
-            [cljs.core.async :as cas :refer [>! <! put! chan pub sub close!]]
             [cljs.reader :as rdr]
             [goog.events :as ev]
             [goog.dom :as gdom]
@@ -130,50 +128,47 @@
                  (om/build nv/navbar (:route-widget data)))))))
 
 (defn init []
-  (let [current-user (-> js/firebase .auth .-currentUser)]
+  (let [current-user (-> js/firebase .auth .-currentUser)
+        user-uid (.-uid current-user)
+        db (js/firebase.database)
+        nangpress-data-ref (.ref db (str "nangpress-data/"))]
 
     (mn/ref-cursor-init mn/monolith)
 
-    (if current-user
-      (println "logged in")
-      (println "not logged in"))
-
     (->
-      (js/firebase.database)
-      (.ref (str "defaultdata/userhome"))
+      nangpress-data-ref
       (.once "value")
       (.then (fn [snapshot]
-               (let [remote-map (js->clj (.val snapshot) :keywordize-keys true)
+               (let [remote-map (js->clj (.val snapshot) :keywordize-keys true)]
+                 (println "first then")
+                 (if
+                   (contains? remote-map :children)
+                   (reset! mn/monolith remote-map)
+                   (reset! mn/monolith (merge remote-map {:children []})))
 
-                     damap {:test ["/"]
-                            :current-route (:current-route remote-map),
-                            :logo-text (:logo-text remote-map),
-                            :all-widgets-data (:all-widgets-data remote-map),
-                            :edit-mode (:edit-mode remote-map) ,
-                            :route-widget {:route-widget-id 0,
-                                           :main-view-style {:style {}},
-                                           :routes-map {:route-name "/",
-                                                        :bg-img "http://www.startupnetcon.org/img/startupnetcon.jpg",
-                                                        :nav-hint ["Architects"], :nav-hint-style {:color "black"},
-                                                        :widgets [{:widget-uid 6, :object-id "sdafoiuewq", :widget-name "Standard image widget", :img "http://i.imgur.com/yxKTvJJ.png"}
-                                                                  {:widget-uid 9, :object-id "90a48dde-a50f-46c8-9dd5-fa7f14ddd410", :widget-name "Sign in widget"}],
-                                                        :children []}}}]
+                 (if current-user
+                   (do
+                     (println "logged in")
+                     (swap! mn/monolith merge {:username [user-uid]
+                                               :route-widget (-> remote-map :route-widgets :userhome)}))
+                   (do
+                     (println "not logged in")
+                     (swap! mn/monolith merge {:username [""]
+                                               :route-widget (-> remote-map :route-widgets :homepage)})))
 
-                 (println "damap: " (keys (:route-widget damap)))
-                 (println "remote map: " (keys (:route-widget remote-map)))
-                 (reset! mn/monolith remote-map)
                  (om/root master mn/monolith
-                          {:target (. js/document (getElementById "super-container"))})))))
-
-    #_(GET "/edn/stringdata.edn"
-           {:handler (fn [resp]
-                       (reset! mn/monolith (rdr/read-string resp))
-                       #_(mn/monolith-watcher-init mn/monolith)
-                       (om/root master mn/monolith
-                                {:target (. js/document
-                                            (getElementById "super-container"))}))})))
+                          {:target (. js/document
+                                      (getElementById "super-container"))})))))))
 
 (comment
+
+  (GET "/edn/stringdata.edn"
+       {:handler (fn [resp]
+                   (reset! mn/monolith (rdr/read-string resp))
+                   #_(mn/monolith-watcher-init mn/monolith)
+                   (om/root master mn/monolith
+                            {:target (. js/document
+                                        (getElementById "super-container"))}))})
 
   uid "SGXvf26OEpeVDQ79XIH2V71fVnT2"
   uiconfig #js {:callbacks #js {:signInSuccess (fn [user credential redirectUrl]

@@ -66,3 +66,8 @@ jquery plugins.
 # Javascript interop noted
 
 - When going js -> clj don't have any empty maps. display inherit for style maps
+
+# Firebase notes
+
+- Unable to store empty values in firebase. Must compensate for this in code
+

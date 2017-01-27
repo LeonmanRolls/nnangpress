@@ -572,26 +572,42 @@
   {:widget-uid 10
    :object-id (u/uid)
    :widget-name "Show your sites"
-   :user-sites [{:site-name "site1"
-                 }
-
-                ]})
+   :user-sites [{:name "site1"
+                 :description "A cool site"
+                 :data {:a "placeholder"}}
+                {:name "site2"
+                 :description "Another cool site"
+                 :data {:a "placeholder"}}]})
 
 ;Your sites
-(defmethod widget 10 [data owner]
+(defmethod widget 10 [{:keys [user-sites] :as data} owner]
   (reify
     om/IInitState
     (init-state [_]
-      {:advertise? false})
+      {:advertise? false
+       :display-site (fn [{:keys [name description data] :as data} owner]
+                       (reify
+                         om/IRender
+                         (render [_]
+                           (dom/div nil
+                                    (dom/p nil (str "Site name: " name))
+                                    (dom/p nil (str "Site description: " description))
+                                    (dom/button nil "Go to site")))))})
 
-    om/IDidMount
-    (did-mount [_]
-      )
+    om/IWillMount
+    (will-mount [_]
+      (->
+        (js/firebase.database)
+        (.ref (str "users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites"))
+        (.once "value")
+        (.then (fn [snapshot]
+                 (let [remote-map (js->clj (.val snapshot) :keywordize-keys true)]
+                   (om/update! user-sites remote-map))))))
 
-    om/IRender
-    (render [_]
-      (dom/div nil "Show your sites widget")
-      )))
+    om/IRenderState
+    (render-state [_ {:keys [display-site] :as state}]
+      (apply dom/div nil
+             (om/build-all display-site user-sites)))))
 
 (defn admin-toolbar [data owner]
   (reify
