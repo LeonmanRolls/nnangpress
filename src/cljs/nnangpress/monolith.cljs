@@ -38,6 +38,9 @@
 
 (defn ref-cursor-init [monolith]
 
+  (defn uid []
+    (om/ref-cursor (:uid (om/root-cursor monolith))))
+
   (defn all-data []
     (om/ref-cursor (om/root-cursor monolith)))
 

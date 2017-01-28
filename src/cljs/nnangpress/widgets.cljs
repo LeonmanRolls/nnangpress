@@ -596,13 +596,14 @@
 
     om/IWillMount
     (will-mount [_]
-      (->
-        (js/firebase.database)
-        (.ref (str "users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites"))
-        (.once "value")
-        (.then (fn [snapshot]
-                 (let [remote-map (js->clj (.val snapshot) :keywordize-keys true)]
-                   (om/update! user-sites remote-map))))))
+      (let [uid-obs (om/observe owner (mn/uid))]
+        (->
+          (js/firebase.database)
+          (.ref (str "users/" (first @uid-obs)  "/sites"))
+          (.once "value")
+          (.then (fn [snapshot]
+                   (let [remote-map (js->clj (.val snapshot) :keywordize-keys true)]
+                     (om/update! user-sites remote-map)))))))
 
     om/IRenderState
     (render-state [_ {:keys [display-site] :as state}]

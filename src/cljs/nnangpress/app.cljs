@@ -149,11 +149,11 @@
                  (if current-user
                    (do
                      (println "logged in")
-                     (swap! mn/monolith merge {:username [user-uid]
+                     (swap! mn/monolith merge {:uid [user-uid]
                                                :route-widget (-> remote-map :route-widgets :userhome)}))
                    (do
                      (println "not logged in")
-                     (swap! mn/monolith merge {:username [""]
+                     (swap! mn/monolith merge {:uid [""]
                                                :route-widget (-> remote-map :route-widgets :homepage)})))
 
                  (om/root master mn/monolith
