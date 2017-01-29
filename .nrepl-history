@@ -1,57 +1,3 @@
-               (println "snapshot: " snapshot)
-               ))))
-    (load-user-data "testing")
-(defn load-user-data [uid]
-    (->
-      (js/firebase.database)
-      (.ref (str "users/" uid))
-      (.once "value")
-      (.then (fn [snapshot]
-               (println "snapshot: " (.val snapshot))
-               ))))
-    (load-user-data "testing")
-(defn load-user-data [uid]
-    (->
-      (js/firebase.database)
-      (.ref (str "users/" uid))
-      (.once "value")
-      (.then (fn [snapshot]
-               (println "snapshot: " (js->clj (.val snapshot)))
-               ))))
-    (load-user-data "testing")
-mn/monolith
-@mn/monolith
-(new-route "defaultdata/" #js {:data (pr-str @mn/monolith)})
-(defn new-route [route data]
-    (->
-      (js/firebase.database)
-      (.ref route)
-      (.set data)))
-(new-route "defaultdata/" #js {:data (pr-str @mn/monolith)})
-(defn new-route [route data]
-    (->
-      (js/firebase.database)
-      (.ref route)
-      (.set data)))
-(new-route "defaultdata/" #js {:data (pr-str @mn/monolith)})
-@mn/monolith
-(defn new-route [route data]
-    (->
-      (js/firebase.database)
-      (.ref route)
-      (.set data)))
-(new-route (str "users/" "SGXvf26OEpeVDQ79XIH2V71fVnT2") #js {:data (pr-str @mn/monolith)})
-(start-repl)
-(in-ns 'nnangpress.app)
-  (js/Firebase.)    
-  (js/Firebase. "sdfsdf")    
-  (js/firebase. "sdfsdf")    
-js/firebase
-js/Firebase
- (-> js/firebase .auth .currentUser) 
- (-> js/firebase .auth .-currentUser) 
-(.dir 
-    js/console 
     (-> js/firebase .auth .-currentUser))
 (in-ns 'nnangpress.repl)
 mn/monolith
@@ -498,3 +444,57 @@ l
   (new-route
     "nangpress-data/route-widgets/homepage"
     (clj->js (:route-widget @mn/monolith)))
+l
+(ns nnangpress.repl
+  (:require [nnangpress.monolith :as mn]
+            [nnangpress.utils :as u]
+            [cljs.reader :as rdr]
+            [ajax.core :refer [GET POST]]))
+)
+l
+(ns nnangpress.repl
+  (:require [nnangpress.monolith :as mn]
+            [nnangpress.utils :as u]
+            [cljs.reader :as rdr]
+            [ajax.core :refer [GET POST]]))
+ mn/monlith 
+ mn/monolith 
+  (keys mn/monolith)
+  (keys @mn/monolith)
+  (:all-widgets-data @mn/monolith)
+@mn/monolith
+(ns nnangpress.repl
+  (:require [nnangpress.monolith :as mn]
+            [nnangpress.utils :as u]
+            [nnangpress.widgets :as wgts]
+            [cljs.reader :as rdr]
+            [ajax.core :refer [GET POST]]))
+:wgts/img
+  (s/valid? :wgts/widget-data sample-data)
+(ns nnangpress.repl
+  (:require [nnangpress.monolith :as mn]
+            [nnangpress.utils :as u]
+            [nnangpress.widgets :as wgts]
+            [cljs.reader :as rdr]
+            [ajax.core :refer [GET POST]]
+            [clojure.spec :as s]))
+  (s/valid? :wgts/widget-data sample-data)
+  (def sample-data {:widget-uid 001
+                    :object-id "23489-23fd9-sdf23-234hjh" 
+                    :widget-name "Standard text widget"
+                    :inner-html ["<p> Hi there </p>"]})
+  (s/valid? :wgts/widget-data sample-data)
+  (s/valid? :nnangpress.widgets/widget-data sample-data)
+  (def sample-data {:widgetuid 001
+                    :object-id "23489-23fd9-sdf23-234hjh" 
+                    :widget-name "Standard text widget"
+                    :inner-html ["<p> Hi there </p>"]})
+  (s/valid? :nnangpress.widgets/widget-data sample-data)
+  (def sample-data {:widget-uid 2
+                    :object-id (u/uid)
+                    :imgs [{:object-id (u/uid)
+                            :url "http://placekitten.com/900/600"}
+                           {:object-id (u/uid)
+                            :url "http://placekitten.com/900/600"}]})
+  (s/valid? :nnangpress.widgets/widget-data sample-data)
+  (s/valid? ::wgts/widget-data sample-data)

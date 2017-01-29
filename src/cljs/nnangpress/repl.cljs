@@ -1,6 +1,7 @@
 (ns nnangpress.repl
   (:require [nnangpress.monolith :as mn]
             [nnangpress.utils :as u]
+            [nnangpress.widgets :as wgts]
             [cljs.reader :as rdr]
             [ajax.core :refer [GET POST]]))
 
@@ -32,21 +33,10 @@
 
 (comment
 
-  (new-route
-    "users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1"
-    (clj->js {:name "site2"
-              :description "Another site"
-              :data @mn/monolith}))
+  (s/def ::all-widgets-data   )
 
-  (def cache (atom []))
+  (:all-widgets-data @mn/monolith)
+  (keys @mn/monolith)
 
-  (->
-    (js/firebase.database)
-    (.ref (str "users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites"))
-    (.once "value")
-    (.then (fn [snapshot]
-             (let [remote-map (js->clj (.val snapshot) :keywordize-keys true)]
-               (reset! cache remote-map)
-               (println "remote map: " remote-map)))))
 
   )

@@ -7,11 +7,27 @@
     [nnangpress.monolith :as mn]
     [nnangpress.core :as cre]
     [nnangpress.routing :as rt]
-    [goog.dom :as gdom]))
+    [goog.dom :as gdom]
+    [clojure.spec :as s]))
 
+(declare widget-data-type)
+
+(s/def ::widget-uid int?)
+(s/def ::object-id string?)
+(s/def ::widget-name string?)
+(s/def ::inner-html vector?)
+(s/def ::imgs vector?)
+(s/def ::text vector?)
+(s/def ::img string?)
+(s/def ::user-sites vector?)
+(s/def ::widget-data (s/multi-spec widget-data-type :widget-uid))
+
+(defmulti widget-data-type :widget-uid)
 (defmulti widget-data (fn [x] x))
-
 (defmulti widget (fn [data owner] (:widget-uid data)))
+
+(defmethod widget-data-type 1 [_]
+  (s/keys :req-un [::widget-uid ::object-id ::widget-name ::inner-html]))
 
 (defmethod widget-data 001 [_]
   {:widget-uid 001
@@ -66,6 +82,9 @@
         (dom/div #js {:id (.toString uuid)
                       :style #js {:color "black"}
                       :dangerouslySetInnerHTML #js {:__html (first (:inner-html data))}})))))
+
+(defmethod widget-data-type 2 [_]
+  (s/keys :req-un [::widget-uid ::object-id ::imgs]))
 
 (defmethod widget-data 2 [_]
   {:widget-uid 2
@@ -150,6 +169,9 @@
                                                           (fn [x] (conj x (default-img)))))}
                                         "Add an image"))))))))
 
+(defmethod widget-data-type 3 [_]
+  (s/keys :req-un [::widget-uid ::object-id ::widget-name ::inner-html]))
+
 (defmethod widget-data 003 [_]
   {:widget-uid 003
    :object-id (u/uid)
@@ -203,6 +225,9 @@
         (dom/div #js {:id (.toString uuid)
                       :className "box-paragraph"
                       :dangerouslySetInnerHTML #js {:__html (first (:inner-html data))}})))))
+
+(defmethod widget-data-type 4 [_]
+  (s/keys :req-un [::widget-uid ::object-id ::widget-name ::text]))
 
 (defmethod widget-data 004 [_]
   {:widget-uid 004
@@ -268,6 +293,9 @@
                             (om/build cre/remove-element text
                                       {:state {:label "remove accordion section"}}))))))))
 
+(defmethod widget-data-type 5 [_]
+  (s/keys :req-un [::widget-uid ::object-id ::widget-name ::inner-html]))
+
 (defmethod widget-data 005 [_]
   {:widget-uid 005
    :object-id (u/uid)
@@ -320,6 +348,9 @@
                     :className "box-paragraph-clear"
                     :dangerouslySetInnerHTML #js {:__html (first (:inner-html data))}}))))
 
+(defmethod widget-data-type 6 [_]
+  (s/keys :req-un [::widget-uid ::object-id ::widget-name ::img]))
+
 (defmethod widget-data 006 [_]
   {:widget-uid 006
    :object-id (u/uid)
@@ -347,6 +378,9 @@
                                    :style #js {:width "100%"}
                                    :onChange (fn [e]
                                                (om/update! data :img (.. e -target -value)))})))))))
+
+(defmethod widget-data-type 7 [_]
+  (s/keys :req-un [::widget-uid ::object-id ::widget-name ::imgs]))
 
 (defmethod widget-data 007 [_]
   {:widget-uid 007
@@ -497,6 +531,9 @@
                             (om/build cre/remove-element imgs
                                       {:state {:label "remove nth element"}}))))))))
 
+(defmethod widget-data-type 8 [_]
+  (s/keys :req-un [::widget-uid ::object-id ::widget-name ::imgs]))
+
 (defmethod widget-data 8 [_]
   {:widget-uid 8
    :object-id (u/uid)
@@ -523,6 +560,9 @@
       (let [routes-map-obs (om/observe owner (mn/routes-map))]
         (apply dom/ul #js {:className "right-nav"}
                (om/build-all li lis {:state {:routes-map routes-map-obs}}))))))
+
+(defmethod widget-data-type 9 [_]
+  (s/keys :req-un [::widget-uid ::object-id ::widget-name]))
 
 (defmethod widget-data 9 [_]
   {:widget-uid 9
@@ -568,6 +608,9 @@
                                            uiconfig))}
                    "Sign in"))))))
 
+(defmethod widget-data-type 10 [_]
+  (s/keys :req-un [::widget-uid ::object-id ::widget-name ::user-sites]))
+
 (defmethod widget-data 10 [_]
   {:widget-uid 10
    :object-id (u/uid)
@@ -585,14 +628,21 @@
     om/IInitState
     (init-state [_]
       {:advertise? false
-       :display-site (fn [{:keys [name description data] :as data} owner]
+       :display-site (fn [{:keys [name description data] :as all-data} owner]
                        (reify
                          om/IRender
                          (render [_]
-                           (dom/div nil
-                                    (dom/p nil (str "Site name: " name))
-                                    (dom/p nil (str "Site description: " description))
-                                    (dom/button nil "Go to site")))))})
+                           (let [all-data-obs (om/observe owner (mn/all-data))]
+                             (println "data: " data)
+                             (println "all data: " all-data-obs)
+                             (dom/div nil
+                                      (dom/p nil (str "Site name: " name))
+                                      (dom/p nil (str "Site description: " description))
+                                      (dom/button
+                                        #js {:onClick (fn [_]
+                                                        (om/update! all-data-obs data)
+                                                        )}
+                                        "Go to site"))))))})
 
     om/IWillMount
     (will-mount [_]

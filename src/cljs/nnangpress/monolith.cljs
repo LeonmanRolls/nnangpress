@@ -2,7 +2,9 @@
   (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
             [om.dom :as dom :include-macros true]
             [nnangpress.utils :as u]
-            [clojure.zip :as z]))
+            [clojure.zip :as z]
+            [clojure.spec :as s]
+            ))
 
 (def monolith (atom {}))
 
@@ -64,4 +66,7 @@
 
   (defn logo-hint []
     (om/ref-cursor (-> (om/root-cursor monolith) :route-widget :routes-map :nav-hint))))
+
+(defn update-all [data]
+  (om/update! (all-data) data))
 
