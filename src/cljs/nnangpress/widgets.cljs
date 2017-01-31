@@ -638,8 +638,7 @@
                                       (dom/p nil (str "Site description: " description))
                                       (dom/button
                                         #js {:onClick (fn [_]
-                                                        (mn/update-all all-data-obs @data)
-                                                        #_(om/update! all-data-obs data))}
+                                                        (mn/update-all  @data))}
                                         "Go to site"))))))})
 
     om/IWillMount

@@ -83,10 +83,8 @@
     (om/ref-cursor (-> (om/root-cursor monolith) :route-widget :routes-map :nav-hint))))
 
 (s/fdef update-all
-        :args (s/cat :cursor any? :data ::all-data))
+        :args (s/cat :data ::all-data))
 
-(defn update-all [cursor data]
-  (println "update-all data: " (keys data))
-  (println "all-data: " (keys @(all-data)))
+(defn update-all [ data]
   (om/update! (all-data) data))
 
