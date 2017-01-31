@@ -12,7 +12,9 @@
             [cljs.reader :as rdr]
             [goog.events :as ev]
             [goog.dom :as gdom]
-            [ajax.core :refer [GET POST]]))
+            [ajax.core :refer [GET POST]]
+            [cljs.spec :as s :include-macros true]
+            [cljs.spec.test :as ts :include-macros true]))
 
 (enable-console-print!)
 
@@ -133,6 +135,8 @@
         db (js/firebase.database)
         nangpress-data-ref (.ref db (str "nangpress-data/"))]
 
+    (println (ts/instrument))
+
     (mn/ref-cursor-init mn/monolith)
 
     (->
@@ -140,11 +144,13 @@
       (.once "value")
       (.then (fn [snapshot]
                (let [remote-map (js->clj (.val snapshot) :keywordize-keys true)]
-                 (println "first then")
-                 (if
+
+                 #_(if
                    (contains? remote-map :children)
                    (reset! mn/monolith remote-map)
                    (reset! mn/monolith (merge remote-map {:children []})))
+
+                 (reset! mn/monolith remote-map)
 
                  (if current-user
                    (do
@@ -155,6 +161,9 @@
                      (println "not logged in")
                      (swap! mn/monolith merge {:uid [""]
                                                :route-widget (-> remote-map :route-widgets :homepage)})))
+
+                 (println "valid? " (s/valid? ::mn/all-data @mn/monolith))
+                 (println "keys: " (keys @mn/monolith))
 
                  (om/root master mn/monolith
                           {:target (. js/document

@@ -3,8 +3,23 @@
             [om.dom :as dom :include-macros true]
             [nnangpress.utils :as u]
             [clojure.zip :as z]
-            [clojure.spec :as s]
-            ))
+            [clojure.spec :as s]))
+
+(s/def ::all-widgets-data vector?)
+(s/def ::current-route vector?)
+(s/def ::edit-mode vector?)
+(s/def ::logo-text vector?)
+(s/def ::route-widget map?)
+(s/def ::uid vector?)
+
+;children uid
+
+(s/def ::all-data (s/keys :req-un [::all-widgets-data
+                                   ::uid
+                                   ::current-route
+                                   ::edit-mode
+                                   ::logo-text
+                                   ::route-widget]))
 
 (def monolith (atom {}))
 
@@ -67,6 +82,11 @@
   (defn logo-hint []
     (om/ref-cursor (-> (om/root-cursor monolith) :route-widget :routes-map :nav-hint))))
 
-(defn update-all [data]
+(s/fdef update-all
+        :args (s/cat :cursor any? :data ::all-data))
+
+(defn update-all [cursor data]
+  (println "update-all data: " (keys data))
+  (println "all-data: " (keys @(all-data)))
   (om/update! (all-data) data))
 

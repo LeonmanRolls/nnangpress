@@ -8,7 +8,7 @@
     [nnangpress.core :as cre]
     [nnangpress.routing :as rt]
     [goog.dom :as gdom]
-    [clojure.spec :as s]))
+    [cljs.spec :as s]))
 
 (declare widget-data-type)
 
@@ -633,15 +633,13 @@
                          om/IRender
                          (render [_]
                            (let [all-data-obs (om/observe owner (mn/all-data))]
-                             (println "data: " data)
-                             (println "all data: " all-data-obs)
                              (dom/div nil
                                       (dom/p nil (str "Site name: " name))
                                       (dom/p nil (str "Site description: " description))
                                       (dom/button
                                         #js {:onClick (fn [_]
-                                                        (om/update! all-data-obs data)
-                                                        )}
+                                                        (mn/update-all all-data-obs @data)
+                                                        #_(om/update! all-data-obs data))}
                                         "Go to site"))))))})
 
     om/IWillMount
@@ -668,11 +666,15 @@
         (dom/div #js {:className "admin-toolbar"}
                  (dom/b nil "Welcome to Nnangpress alpha ")
                  (dom/button #js {:onClick (fn [_]
+                                             (println "edit mode: " (mn/edit-mode))
+                                             (println
+                                               "edit mode type: "
+                                               (type (mn/edit-mode)))
                                              (om/transact!
                                                (mn/edit-mode)
                                                (fn [dabool]
                                                  [(not (first dabool))])))}
-                             "Toogle edit mode"))))))
+                             "Toggle edit mode"))))))
 
 (defn select-widget-wrapper [{:keys [widget-name widget-uid] :as data} owner]
   (reify
