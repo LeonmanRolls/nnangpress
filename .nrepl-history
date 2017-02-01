@@ -1,4 +1,3 @@
-             (callback (js->clj (.val snapshot) :keywordize-keys true))))))
 load-data
 @mn/monolith
 (new-route
@@ -498,3 +497,4 @@ q
 l
 (empty? [""])
 (empty? [])
+l

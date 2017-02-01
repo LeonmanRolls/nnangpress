@@ -129,10 +129,23 @@
                  (om/build main-view current-widgets)
                  (om/build nv/navbar (:route-widget data)))))))
 
-(defn init []
+(defn nnangpress-data->monolith
+  "Going from system data to system + user data" 
+  [nnangpress-data current-user]
+  (reset! 
+    mn/monolith 
+    (assoc 
+      (dissoc nnangpress-data :route-widgets)  
+      :uid [(if current-user (.-uid current-user) "")] 
+      :email [(if current-user (.-email current-user) "")]
+      :route-widget (if current-user
+                      (-> nnangpress-data :route-widgets :userhome)
+                      (-> nnangpress-data :route-widgets :homepage)))))
+
+(defn init 
+  "Create monolith based on user auth state an init om" 
+  []
   (let [current-user (-> js/firebase .auth .-currentUser)
-        user-uid (.-uid current-user)
-        user-email (.-email current-user)
         db (js/firebase.database)
         nangpress-data-ref (.ref db (str "nangpress-data/"))]
 
@@ -144,25 +157,9 @@
       (.once "value")
       (.then (fn [snapshot]
                (let [remote-map (js->clj (.val snapshot) :keywordize-keys true)]
-
-                 (reset! mn/monolith remote-map)
-
-                 (if current-user
-                   (do
-                     (println "logged in")
-                     (swap! mn/monolith merge {:uid [user-uid]
-                                               :email [user-email]
-                                               :route-widget (-> remote-map :route-widgets :userhome)}))
-                   (do
-                     (println "not logged in")
-                     (swap! mn/monolith merge {:uid [""]
-                                               :email [""]
-                                               :route-widget (-> remote-map :route-widgets :homepage)})))
-
-                 (println "valid? " (s/valid? ::mn/all-data @mn/monolith))
-                 (println "keys: " (keys @mn/monolith))
-
-                 (om/root master mn/monolith
-                          {:target (. js/document
-                                      (getElementById "super-container"))})))))))
+                 (do 
+                   (nnangpress-data->monolith remote-map current-user)
+                   (om/root master mn/monolith
+                            {:target (. js/document
+                                        (getElementById "super-container"))}))))))))
 
