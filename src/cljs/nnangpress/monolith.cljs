@@ -11,8 +11,7 @@
 (s/def ::logo-text vector?)
 (s/def ::route-widget map?)
 (s/def ::uid vector?)
-
-;children uid
+(s/def ::email vector?)
 
 (s/def ::all-data (s/keys :req-un [::all-widgets-data
                                    ::uid
@@ -58,6 +57,9 @@
   (defn uid []
     (om/ref-cursor (:uid (om/root-cursor monolith))))
 
+  (defn user-email []
+    (om/ref-cursor (:email (om/root-cursor monolith))))
+
   (defn all-data []
     (om/ref-cursor (om/root-cursor monolith)))
 
@@ -85,6 +87,32 @@
 (s/fdef update-all
         :args (s/cat :data ::all-data))
 
-(defn update-all [ data]
+(defn update-all [data]
   (om/update! (all-data) data))
+
+(s/fdef add-current-user 
+        :args (s/cat :data ::all-data))
+
+(defn add-current-user-email 
+  "Add current user email to data map" 
+  [data]
+  (assoc data :email (user-email)))
+
+(s/fdef change-site 
+        :args (s/cat :data ::all-data))
+
+(defn change-site 
+  "Load a new site" 
+  [site-data]
+  (-> 
+    site-data 
+    add-current-user-email 
+    update-all))
+
+(defn toggle-edit-mode 
+  "Toggle edit mode" 
+  []
+  (om/transact! 
+    (edit-mode) 
+    (fn [dabool] [(not (first dabool))])))
 

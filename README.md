@@ -71,3 +71,12 @@ jquery plugins.
 
 - Unable to store empty values in firebase. Must compensate for this in code
 
+# Bugs and Spec 
+
+- Each bug upon being fixed must be speced to guard against regression
+
+# Monolith
+
+- A vector with an empty string will count as 'empty', so that we can 
+store it in firebase. 
+

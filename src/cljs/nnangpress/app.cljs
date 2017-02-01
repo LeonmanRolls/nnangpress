@@ -132,11 +132,11 @@
 (defn init []
   (let [current-user (-> js/firebase .auth .-currentUser)
         user-uid (.-uid current-user)
+        user-email (.-email current-user)
         db (js/firebase.database)
         nangpress-data-ref (.ref db (str "nangpress-data/"))]
 
     (println (ts/instrument))
-
     (mn/ref-cursor-init mn/monolith)
 
     (->
@@ -145,21 +145,18 @@
       (.then (fn [snapshot]
                (let [remote-map (js->clj (.val snapshot) :keywordize-keys true)]
 
-                 #_(if
-                   (contains? remote-map :children)
-                   (reset! mn/monolith remote-map)
-                   (reset! mn/monolith (merge remote-map {:children []})))
-
                  (reset! mn/monolith remote-map)
 
                  (if current-user
                    (do
                      (println "logged in")
                      (swap! mn/monolith merge {:uid [user-uid]
+                                               :email [user-email]
                                                :route-widget (-> remote-map :route-widgets :userhome)}))
                    (do
                      (println "not logged in")
                      (swap! mn/monolith merge {:uid [""]
+                                               :email [""]
                                                :route-widget (-> remote-map :route-widgets :homepage)})))
 
                  (println "valid? " (s/valid? ::mn/all-data @mn/monolith))
@@ -168,48 +165,4 @@
                  (om/root master mn/monolith
                           {:target (. js/document
                                       (getElementById "super-container"))})))))))
-
-(comment
-
-  (GET "/edn/stringdata.edn"
-       {:handler (fn [resp]
-                   (reset! mn/monolith (rdr/read-string resp))
-                   #_(mn/monolith-watcher-init mn/monolith)
-                   (om/root master mn/monolith
-                            {:target (. js/document
-                                        (getElementById "super-container"))}))})
-
-  uid "SGXvf26OEpeVDQ79XIH2V71fVnT2"
-  uiconfig #js {:callbacks #js {:signInSuccess (fn [user credential redirectUrl]
-                                                 (println "sucessful sign in")
-                                                 (.dir js/console user)
-                                                 false)}
-                :signInFlow "popup"
-                :signInOptions (array
-                                 #js {:provider js/firebase.auth.EmailAuthProvider.PROVIDER_ID})
-                :tosUrl "https://google.com"
-                :credentialHelper js/firebaseui.auth.CredentialHelper.NONE}
-  ui (js/firebaseui.auth.AuthUI. (js/firebase.auth))
-  user-data-ref (->
-                  (js/firebase.database)
-                  (.ref (str "users/" uid)))
-
-  "SGXvf26OEpeVDQ79XIH2V71fVnT2"
-  (rdr/read-string (.-data (.val snapshot)))
-
-  (new-route (str "users/" "SGXvf26OEpeVDQ79XIH2V71fVnT2") #js {:data (pr-str @mn/monolith)})
-
-  (save-user-monolith)
-
-  (load-user-data "testing")
-
-  ;Watching auth state ---
-
-  (js/firebase. "sdfsdf")
-
-  (.dir
-    js/console
-    (-> js/firebase .auth .-currentUser))
-
-  )
 

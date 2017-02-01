@@ -632,14 +632,12 @@
                        (reify
                          om/IRender
                          (render [_]
-                           (let [all-data-obs (om/observe owner (mn/all-data))]
-                             (dom/div nil
-                                      (dom/p nil (str "Site name: " name))
-                                      (dom/p nil (str "Site description: " description))
-                                      (dom/button
-                                        #js {:onClick (fn [_]
-                                                        (mn/update-all  @data))}
-                                        "Go to site"))))))})
+                           (dom/div nil
+                                    (dom/p nil (str "Site name: " name))
+                                    (dom/p nil (str "Site description: " description))
+                                    (dom/button
+                                      #js {:onClick (fn [_] (mn/change-site @data))}
+                                      "Go to site")))))})
 
     om/IWillMount
     (will-mount [_]
@@ -661,19 +659,12 @@
   (reify
     om/IRender
     (render [_]
-      (let []
+      (let [user-email-obs (om/observe owner (mn/user-email))]
         (dom/div #js {:className "admin-toolbar"}
-                 (dom/b nil "Welcome to Nnangpress alpha ")
-                 (dom/button #js {:onClick (fn [_]
-                                             (println "edit mode: " (mn/edit-mode))
-                                             (println
-                                               "edit mode type: "
-                                               (type (mn/edit-mode)))
-                                             (om/transact!
-                                               (mn/edit-mode)
-                                               (fn [dabool]
-                                                 [(not (first dabool))])))}
-                             "Toggle edit mode"))))))
+                 (dom/b nil "Welcome to Nnangpress alpha | ")
+                 (dom/button #js {:onClick (fn [_] (mn/toggle-edit-mode))}
+                             "Toggle edit mode")
+                 (dom/b nil (str " | username:  " (first @user-email-obs))))))))
 
 (defn select-widget-wrapper [{:keys [widget-name widget-uid] :as data} owner]
   (reify
