@@ -105,15 +105,15 @@
                           "nav hint"))))))
 
 (defn nav-menu-logo
-  [data owner]
+  [{:keys [logo-text logo-style] :as data} owner]
   (reify
     om/IRender
     (render [_]
-      (let [logo-text-obs (om/observe owner (mn/logo-text))
-            routes-map-obs (om/observe owner (mn/routes-map))]
-        (dom/h1 #js {:className "logo"
+      (let [routes-map-obs (om/observe owner (mn/routes-map))]
+        (dom/h1 #js {:style (clj->js logo-style)
+                     :className "logo"
                      :onClick (partial rt/js-link @routes-map-obs "/")}
-                (first logo-text-obs))))))
+                "Leon Talbert")))))
 
 (defn nav-menu
   [{:keys [:route-name :background :widgets :children] :as all} owner]
@@ -187,7 +187,7 @@
 
                   (str-beautify route-name)))))))
 
-(defmethod navbar 1 [{:keys [:routes-map] :as data} owner]
+(defmethod navbar 1 [{:keys [routes-map logo-data nav-style] :as data} owner]
   (reify
     om/IRender
     (render [this]
@@ -196,7 +196,9 @@
                (dom/div #js {:className "nav-aux"}
                         (om/build nav-hint {}))
 
-               (dom/div #js {:className "nav-menu"}
-                        (om/build nav-menu-logo {})
+               (dom/div #js {:className "nav-menu"
+                             :style (clj->js nav-style)}
+                        (om/build nav-menu-logo logo-data)
                         (om/build nav-menu routes-map))))))
 ;navbar 1 ---
+
