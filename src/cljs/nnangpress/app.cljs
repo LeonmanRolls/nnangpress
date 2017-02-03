@@ -129,19 +129,6 @@
                  (om/build main-view current-widgets)
                  (om/build nv/navbar (:route-widget data)))))))
 
-(defn nnangpress-data->monolith
-  "Going from system data to system + user data" 
-  [nnangpress-data current-user]
-  (reset! 
-    mn/monolith 
-    (assoc 
-      (dissoc nnangpress-data :route-widgets)  
-      :uid [(if current-user (.-uid current-user) "")] 
-      :email [(if current-user (.-email current-user) "")]
-      :route-widget (if current-user
-                      (-> nnangpress-data :route-widgets :userhome)
-                      (-> nnangpress-data :route-widgets :homepage)))))
-
 (defn init 
   "Create monolith based on user auth state an init om" 
   []
@@ -156,9 +143,12 @@
       nangpress-data-ref
       (.once "value")
       (.then (fn [snapshot]
-               (let [remote-map (js->clj (.val snapshot) :keywordize-keys true)]
+               (let [remote-map (mn/firebase-empty->clj-empty
+                                  (js->clj 
+                                    (.val snapshot) 
+                                    :keywordize-keys true))]
                  (do 
-                   (nnangpress-data->monolith remote-map current-user)
+                   (mn/nnangpress-data->monolith remote-map current-user)
                    (om/root master mn/monolith
                             {:target (. js/document
                                         (getElementById "super-container"))}))))))))

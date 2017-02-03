@@ -10,6 +10,13 @@
           (= item (get v i)) i
           :else (recur (inc i ))))))
 
+(defn index-of-key-val [s key val]
+    (loop [idx 0 items s]
+      (cond
+        (empty? items) nil
+        (= val (key (first items))) idx
+        :else (recur (inc idx) (rest items)))))
+
 (defn tree-seq-path [branch? children root & [node-fn]]
   (let [node-fn (or node-fn identity)
         walk (fn walk  [path node]

@@ -1,260 +1,3 @@
-load-data
-@mn/monolith
-(new-route
-    "js-data/data"
-    (clj->js @mn/monolith))
-(defn new-route [route data]
-  (->
-    (js/firebase.database)
-    (.ref route)
-    (.set data)))
-(ns nnangpress.repl
-  (:require [nnangpress.monolith :as mn]
-            [cljs.reader :as rdr]))
-(defn new-route [route data]
-  (->
-    (js/firebase.database)
-    (.ref route)
-    (.set data)))
-(new-route
-    "js-data/data"
-    (clj->js @mn/monolith))
-l
-(ns nnangpress.repl
-  (:require [nnangpress.monolith :as mn]
-            [cljs.reader :as rdr]))
-(defn new-route [route data]
-  (->
-    (js/firebase.database)
-    (.ref route)
-    (.set data)))
-@mn/monolith
-  (:test @mn/monolith)
-(new-route
-    "js-data/data"
-    (clj->js 
-      {:test ["/"]
-       :current-route ["/"],
-       :logo-text ["Solari"],
-       :all-widgets-data [{:widget-uid 1, :object-id "a", :widget-name "Standard text widget", :inner-html ["<p> Hi there </p>"]}
-                          {:widget-uid 2, :widget-name "Slider", :object-id "basdfafoi", :imgs [{:object-id "dsafoijlsaf", :url "http://placekitten.com/900/600"} {:object-id "asdfipwnelj", :url "http://placekitten.com/900/600"}]}
-                          {:widget-uid 3, :object-id "b", :widget-name "Standard text widget", :inner-html ["<p> Hi there </p>"]}
-                          {:widget-uid 4, :object-id "c", :widget-name "Accordion", :text [{:title {:widget-uid 1, :object-id "d", :widget-name "Standard text widget", :inner-html ["<p> Hi there </p>"]}, :sub {:widget-uid 1, :object-id "e", :widget-name "Standard text widget", :inner-html ["<p> Hi there </p>"]}}]}
-                          {:widget-uid 5, :object-id "f", :widget-name "Standard text widget", :inner-html ["<p> Hi there </p>"]}
-                          {:widget-uid 6, :object-id "g", :widget-name "Standard image widget", :img "http://placekitten.com/800/400"}
-                          {:widget-uid 7, :object-id "h", :widget-name "Grid", :imgs [{:id "entry-1", :className "mega-entry", :data-src "http://placekitten.com/300/301", :data-width "320", :data-height "400"} {:id "entry-1-1", :className "mega-entry", :title "WE HAVE A LAUGH", :text "Cue James in a bald cap, need I say more?", :data-width "320", :data-height "400"}]}
-                          {:widget-uid 9, :object-id "fdsaiwasasdfl", :widget-name "Sign in widget"}],
-       :edit-mode [false],
-       :route-widget {:route-widget-id 0,
-                      :main-view-style {:style {}},
-                      :routes-map {:route-name "/",
-                                   :bg-img "http://www.startupnetcon.org/img/startupnetcon.jpg",
-                                   :nav-hint ["Architects"], :nav-hint-style {:color "black"},
-                                   :widgets [{:widget-uid 6, :object-id "sdafoiuewq", :widget-name "Standard image widget", :img "http://i.imgur.com/yxKTvJJ.png"}
-                                             {:widget-uid 9, :object-id "90a48dde-a50f-46c8-9dd5-fa7f14ddd410", :widget-name "Sign in widget"}],
-                                   :children []}}}))
-(defn new-route [route data]
-  (->
-    (js/firebase.database)
-    (.ref route)
-    (.set data)))
-(ns nnangpress.repl
-  (:require [nnangpress.monolith :as mn]
-            [cljs.reader :as rdr]))
-(defn new-route [route data]
-  (->
-    (js/firebase.database)
-    (.ref route)
-    (.set data)))
-(new-route
-    "js-data/data"
-    (clj->js 
-      {:test ["/"]
-       :current-route ["/"],
-       :logo-text ["Solari"],
-       :all-widgets-data [{:widget-uid 1, :object-id "a", :widget-name "Standard text widget", :inner-html ["<p> Hi there </p>"]}
-                          {:widget-uid 2, :widget-name "Slider", :object-id "basdfafoi", :imgs [{:object-id "dsafoijlsaf", :url "http://placekitten.com/900/600"} {:object-id "asdfipwnelj", :url "http://placekitten.com/900/600"}]}
-                          {:widget-uid 3, :object-id "b", :widget-name "Standard text widget", :inner-html ["<p> Hi there </p>"]}
-                          {:widget-uid 4, :object-id "c", :widget-name "Accordion", :text [{:title {:widget-uid 1, :object-id "d", :widget-name "Standard text widget", :inner-html ["<p> Hi there </p>"]}, :sub {:widget-uid 1, :object-id "e", :widget-name "Standard text widget", :inner-html ["<p> Hi there </p>"]}}]}
-                          {:widget-uid 5, :object-id "f", :widget-name "Standard text widget", :inner-html ["<p> Hi there </p>"]}
-                          {:widget-uid 6, :object-id "g", :widget-name "Standard image widget", :img "http://placekitten.com/800/400"}
-                          {:widget-uid 7, :object-id "h", :widget-name "Grid", :imgs [{:id "entry-1", :className "mega-entry", :data-src "http://placekitten.com/300/301", :data-width "320", :data-height "400"} {:id "entry-1-1", :className "mega-entry", :title "WE HAVE A LAUGH", :text "Cue James in a bald cap, need I say more?", :data-width "320", :data-height "400"}]}
-                          {:widget-uid 9, :object-id "fdsaiwasasdfl", :widget-name "Sign in widget"}],
-       :edit-mode [false],
-       :route-widget {:route-widget-id 0,
-                      :main-view-style {:style {}},
-                      :routes-map {:route-name "/",
-                                   :bg-img "http://www.startupnetcon.org/img/startupnetcon.jpg",
-                                   :nav-hint ["Architects"], :nav-hint-style {:color "black"},
-                                   :widgets [{:widget-uid 6, :object-id "sdafoiuewq", :widget-name "Standard image widget", :img "http://i.imgur.com/yxKTvJJ.png"}
-                                             {:widget-uid 9, :object-id "90a48dde-a50f-46c8-9dd5-fa7f14ddd410", :widget-name "Sign in widget"}],
-                                   :children []}}}))
-(new-route
-    "js-data/data"
-    (clj->js 
-      {:test ["/"]
-       :current-route ["/"],
-       :logo-text ["Solari"],
-       :all-widgets-data [{:widget-uid 1, :object-id "a", :widget-name "Standard text widget", :inner-html ["<p> Hi there </p>"]}
-                          {:widget-uid 2, :widget-name "Slider", :object-id "basdfafoi", :imgs [{:object-id "dsafoijlsaf", :url "http://placekitten.com/900/600"} {:object-id "asdfipwnelj", :url "http://placekitten.com/900/600"}]}
-                          {:widget-uid 3, :object-id "b", :widget-name "Standard text widget", :inner-html ["<p> Hi there </p>"]}
-                          {:widget-uid 4, :object-id "c", :widget-name "Accordion", :text [{:title {:widget-uid 1, :object-id "d", :widget-name "Standard text widget", :inner-html ["<p> Hi there </p>"]}, :sub {:widget-uid 1, :object-id "e", :widget-name "Standard text widget", :inner-html ["<p> Hi there </p>"]}}]}
-                          {:widget-uid 5, :object-id "f", :widget-name "Standard text widget", :inner-html ["<p> Hi there </p>"]}
-                          {:widget-uid 6, :object-id "g", :widget-name "Standard image widget", :img "http://placekitten.com/800/400"}
-                          {:widget-uid 7, :object-id "h", :widget-name "Grid", :imgs [{:id "entry-1", :className "mega-entry", :data-src "http://placekitten.com/300/301", :data-width "320", :data-height "400"} {:id "entry-1-1", :className "mega-entry", :title "WE HAVE A LAUGH", :text "Cue James in a bald cap, need I say more?", :data-width "320", :data-height "400"}]}
-                          {:widget-uid 9, :object-id "fdsaiwasasdfl", :widget-name "Sign in widget"}],
-       :edit-mode [false],
-       :route-widget {:route-widget-id 0,
-                      :main-view-style {:style {}},
-                      :routes-map {:route-name "/",
-                                   :bg-img "http://www.startupnetcon.org/img/startupnetcon.jpg",
-                                   :nav-hint ["Architects"], :nav-hint-style {:color "black"},
-                                   :widgets [{:widget-uid 6, :object-id "sdafoiuewq", :widget-name "Standard image widget", :img "http://i.imgur.com/yxKTvJJ.png"}
-                                             {:widget-uid 9, :object-id "90a48dde-a50f-46c8-9dd5-fa7f14ddd410", :widget-name "Sign in widget"}],
-                                   :children []}}}))
-(new-route
-    "js-data/data/route-widget/main-nav-view-style"
-    (clj->js {:style {}}))
-(defn new-route [route data]
-  (->
-    (js/firebase.database)
-    (.ref route)
-    (.set data)))
-(ns nnangpress.repl
-  (:require [nnangpress.monolith :as mn]
-            [cljs.reader :as rdr]))
-(defn new-route [route data]
-  (->
-    (js/firebase.database)
-    (.ref route)
-    (.set data)))
-(new-route
-    "js-data/data/route-widget/main-nav-view-style"
-    (clj->js {:style {}}))
-(clj->js {:style {}})
-(new-route
-    "js-data/data/route-widget/main-nav-view-style"
-    (clj->js {:style {}}))
-(new-route
-    "js-data/data/route-widget/main-nav-view-style"
-    (clj->js {:style {}}))
-  (load-data "defaultdata/data")
-  (load-data "defaultdata/data" identity)
-(defn load-data [route callback]
-  (->
-    (js/firebase.database)
-    (.ref route)
-    (.once "value")
-    (.then (fn [snapshot]
-             #_(println "snapshot: " (js->clj (.val snapshot) :keywordize-keys true))
-             (callback (.val snapshot))))))
-(defn load-data [route callback]
-  (->
-    (js/firebase.database)
-    (.ref route)
-    (.once "value")
-    (.then (fn [snapshot]
-             #_(println "snapshot: " (js->clj (.val snapshot) :keywordize-keys true))
-             (callback (.val snapshot))))))
-(ns nnangpress.repl
-  (:require [nnangpress.monolith :as mn]
-            [cljs.reader :as rdr]))
-(defn load-data [route callback]
-  (->
-    (js/firebase.database)
-    (.ref route)
-    (.once "value")
-    (.then (fn [snapshot]
-             #_(println "snapshot: " (js->clj (.val snapshot) :keywordize-keys true))
-             (callback (.val snapshot))))))
-  (load-data "defaultdata/data" identity)
-  (load-data "defaultdata/data" (fn [x] (println x)))
-@mn/monolith
-(new-route
-    "users/eKWcekJm6GMc4klsRG7CNvteCQN2"
-    (clj->js @mn/monolith))
-(defn new-route [route data]
-  (->
-    (js/firebase.database)
-    (.ref route)
-    (.set data)))
-(ns nnangpress.repl
-  (:require [nnangpress.monolith :as mn]
-            [cljs.reader :as rdr]))
-(defn new-route [route data]
-  (->
-    (js/firebase.database)
-    (.ref route)
-    (.set data)))
-(new-route
-    "users/eKWcekJm6GMc4klsRG7CNvteCQN2"
-    (clj->js @mn/monolith))
-(new-route
-    "users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/site1"
-    (clj->js @mn/monolith))
-(new-route
-    "users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/site2"
-    (clj->js @mn/monolith))
-(new-route
-    "users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/site3"
-    (clj->js @mn/monolith))
-(new-route
-    "defaultdata/homepage"
-    (clj->js @mn/monolith))
-(new-route
-    "defaultdata/userhome"
-    (clj->js @mn/monolith))
-(:all-widgets-data @mn/monolith)
-(new-route
-    "defaultdata/all-widgets-data"
-    (clj->js (:all-widgets-data @mn/monolith)))
-(ns nnangpress.repl
-  (:require [nnangpress.monolith :as mn]
-            [nnangpress.utils :as u]
-            [cljs.reader :as rdr]))
-  (u/uid)
-(ns nnangpress.repl
-  (:require [nnangpress.monolith :as mn]
-            [nnangpress.utils :as u]
-            [cljs.reader :as rdr]
-            [ajax.core :refer [GET POST]]))
-  (->
-    (js/firebase.database)
-    (.ref (str "users/eKWcekJm6GMc4klsRG7CNvteCQN2"))
-    (.once "value")
-    (.then (fn [snapshot]
-             (let [remote-map (js->clj (.val snapshot) :keywordize-keys true)]
-               (println "remote map: " remote-map)))))
-(->
-    (js/firebase.database)
-    (.ref (str "users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites"))
-    (.once "value")
-    (.then (fn [snapshot]
-             (let [remote-map (js->clj (.val snapshot) :keywordize-keys true)]
-               (println "remote map: " remote-map)))))
-(->
-    (js/firebase.database)
-    (.ref (str "users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites"))
-    (.once "value")
-    (.then (fn [snapshot]
-             (let [remote-map (js->clj (.val snapshot) :keywordize-keys true)]
-               (println "remote map: " remote-map)))))
-(->
-    (js/firebase.database)
-    (.ref (str "users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites"))
-    (.once "value")
-    (.then (fn [snapshot]
-             (let [remote-map (js->clj (.val snapshot) :keywordize-keys true)]
-               (reset! cache remote-map)
-               (println "remote map: " remote-map)))))
-@cache
-  (def cache (atom []))
-(ns nnangpress.repl
-  (:require [nnangpress.monolith :as mn]
-            [nnangpress.utils :as u]
-            [cljs.reader :as rdr]
-            [ajax.core :refer [GET POST]]))
-  (def cache (atom []))
 (->
     (js/firebase.database)
     (.ref (str "users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites"))
@@ -498,3 +241,260 @@ l
 (empty? [""])
 (empty? [])
 l
+(ns nnangpress.app
+  (:import [goog.history Html5History EventType])
+  (:require-macros [cljs.core.async.macros :refer  [go go-loop]])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [nnangpress.monolith :as mn]
+            [nnangpress.navbars :as nv]
+            [nnangpress.widgets :as wgt]
+            [nnangpress.core :as cre]
+            [nnangpress.utils :as u]
+            [nnangpress.routing :as rt]
+            [cljs.reader :as rdr]
+            [goog.events :as ev]
+            [goog.dom :as gdom]
+            [ajax.core :refer [GET POST]]
+            [cljs.spec :as s :include-macros true]
+            [cljs.spec.test :as ts :include-macros true]))
+@cache
+  @cache  
+(ns nnangpress.app
+  (:import [goog.history Html5History EventType])
+  (:require-macros [cljs.core.async.macros :refer  [go go-loop]])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [nnangpress.monolith :as mn]
+            [nnangpress.navbars :as nv]
+            [nnangpress.widgets :as wgt]
+            [nnangpress.core :as cre]
+            [nnangpress.utils :as u]
+            [nnangpress.routing :as rt]
+            [cljs.reader :as rdr]
+            [goog.events :as ev]
+            [goog.dom :as gdom]
+            [ajax.core :refer [GET POST]]
+            [cljs.spec :as s :include-macros true]
+            [cljs.spec.test :as ts :include-macros true]
+            [clojure.walk :as wlk]))
+  (wlk/postwalk-demo testes)
+(ns nnangpress.app
+  (:import [goog.history Html5History EventType])
+  (:require-macros [cljs.core.async.macros :refer  [go go-loop]])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [nnangpress.monolith :as mn]
+            [nnangpress.navbars :as nv]
+            [nnangpress.widgets :as wgt]
+            [nnangpress.core :as cre]
+            [nnangpress.utils :as u]
+            [nnangpress.routing :as rt]
+            [cljs.reader :as rdr]
+            [goog.events :as ev]
+            [goog.dom :as gdom]
+            [ajax.core :refer [GET POST]]
+            [cljs.spec :as s :include-macros true]
+            [cljs.spec.test :as ts :include-macros true]
+            [clojure.walk :as wlk :include-macros true]))
+  (wlk/postwalk-demo testes)
+  (wlk/postwalk testes)
+  (wlk/postwalk prn testes)
+(def testes {:route-name (str "/parent" (subs (u/uid) 0 3))
+               :bg-img "from_uss.jpg"
+               :grey-bg? true
+               :nav-hint ["nav hint"]
+               :nav-hint-style {:color "white"}
+               :widgets [{:widget-uid 001
+                          :object-id (u/uid)
+                          :widget-name "Standard text widget"
+                          :inner-html ["<p> Hi there </p>"]}]
+               :children [{:route-name (str "/child" (subs (u/uid) 0 3))
+                           :bg-img "from_uss.jpg"
+                           :grey-bg? true
+                           :nav-hint ["nav hint"]
+                           :nav-hint-style {:color "white"}
+                           :widgets [{:widget-uid 001
+                                      :object-id (u/uid)
+                                      :widget-name "Standard text widget"
+                                      :inner-html ["<p> Hi there </p>"]}]
+                           :children []}]} )
+  (wlk/postwalk prn testes)
+  (wlk/postwalk println testes)
+  (wlk/postwalk identity testes)
+  (wlk/postwalk (fn [x] (println x)) testes)
+  (wlk/postwalk println testes)
+(wlk/postwalk 
+    (fn [x]   
+      (if 
+        (and (vector? x) (= 1 (count x)) (= "" (first x))) 
+        [] 
+        x)) 
+    testes)
+(def testes {:route-name (str "/parent" (subs (u/uid) 0 3))
+               :bg-img "from_uss.jpg"
+               :grey-bg? true
+               :nav-hint ["nav hint"]
+               :nav-hint-style {:color "white"}
+               :widgets [{:widget-uid 001
+                          :object-id (u/uid)
+                          :widget-name "Standard text widget"
+                          :inner-html ["<p> Hi there </p>"]}]
+               :children [{:route-name (str "/child" (subs (u/uid) 0 3))
+                           :bg-img "from_uss.jpg"
+                           :grey-bg? true
+                           :nav-hint ["nav hint"]
+                           :nav-hint-style {:color "white"}
+                           :widgets [""]
+                           :children [""]}]})
+(wlk/postwalk 
+    (fn [x]   
+      (if 
+        (and (vector? x) (= 1 (count x)) (= "" (first x))) 
+        [] 
+        x)) 
+    testes)
+testes
+(defn firebase-empty->clj-empty 
+  "Goiing from firebase representation of empty vector to a clj empty vector" 
+  [data]
+  (wlk/postwalk 
+    (fn [x]   
+      (if 
+        (and 
+          (vector? x) 
+          (= 1 (count x)) 
+          (= "" (first x))) 
+        [] 
+        x)) 
+    data))
+  (firebase-empty->clj-empty testes)
+(defn clj-empty->firebase-empty 
+  "Opposite of firebase-empty->clj-empty" 
+  [data]
+  (wlk/postwalk 
+    (fn [x]   
+      (if 
+        (and 
+          (vector? x) 
+          (empty? x)) 
+        [""] 
+        x)) 
+    data))
+(def testes {:route-name (str "/parent" (subs (u/uid) 0 3))
+               :bg-img "from_uss.jpg"
+               :grey-bg? true
+               :nav-hint ["nav hint"]
+               :nav-hint-style {:color "white"}
+               :widgets [{:widget-uid 001
+                          :object-id (u/uid)
+                          :widget-name "Standard text widget"
+                          :inner-html ["<p> Hi there </p>"]}]
+               :children [{:route-name (str "/child" (subs (u/uid) 0 3))
+                           :bg-img "from_uss.jpg"
+                           :grey-bg? true
+                           :nav-hint ["nav hint"]
+                           :nav-hint-style {:color "white"}
+                           :widgets []
+                           :children []}]})
+  (clj-empty->firebase-empty testes)
+l
+(ns nnangpress.repl
+  (:require [nnangpress.monolith :as mn]
+            [nnangpress.utils :as u]
+            [nnangpress.widgets :as wgts]
+            [cljs.reader :as rdr]
+            [ajax.core :refer [GET POST]]
+            [cljs.spec :as s]
+            [cljs.spec.test :as ts :include-macros true]))
+(-> js/firebase .auth .-currentUser)
+  (def current-user (-> js/firebase .auth .-currentUser))
+  (def db (js/firebase.database))
+  (def data-ref (.ref db (str "users/")))
+current-user
+(.-uid current-user)
+  (def uid (.-uid current-user))
+uid
+  (def data-ref (.ref db (str "users/" uid)))
+(->
+    data-ref
+    (.once "value")
+    (.then (fn [snapshot]
+             (let [remote-map (mn/firebase-empty->clj-empty
+                                (js->clj (.val snapshot) :keywordize-keys true))]
+                  (println remote-map)        
+                            
+               ))))
+l
+  (def cache (atom []))
+(->
+    data-ref
+    (.once "value")
+    (.then (fn [snapshot]
+             (let [remote-map (mn/firebase-empty->clj-empty
+                                (js->clj (.val snapshot) :keywordize-keys true))]
+                  (println remote-map)        
+               (reset! cache remote-map)
+               ))))
+l
+@cache
+  (keys @cache)
+  (:sites @cache)
+(to-array 
+    (:sites @cache)
+    )
+(.indexOf 
+  (to-array 
+    (:sites @cache))  
+    (fn [x]
+     (= (.-name x) "site1") 
+      ))
+(.indexOf 
+    (to-array 
+      (:sites @cache))  
+    (fn [x]
+      (println (.-name x))
+      (= (.-name x) "site1") 
+      ))
+(defn index-of [s v]
+    (loop [idx 0 items s]
+      (println items)
+      (cond
+        (empty? items) nil
+        (= v (first items)) idx
+        :else (recur (inc idx) (rest items)))))
+  (index-of (:sites @cache) "")
+(:sites @cache)
+(defn index-of [s v]
+    (loop [idx 0 items s]
+      (println (count items))
+      (cond
+        (empty? items) nil
+        (= v (first items)) idx
+        :else (recur (inc idx) (rest items)))))
+  (index-of (:sites @cache) "")
+(defn index-of [s v]
+    (loop [idx 0 items s]
+      (println (count items))
+      (cond
+        (empty? items) nil
+        (= "site1" (:name (first items))) idx
+        :else (recur (inc idx) (rest items)))))
+  (index-of (:sites @cache) "")
+(defn index-of [s v]
+    (loop [idx 0 items s]
+      (println (count items))
+      (cond
+        (empty? items) nil
+        (= "site2" (:name (first items))) idx
+        :else (recur (inc idx) (rest items)))))
+  (index-of (:sites @cache) "")
+(defn index-of-key-val [s key val]
+    (loop [idx 0 items s]
+      (println (count items))
+      (cond
+        (empty? items) nil
+        (= val (key (first items))) idx
+        :else (recur (inc idx) (rest items)))))
+  (index-of-key-val (:sites @cache) :name "site1")
+  (index-of-key-val (:sites @cache) :name "site2")

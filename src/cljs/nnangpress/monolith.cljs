@@ -3,7 +3,8 @@
             [om.dom :as dom :include-macros true]
             [nnangpress.utils :as u]
             [clojure.zip :as z]
-            [clojure.spec :as s]))
+            [clojure.spec :as s]
+            [clojure.walk :as wlk]))
 
 (s/def ::all-widgets-data vector?)
 (s/def ::current-route vector?)
@@ -36,7 +37,9 @@
                               :email "leon.talbert@gmail.com"
                               :data  (pr-str @monolith)}))))))
 
-(defn current-route-map [route routes-map]
+(defn current-route-map 
+  "Get the whole data map for the current route"
+  [route routes-map]
   (let [xs (rest route)
         fxs (first xs)
         idx (u/index-of (vec (map :route-name (:children routes-map))) (str "/" fxs))]
@@ -44,7 +47,9 @@
       (empty? xs) routes-map
       :else (current-route-map xs (get (:children routes-map) idx)))))
 
-(defn current-widgets [route routes-map]
+(defn current-widgets 
+  "Get the widget(s) data for the current route" 
+  [route routes-map]
   (let [xs (rest route)
         fxs (first xs)
         idx (u/index-of (vec (map :route-name (:children routes-map))) (str "/" fxs))]
@@ -52,7 +57,9 @@
       (empty? xs) (:widgets routes-map)
       :else (current-widgets xs (get (:children routes-map) idx)))))
 
-(defn ref-cursor-init [monolith]
+(defn ref-cursor-init 
+  "Defines our monolith API" 
+  [monolith]
 
   (defn uid []
     (om/ref-cursor (:uid (om/root-cursor monolith))))
@@ -87,7 +94,9 @@
 (s/fdef update-all
         :args (s/cat :data ::all-data))
 
-(defn update-all [data]
+(defn update-all 
+  "Replace the entire monolith with a new monolith" 
+  [data]
   (om/update! (all-data) data))
 
 (s/fdef add-current-user 
@@ -115,4 +124,44 @@
   (om/transact! 
     (edit-mode) 
     (fn [dabool] [(not (first dabool))])))
+
+(defn firebase-empty->clj-empty 
+  "Goiing from firebase representation of empty vector to a clj empty vector" 
+  [data]
+  (wlk/postwalk 
+    (fn [x]   
+      (if 
+        (and 
+          (vector? x) 
+          (= 1 (count x)) 
+          (= "" (first x))) 
+        [] 
+        x)) 
+    data))
+
+(defn clj-empty->firebase-empty 
+  "Opposite of firebase-empty->clj-empty" 
+  [data]
+  (wlk/postwalk 
+    (fn [x]   
+      (if 
+        (and 
+          (vector? x) 
+          (empty? x)) 
+        [""] 
+        x)) 
+    data))
+
+(defn nnangpress-data->monolith
+  "Going from system data to system + user data" 
+  [nnangpress-data current-user]
+  (reset! 
+    monolith 
+    (assoc 
+      (dissoc nnangpress-data :route-widgets)  
+      :uid [(if current-user (.-uid current-user) "")] 
+      :email [(if current-user (.-email current-user) "")]
+      :route-widget (if current-user
+                      (-> nnangpress-data :route-widgets :userhome)
+                      (-> nnangpress-data :route-widgets :homepage)))))
 
