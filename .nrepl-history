@@ -1,180 +1,3 @@
-(->
-    (js/firebase.database)
-    (.ref (str "users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites"))
-    (.once "value")
-    (.then (fn [snapshot]
-             (let [remote-map (js->clj (.val snapshot) :keywordize-keys true)]
-               (reset! cache remote-map)
-               (println "remote map: " remote-map)))))
-l
-@cache
-@mn/monolith
-(new-route
-    "users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0"
-    (clj->js @mn/monolith))
-(ns nnangpress.repl
-  (:require [nnangpress.monolith :as mn]
-            [nnangpress.utils :as u]
-            [cljs.reader :as rdr]
-            [ajax.core :refer [GET POST]]))
-(defn new-route [route data]
-  (->
-    (js/firebase.database)
-    (.ref route)
-    (.set data)))
-  (new-route
-    "users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0"
-    (clj->js @mn/monolith))
-(new-route
-    "users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0"
-    (clj->js {:name "site1"
-              :description "A site"
-              :data @mn/monolith}))
-(new-route
-    "users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1"
-    (clj->js {:name "site2"
-              :description "Another site"
-              :data @mn/monolith}))
-(->
-    (js/firebase.database)
-    (.ref (str "users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites"))
-    (.once "value")
-    (.then (fn [snapshot]
-             (let [remote-map (js->clj (.val snapshot) :keywordize-keys true)]
-               (reset! cache remote-map)
-               (println "remote map: " remote-map)))))
-@cache
-l
-(empty? "")
-(ns nnangpress.repl
-  (:require [nnangpress.monolith :as mn]
-            [nnangpress.utils :as u]
-            [cljs.reader :as rdr]
-            [ajax.core :refer [GET POST]]))
-(defn new-route [route data]
-  (->
-    (js/firebase.database)
-    (.ref route)
-    (.set data)))
-(new-route
-    "nangpress-data/"
-    (clj->js {:name "site2"
-              :description "Another site"
-              :data @mn/monolith}))
-  (new-route
-    "nangpress-data/"
-    (clj->js @mn/monolith))
-(new-route
-    "nangpress-data/route-widgets/homepage"
-    (clj->js @mn/monolith))
-(ns nnangpress.repl
-  (:require [nnangpress.monolith :as mn]
-            [nnangpress.utils :as u]
-            [cljs.reader :as rdr]
-            [ajax.core :refer [GET POST]]))
-(defn new-route [route data]
-  (->
-    (js/firebase.database)
-    (.ref route)
-    (.set data)))
-  (new-route
-    "nangpress-data/route-widgets/homepage"
-    (clj->js @mn/monolith))
-@mn/monolith
-(:route-widget @mn/monolith)
-(new-route
-    "nangpress-data/route-widgets/homepage"
-    (clj->js (:route-widget @mn/monolith)))
-  (new-route
-    "nangpress-data/route-widgets/userhome"
-    (clj->js (:route-widget @mn/monolith)))
-  (new-route
-    "nangpress-data/route-widgets/homepage"
-    (clj->js (:route-widget @mn/monolith)))
-l
-(ns nnangpress.repl
-  (:require [nnangpress.monolith :as mn]
-            [nnangpress.utils :as u]
-            [cljs.reader :as rdr]
-            [ajax.core :refer [GET POST]]))
-)
-l
-(ns nnangpress.repl
-  (:require [nnangpress.monolith :as mn]
-            [nnangpress.utils :as u]
-            [cljs.reader :as rdr]
-            [ajax.core :refer [GET POST]]))
- mn/monlith 
- mn/monolith 
-  (keys mn/monolith)
-  (keys @mn/monolith)
-  (:all-widgets-data @mn/monolith)
-@mn/monolith
-(ns nnangpress.repl
-  (:require [nnangpress.monolith :as mn]
-            [nnangpress.utils :as u]
-            [nnangpress.widgets :as wgts]
-            [cljs.reader :as rdr]
-            [ajax.core :refer [GET POST]]))
-:wgts/img
-  (s/valid? :wgts/widget-data sample-data)
-(ns nnangpress.repl
-  (:require [nnangpress.monolith :as mn]
-            [nnangpress.utils :as u]
-            [nnangpress.widgets :as wgts]
-            [cljs.reader :as rdr]
-            [ajax.core :refer [GET POST]]
-            [clojure.spec :as s]))
-  (s/valid? :wgts/widget-data sample-data)
-  (def sample-data {:widget-uid 001
-                    :object-id "23489-23fd9-sdf23-234hjh" 
-                    :widget-name "Standard text widget"
-                    :inner-html ["<p> Hi there </p>"]})
-  (s/valid? :wgts/widget-data sample-data)
-  (s/valid? :nnangpress.widgets/widget-data sample-data)
-  (def sample-data {:widgetuid 001
-                    :object-id "23489-23fd9-sdf23-234hjh" 
-                    :widget-name "Standard text widget"
-                    :inner-html ["<p> Hi there </p>"]})
-  (s/valid? :nnangpress.widgets/widget-data sample-data)
-  (def sample-data {:widget-uid 2
-                    :object-id (u/uid)
-                    :imgs [{:object-id (u/uid)
-                            :url "http://placekitten.com/900/600"}
-                           {:object-id (u/uid)
-                            :url "http://placekitten.com/900/600"}]})
-  (s/valid? :nnangpress.widgets/widget-data sample-data)
-  (s/valid? ::wgts/widget-data sample-data)
-  (s/def ::all-widgets-data (s/coll-of ::wgts/widget-data)  )
-(:all-widgets-data @mn/monolith)
-  (s/valid? ::all-widgets-data (:all-widgets-data @mn/monolith))
-[sample-data]
-  (s/valid? ::all-widgets-data [sample-data])
-  (s/valid? ::all-widgets-data sample-data)
-(ns nnangpress.repl
-  (:require [nnangpress.monolith :as mn]
-            [nnangpress.utils :as u]
-            [nnangpress.widgets :as wgts]
-            [cljs.reader :as rdr]
-            [ajax.core :refer [GET POST]]
-            [cljs.spec :as s]))
-  (s/checkable-syms)
-  (s/instrument-all)
-  (ts/instrument-all)
-(ns nnangpress.repl
-  (:require [nnangpress.monolith :as mn]
-            [nnangpress.utils :as u]
-            [nnangpress.widgets :as wgts]
-            [cljs.reader :as rdr]
-            [ajax.core :refer [GET POST]]
-            [cljs.spec :as s]
-            [cljs.spec.test :as ts]))
-l
-(ns nnangpress.repl
-  (:require [nnangpress.monolith :as mn]
-            [nnangpress.utils :as u]
-            [nnangpress.widgets :as wgts]
-            [cljs.reader :as rdr]
             [ajax.core :refer [GET POST]]
             [cljs.spec :as s]
             [cljs.spec.test :as ts :refer-macros true]))
@@ -498,3 +321,180 @@ l
         :else (recur (inc idx) (rest items)))))
   (index-of-key-val (:sites @cache) :name "site1")
   (index-of-key-val (:sites @cache) :name "site2")
+(ns nnangpress.repl
+  (:require [nnangpress.monolith :as mn]
+            [nnangpress.utils :as u]
+            [nnangpress.widgets :as wgts]
+            [cljs.reader :as rdr]
+            [ajax.core :refer [GET POST]]
+            [cljs.spec :as s]
+            [cljs.spec.test :as ts :include-macros true]))
+  (keys @cache)
+  (u/index-of-key-val (:sites @cache) :name "site2")
+(ns nnangpress.repl
+  (:require [nnangpress.monolith :as mn]
+            [nnangpress.utils :as u]
+            [nnangpress.widgets :as wgts]
+            [cljs.reader :as rdr]
+            [ajax.core :refer [get post]]
+            [cljs.spec :as s]
+            [cljs.spec.test :as ts :include-macros true]))
+  mn/user-site-index
+(let [c (chan)]
+    (go 
+      (println (<! (mn/user-site-index uid "site2" c)))
+      ))
+(ns nnangpress.repl
+  (:require [nnangpress.monolith :as mn]
+            [nnangpress.utils :as u]
+            [nnangpress.widgets :as wgts]
+            [cljs.reader :as rdr]
+            [ajax.core :refer [get post]]
+            [cljs.spec :as s]
+            [cljs.spec.test :as ts :include-macros true]))
+(ns nnangpress.repl
+  (:require [nnangpress.monolith :as mn]
+            [nnangpress.utils :as u]
+            [nnangpress.widgets :as wgts]
+            [cljs.reader :as rdr]
+            [cljs.spec :as s]
+            [cljs.spec.test :as ts :include-macros true]))
+(let [c (chan)]
+    (go 
+      (println (<! (mn/user-site-index uid "site2" c)))
+      ))
+(ns nnangpress.repl
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [nnangpress.monolith :as mn]
+            [nnangpress.utils :as u]
+            [nnangpress.widgets :as wgts]
+            [cljs.reader :as rdr]
+            [cljs.spec :as s]
+            [cljs.spec.test :as ts :include-macros true]
+            [cljs.core.async :refer [put! chan <!]]))
+(let [c (chan)]
+    (go 
+      (println (<! (mn/user-site-index uid "site2" c)))
+      ))
+(let [c (chan)]
+    (go 
+      (mn/user-site-index uid "site2" c)
+      (println (<! c))
+      ))
+(let [c (chan)]
+    (go 
+      (mn/user-site-index uid "site1" c)
+      (println (<! c))
+      ))
+(defn update-site-data 
+  "Update a user's site data by site name" 
+  [uid site-name data]
+  (let [c (chan)
+        _ (mn/user-site-index uid site-name c)]
+    (go
+      (->
+        (js/firebase.database)
+        (.ref (str "users/" uid "/sites/" "3" "/"))
+        (.set {:test "hi"}) 
+        ))))
+(ns nnangpress.repl
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [nnangpress.monolith :as mn]
+            [nnangpress.utils :as u]
+            [nnangpress.widgets :as wgts]
+            [cljs.reader :as rdr]
+            [cljs.spec :as s]
+            [cljs.spec.test :as ts :include-macros true]
+            [cljs.core.async :refer [put! chan <!]]))
+  (mn/update-site-data "eKWcekJm6GMc4klsRG7CNvteCQN2" "site2" {})
+(->
+    (js/firebase.database)
+    (.ref (str "users/" "eKWcekJm6GMc4klsRG7CNvteCQN2" "/sites/" "3" ))
+    (.set {:test "hi"}) 
+    )
+(->
+    (js/firebase.database)
+    (.ref (str "users/" "eKWcekJm6GMc4klsRG7CNvteCQN2" "/sites/" "3" ))
+    (.set (clj->js {:test "hi"})) 
+    )
+  (mn/update-site-data "eKWcekJm6GMc4klsRG7CNvteCQN2" "site2" {:test 2})
+(->
+    (js/firebase.database)
+    (.ref (str "users/" "eKWcekJm6GMc4klsRG7CNvteCQN2" "/sites/" "3" ))
+    (.set (clj->js {:test "hi"})) 
+    )
+  (mn/update-site-data "eKWcekJm6GMc4klsRG7CNvteCQN2" "site2" {:test "hi"})
+(defn update-site-data 
+  "Update a user's site data by site name" 
+  [uid site-name data]
+  (let [c (chan)
+        _ (user-site-index uid site-name c)]
+    (go
+      (->
+        (js/firebase.database)
+        (.ref (str "users/" uid "/sites/" "3"))
+        (.set (clj->js data)) 
+        ))))
+(defn update-site-data 
+  "Update a user's site data by site name" 
+  [uid site-name data]
+  (let [c (chan)
+        _ (mn/user-site-index uid site-name c)]
+    (go
+      (->
+        (js/firebase.database)
+        (.ref (str "users/" uid "/sites/" "3"))
+        (.set (clj->js data)) 
+        ))))
+  (update-site-data "eKWcekJm6GMc4klsRG7CNvteCQN2" "site2" {:test "hi"})
+  (mn/update-site-data "eKWcekJm6GMc4klsRG7CNvteCQN2" "site2" {:test "hi"})
+(ns nnangpress.repl
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [nnangpress.monolith :as mn]
+            [nnangpress.utils :as u]
+            [nnangpress.widgets :as wgts]
+            [cljs.reader :as rdr]
+            [cljs.spec :as s]
+            [cljs.spec.test :as ts :include-macros true]
+            [cljs.core.async :refer [put! chan <!]]))
+  (mn/update-site-data "eKWcekJm6GMc4klsRG7CNvteCQN2" "site2" {:test "hi"})
+(ns nnangpress.monolith
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [nnangpress.utils :as u]
+            [clojure.zip :as z]
+            [clojure.spec :as s]
+            [clojure.walk :as wlk]
+            [cljs.core.async :refer [put! chan <!]]))
+(defn update-site-data 
+  "Update a user's site data by site name" 
+  [uid site-name data]
+  (let [c (chan)
+        _ (user-site-index uid site-name c)]
+    (go
+      (->
+        (js/firebase.database)
+        (.ref (str "users/" uid "/sites/" "3"))
+        (.set (clj->js data)) 
+        ))))
+(ns nnangpress.repl
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [nnangpress.monolith :as mn]
+            [nnangpress.utils :as u]
+            [nnangpress.widgets :as wgts]
+            [cljs.reader :as rdr]
+            [cljs.spec :as s]
+            [cljs.spec.test :as ts :include-macros true]
+            [cljs.core.async :refer [put! chan <!]]))
+  (mn/update-site-data "eKWcekJm6GMc4klsRG7CNvteCQN2" "site2" {:test "hi"})
+(ns nnangpress.repl
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [nnangpress.monolith :as mn]
+            [nnangpress.utils :as u]
+            [nnangpress.widgets :as wgts]
+            [cljs.reader :as rdr]
+            [cljs.spec :as s]
+            [cljs.spec.test :as ts :include-macros true]
+            [cljs.core.async :refer [put! chan <!]]))
+  (mn/update-site-data "eKWcekJm6GMc4klsRG7CNvteCQN2" "site2" {:test "hi"})

@@ -1,11 +1,12 @@
 (ns nnangpress.repl
+  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [nnangpress.monolith :as mn]
             [nnangpress.utils :as u]
             [nnangpress.widgets :as wgts]
             [cljs.reader :as rdr]
-            [ajax.core :refer [GET POST]]
             [cljs.spec :as s]
-            [cljs.spec.test :as ts :include-macros true]))
+            [cljs.spec.test :as ts :include-macros true]
+            [cljs.core.async :refer [put! chan <!]]))
 
 (defn new-route [route data]
   (->
@@ -35,29 +36,61 @@
 
 (comment
 
-  (def sample-data {:widget-uid 2
-                    :object-id (u/uid)
-                    :imgs [{:object-id (u/uid)
-                            :url "http://placekitten.com/900/600"}
-                           {:object-id (u/uid)
-                            :url "http://placekitten.com/900/600"}]})
+  (def current-user (-> js/firebase .auth .-currentUser))
+  (def uid (.-uid current-user))
+  (def db (js/firebase.database))
+  (def data-ref (.ref db (str "users/" uid)))
 
-  (s/valid? ::wgts/widget-data sample-data)
+  (def cache (atom []))
+  (keys @cache)
 
-  (s/def ::all-widgets-data (s/coll-of ::wgts/widget-data))
+  (u/index-of-key-val (:sites @cache) :name "site2")
 
-  (s/valid? ::all-widgets-data (:all-widgets-data @mn/monolith))
-  (s/valid? ::all-widgets-data sample-data)
+  (let [c (chan)]
+    (go 
+      (mn/user-site-index uid "site1" c)
+      (println (<! c))
+      ))
 
-  (:all-widgets-data @mn/monolith)
-  (keys @mn/monolith)
+  (->
+    data-ref
+    (.once "value")
+    (.then (fn [snapshot]
+             (let [remote-map (mn/firebase-empty->clj-empty
+                                (js->clj (.val snapshot) :keywordize-keys true))]
+               (println remote-map)        
+               (reset! cache remote-map)
+               ))))
 
-  (ts/instrument
-    'nnangpress.monolith
+  (let [uid "SGXvf26OEpeVDQ79XIH2V71fVnT2"
+        user-data-ref (->
+                        (js/firebase.database)
+                        (.ref (str "users/" uid)))]
+    (prn "-- Atom Changed --")
+    (->
+      user-data-ref
+      (.set #js {:username "wellwell"
+                 :email "leon.talbert@gmail.com"
+                 :data  (pr-str @monolith)})))
+
+  (->
+    (js/firebase.database)
+    (.ref (str "users/" "eKWcekJm6GMc4klsRG7CNvteCQN2" "/sites/" "3" ))
+    (.set (clj->js {:test "hi"})) 
     )
 
-  (ts/instrumentable-syms)
+(defn update-site-data 
+  "Update a user's site data by site name" 
+  [uid site-name data]
+  (let [c (chan)
+        _ (mn/user-site-index uid site-name c)]
+    (go
+      (->
+        (js/firebase.database)
+        (.ref (str "users/" uid "/sites/" "3"))
+        (.set (clj->js data)) 
+        ))))
 
-
+  (mn/update-site-data "eKWcekJm6GMc4klsRG7CNvteCQN2" "site2" {:test "hi"})
   )
 

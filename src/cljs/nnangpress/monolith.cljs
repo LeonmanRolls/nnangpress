@@ -1,10 +1,12 @@
 (ns nnangpress.monolith
+  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
             [om.dom :as dom :include-macros true]
             [nnangpress.utils :as u]
             [clojure.zip :as z]
             [clojure.spec :as s]
-            [clojure.walk :as wlk]))
+            [clojure.walk :as wlk]
+            [cljs.core.async :refer [put! chan <!]]))
 
 (s/def ::all-widgets-data vector?)
 (s/def ::current-route vector?)
@@ -36,6 +38,7 @@
                    (.set #js {:username "wellwell"
                               :email "leon.talbert@gmail.com"
                               :data  (pr-str @monolith)}))))))
+
 
 (defn current-route-map 
   "Get the whole data map for the current route"
@@ -90,6 +93,23 @@
 
   (defn logo-hint []
     (om/ref-cursor (-> (om/root-cursor monolith) :route-widget :routes-map :nav-hint))))
+
+
+
+(defn save-user-site 
+  "Save a specific user's site" 
+  [user]
+  (let [uid "SGXvf26OEpeVDQ79XIH2V71fVnT2"
+        user-data-ref (->
+                        (js/firebase.database)
+                        (.ref (str "users/" uid)))]
+    (prn "-- Atom Changed --")
+    (->
+      user-data-ref
+      (.set #js {:username "wellwell"
+                 :email "leon.talbert@gmail.com"
+                 :data  (pr-str @monolith)})))
+  )
 
 (s/fdef update-all
         :args (s/cat :data ::all-data))
@@ -164,4 +184,30 @@
       :route-widget (if current-user
                       (-> nnangpress-data :route-widgets :userhome)
                       (-> nnangpress-data :route-widgets :homepage)))))
+
+(defn user-site-index 
+  "Get the index of a user's site" 
+  [uid site-name chan] 
+  (let [db (js/firebase.database)
+        data-ref (.ref db (str "users/" uid))]
+    (->
+      data-ref
+      (.once "value")
+      (.then (fn [snapshot]
+               (let [remote-map (firebase-empty->clj-empty
+                                  (js->clj (.val snapshot) :keywordize-keys true))]
+                 (put! 
+                   chan 
+                   (u/index-of-key-val (:sites remote-map) :name site-name))))))))
+
+(defn update-site-data 
+  "Update a user's site data by site name" 
+  [uid site-name data]
+  (let [c (chan)
+        _ (user-site-index uid site-name c)]
+    (go
+      (->
+        (js/firebase.database)
+        (.ref (str "users/" uid "/sites/" (<! c)))
+        (.set (clj->js data))))))
 
