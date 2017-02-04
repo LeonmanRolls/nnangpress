@@ -16,12 +16,25 @@
 
 #Application architecture
 
+## Monolith
+
 -All the data is in a single atom
 
 -Reference cursors are used to create an api to simplify management of this 'monolith' data
 structure which may get reasonably complicated.
 
--
+- A vector with an empty string will count as 'empty', so that we can 
+store it in firebase. 
+
+- A 'safe' piece of data means that it is either a vector or a map. This is a requirement 
+of om cursors.
+
+- A raw piece of data means that it is not inside a map or vector
+
+### Monolith Init
+
+- In the database the data is split into nnangpress system data and user data. Both must be 
+loaded individually and then any session specific data added 
 
 ## The routes map
 
@@ -74,9 +87,4 @@ jquery plugins.
 # Bugs and Spec 
 
 - Each bug upon being fixed must be speced to guard against regression
-
-# Monolith
-
-- A vector with an empty string will count as 'empty', so that we can 
-store it in firebase. 
 

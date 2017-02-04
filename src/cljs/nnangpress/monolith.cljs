@@ -13,8 +13,14 @@
 (s/def ::edit-mode vector?)
 (s/def ::logo-text vector?)
 (s/def ::route-widget map?)
-(s/def ::uid vector?)
 (s/def ::email vector?)
+
+(s/def ::uid vector?)
+(s/def ::authed-uid-raw (s/and #(not (empty? %)) string?))
+
+(s/def ::channel #(= 
+                    (type %)
+                    cljs.core.async.impl.channels/ManyToManyChannel))
 
 (s/def ::all-data (s/keys :req-un [::all-widgets-data
                                    ::uid
@@ -64,6 +70,9 @@
   "Defines our monolith API" 
   [monolith]
 
+  (defn site-name []
+    (om/ref-cursor (:site-name (om/root-cursor monolith))))
+
   (defn uid []
     (om/ref-cursor (:uid (om/root-cursor monolith))))
 
@@ -94,23 +103,6 @@
   (defn logo-hint []
     (om/ref-cursor (-> (om/root-cursor monolith) :route-widget :routes-map :nav-hint))))
 
-
-
-(defn save-user-site 
-  "Save a specific user's site" 
-  [user]
-  (let [uid "SGXvf26OEpeVDQ79XIH2V71fVnT2"
-        user-data-ref (->
-                        (js/firebase.database)
-                        (.ref (str "users/" uid)))]
-    (prn "-- Atom Changed --")
-    (->
-      user-data-ref
-      (.set #js {:username "wellwell"
-                 :email "leon.talbert@gmail.com"
-                 :data  (pr-str @monolith)})))
-  )
-
 (s/fdef update-all
         :args (s/cat :data ::all-data))
 
@@ -119,13 +111,18 @@
   [data]
   (om/update! (all-data) data))
 
-(s/fdef add-current-user 
+(s/fdef add-current-user-email
         :args (s/cat :data ::all-data))
 
 (defn add-current-user-email 
   "Add current user email to data map" 
   [data]
   (assoc data :email (user-email)))
+
+(defn add-current-uid 
+  "Add current user email to data map" 
+  [data]
+  (assoc data :uid @(uid)))
 
 (s/fdef change-site 
         :args (s/cat :data ::all-data))
@@ -136,6 +133,7 @@
   (-> 
     site-data 
     add-current-user-email 
+    add-current-uid
     update-all))
 
 (defn toggle-edit-mode 
@@ -172,6 +170,9 @@
         x)) 
     data))
 
+(s/fdef nnangpress-data->monolith 
+  :args (s/cat :nnangpress-dasta any? :current-user any?))
+
 (defn nnangpress-data->monolith
   "Going from system data to system + user data" 
   [nnangpress-data current-user]
@@ -185,9 +186,12 @@
                       (-> nnangpress-data :route-widgets :userhome)
                       (-> nnangpress-data :route-widgets :homepage)))))
 
-(defn user-site-index 
-  "Get the index of a user's site" 
-  [uid site-name chan] 
+(s/fdef get-user-sites 
+  :args (s/cat :uid ::authed-uid-raw :chan ::channel))
+
+(defn get-user-sites 
+  "Get all the site data for a given user" 
+  [uid chan]
   (let [db (js/firebase.database)
         data-ref (.ref db (str "users/" uid))]
     (->
@@ -198,16 +202,62 @@
                                   (js->clj (.val snapshot) :keywordize-keys true))]
                  (put! 
                    chan 
-                   (u/index-of-key-val (:sites remote-map) :name site-name))))))))
+                   (:sites remote-map))))))))
 
-(defn update-site-data 
-  "Update a user's site data by site name" 
-  [uid site-name data]
-  (let [c (chan)
-        _ (user-site-index uid site-name c)]
-    (go
-      (->
-        (js/firebase.database)
-        (.ref (str "users/" uid "/sites/" (<! c)))
-        (.set (clj->js data))))))
+(s/fdef user-site-index 
+  :args (s/cat :uid ::authed-uid-raw :data string? :chan ::channel)
+  :ret ::channel)
+
+(defn user-site-index 
+  "Get the index of a user's site" 
+  [uid site-name chan] 
+  (let [c (chan)]
+    (go 
+      (get-user-sites uid c) 
+      (put! chan (u/index-of-key-val (<! c) :name site-name)))))
+
+(s/fdef user-site-count 
+  :args (s/cat :uid ::authed-uid-raw :data map? :chan ::channel))
+
+(defn save-site-data 
+  "Save a user's site data by site name or index" 
+  [uid data idx-or-site-name]
+  (if 
+    (int? idx-or-site-name)
+    (->
+      (js/firebase.database)
+      (.ref (str "users/" uid "/sites/" idx-or-site-name))
+      (.set (clj->js data)))
+    (let [c (chan)
+          _ (user-site-index uid site-name c)]
+      (go
+        (->
+          (js/firebase.database)
+          (.ref (str "users/" uid "/sites/" (<! c)))
+          (.set (clj->js data)))))))
+
+(s/fdef user-site-count 
+  :args (s/cat :uid ::authed-uid-raw :chan ::channel)
+  :ret ::channel)
+
+(defn user-site-count 
+  "number of sites a user has" 
+  [uid out]
+  (go 
+    (let [c (chan)
+          _ (get-user-sites uid c)]
+      (put! out (count (<! c))))))
+
+(defn new-site 
+  "Save data as a new site" 
+  []
+  (go 
+   (let [uid (uid)
+        c (chan)
+        _ (user-site-count (first @uid) c)
+        data (all-data)]
+    (save-site-data 
+      (first @uid) 
+      (update @data :site-name (fn [x] [(str (first x) "-" (u/uid 4))])) 
+      (<! c)))))
 

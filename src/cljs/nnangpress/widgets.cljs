@@ -659,12 +659,16 @@
   (reify
     om/IRender
     (render [_]
-      (let [user-email-obs (om/observe owner (mn/user-email))]
+      (let [user-email-obs (om/observe owner (mn/user-email))
+            site-name-obs (om/observe owner (mn/site-name))]
         (dom/div #js {:className "admin-toolbar"}
                  (dom/b nil "Welcome to Nnangpress alpha | ")
                  (dom/button #js {:onClick (fn [_] (mn/toggle-edit-mode))}
                              "Toggle edit mode")
-                 (dom/b nil (str " | username:  " (first @user-email-obs))))))))
+                 (dom/b nil (str " | Username:  " (first @user-email-obs)))
+                 (dom/b nil (str " | Site name:  " (first @site-name-obs) " | " ))
+                 (dom/button #js {:onClick (fn [_] (mn/new-site))}
+                             "Save new site"))))))
 
 (defn select-widget-wrapper [{:keys [widget-name widget-uid] :as data} owner]
   (reify
