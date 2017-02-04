@@ -9,12 +9,14 @@
             [nnangpress.core :as cre]
             [nnangpress.utils :as u]
             [nnangpress.routing :as rt]
+            [nnangpress.firebase :as fb]
             [cljs.reader :as rdr]
             [goog.events :as ev]
             [goog.dom :as gdom]
             [ajax.core :refer [GET POST]]
             [cljs.spec :as s :include-macros true]
-            [cljs.spec.test :as ts :include-macros true]))
+            [cljs.spec.test :as ts :include-macros true]
+            [cljs.core.async :refer [put! chan <!]]))
 
 (enable-console-print!)
 
@@ -133,23 +135,15 @@
   "Create monolith based on user auth state an init om" 
   []
   (let [current-user (-> js/firebase .auth .-currentUser)
-        db (js/firebase.database)
-        nangpress-data-ref (.ref db (str "nangpress-data/"))]
+        nangpress-data-chan (chan)]
 
     (println (ts/instrument))
     (mn/ref-cursor-init mn/monolith)
 
-    (->
-      nangpress-data-ref
-      (.once "value")
-      (.then (fn [snapshot]
-               (let [remote-map (mn/firebase-empty->clj-empty
-                                  (js->clj 
-                                    (.val snapshot) 
-                                    :keywordize-keys true))]
-                 (do 
-                   (mn/nnangpress-data->monolith remote-map current-user)
-                   (om/root master mn/monolith
-                            {:target (. js/document
-                                        (getElementById "super-container"))}))))))))
+    (go 
+      (fb/firebase-get "nangpress-data/" nangpress-data-chan)
+      (mn/nnangpress-data->monolith (<! nangpress-data-chan) current-user)
+      (om/root master mn/monolith
+               {:target (. js/document
+                           (getElementById "super-container"))}))))
 

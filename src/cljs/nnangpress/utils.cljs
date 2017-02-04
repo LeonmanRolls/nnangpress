@@ -36,11 +36,7 @@
   (vec (concat (subvec coll 0 pos) (subvec coll (inc pos)))))
 
 (defn uid 
+  "Random string with hyphens"
   ([] (.toString (random-uuid))) 
   ([length] (subs (.toString (random-uuid)) 0 length)))
 
-;Firebase Start ---
-
-
-
-;Firebase End ---

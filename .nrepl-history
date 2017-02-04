@@ -1,69 +1,3 @@
-            [nnangpress.widgets :as wgts]
-            [cljs.reader :as rdr]
-            [ajax.core :refer [GET POST]]
-            [cljs.spec :as s]
-            [cljs.spec.test :as ts :include-macros true]))
-  (ts/instrument-all)
-  (ts/instrumentable-syms)
-  (ts/instrument)
-  (ts/instrumentable-syms)
-  (ts/instrument)
-  (ts/instrumentable-syms)
-  (ts/instrument
-  (ts/instrumentable-syms)
-    )
-q
-(ts/instrumentable-syms)
-  (ts/instrumentable-syms)
-(ts/instrument
-    'nnangpress.monolith
-    )
-  (ts/instrumentable-syms)
-  (ts/instrument
-    'nnangpress.monolith/update-all
-    )
-  (ts/instrument
-    'nnangpress.monolith
-    )
-  (vector? [])
-(start-repl)
-l
-(empty? [""])
-(empty? [])
-l
-(ns nnangpress.app
-  (:import [goog.history Html5History EventType])
-  (:require-macros [cljs.core.async.macros :refer  [go go-loop]])
-  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
-            [om.dom :as dom :include-macros true]
-            [nnangpress.monolith :as mn]
-            [nnangpress.navbars :as nv]
-            [nnangpress.widgets :as wgt]
-            [nnangpress.core :as cre]
-            [nnangpress.utils :as u]
-            [nnangpress.routing :as rt]
-            [cljs.reader :as rdr]
-            [goog.events :as ev]
-            [goog.dom :as gdom]
-            [ajax.core :refer [GET POST]]
-            [cljs.spec :as s :include-macros true]
-            [cljs.spec.test :as ts :include-macros true]))
-@cache
-  @cache  
-(ns nnangpress.app
-  (:import [goog.history Html5History EventType])
-  (:require-macros [cljs.core.async.macros :refer  [go go-loop]])
-  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
-            [om.dom :as dom :include-macros true]
-            [nnangpress.monolith :as mn]
-            [nnangpress.navbars :as nv]
-            [nnangpress.widgets :as wgt]
-            [nnangpress.core :as cre]
-            [nnangpress.utils :as u]
-            [nnangpress.routing :as rt]
-            [cljs.reader :as rdr]
-            [goog.events :as ev]
-            [goog.dom :as gdom]
             [ajax.core :refer [GET POST]]
             [cljs.spec :as s :include-macros true]
             [cljs.spec.test :as ts :include-macros true]
@@ -498,3 +432,69 @@ l
                     (type %)
                     cljs.core.async.impl.channels/ManyToManyChannel))
  (s/valid? ::channel (chan))
+(ns nnangpress.repl
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [nnangpress.monolith :as mn]
+            [nnangpress.utils :as u]
+            [nnangpress.widgets :as wgts]
+            [nnangpress.firebase :as fb]
+            [cljs.reader :as rdr]
+            [cljs.spec :as s]
+            [cljs.spec.test :as ts :include-macros true]
+            [cljs.core.async :refer [put! chan <!]]))
+(let [c (chan)]
+  (go 
+    (fb/firebase-get c)
+    (println "rtn" (<! c))))
+(let [c (chan)]
+  (go 
+    (fb/firebase-get "nangpress-data/" c)
+    (println "rtn" (<! c))))
+(ns nnangpress.repl
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [nnangpress.monolith :as mn]
+            [nnangpress.utils :as u]
+            [nnangpress.widgets :as wgts]
+            [nnangpress.firebase :as fb]
+            [cljs.reader :as rdr]
+            [cljs.spec :as s]
+            [cljs.spec.test :as ts :include-macros true]
+            [cljs.core.async :refer [put! chan <!]]))
+(let [c (chan)]
+  (go 
+    (fb/firebase-get "nangpress-data/" c)
+    (println "rtn" (<! c))))
+(ns nnangpress.firebase
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [cljs.core.async :refer [put! chan <!]]
+            [nnangpress.monolith :as mn]))
+(defn firebase-get
+  "Get data from firebase database by route"  
+  [route out] 
+  (->
+    (.ref (js/firebase.database) route)
+    (.once "value")
+    (.then (fn [snapshot]
+             (put! 
+               out 
+               (mn/firebase-empty->clj-empty
+                 (js->clj (.val snapshot) :keywordize-keys true)))))))
+(ns nnangpress.repl
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [nnangpress.monolith :as mn]
+            [nnangpress.utils :as u]
+            [nnangpress.widgets :as wgts]
+            [nnangpress.firebase :as fb]
+            [cljs.reader :as rdr]
+            [cljs.spec :as s]
+            [cljs.spec.test :as ts :include-macros true]
+            [cljs.core.async :refer [put! chan <!]]))
+(let [c (chan)]
+  (go 
+    (fb/firebase-get "nangpress-data/" c)
+    (println "rtn" (<! c))))
+(let [c (chan)]
+  (go 
+    (fb/firebase-get "nangpress-data/site-name" c)
+    (println "rtn" (<! c))))
+(start-repl)

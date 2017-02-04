@@ -45,7 +45,6 @@
                               :email "leon.talbert@gmail.com"
                               :data  (pr-str @monolith)}))))))
 
-
 (defn current-route-map 
   "Get the whole data map for the current route"
   [route routes-map]
@@ -157,6 +156,9 @@
         x)) 
     data))
 
+(s/fdef clj-empty->firebase-empty 
+        :args (s/cat :data any?))
+
 (defn clj-empty->firebase-empty 
   "Opposite of firebase-empty->clj-empty" 
   [data]
@@ -171,7 +173,7 @@
     data))
 
 (s/fdef nnangpress-data->monolith 
-  :args (s/cat :nnangpress-dasta any? :current-user any?))
+        :args (s/cat :nnangpress-data any? :current-user any?))
 
 (defn nnangpress-data->monolith
   "Going from system data to system + user data" 

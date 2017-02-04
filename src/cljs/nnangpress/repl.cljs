@@ -3,6 +3,7 @@
   (:require [nnangpress.monolith :as mn]
             [nnangpress.utils :as u]
             [nnangpress.widgets :as wgts]
+            [nnangpress.firebase :as fb]
             [cljs.reader :as rdr]
             [cljs.spec :as s]
             [cljs.spec.test :as ts :include-macros true]
@@ -36,7 +37,9 @@
 
 (comment
 
-
-
+(let [c (chan)]
+  (go 
+    (fb/firebase-get "nangpress-data/site-name" c)
+    (println "rtn" (<! c))))
   )
 
