@@ -24,6 +24,10 @@
                     (type %)
                     cljs.core.async.impl.channels/ManyToManyChannel))
 
+(s/def ::name string?)
+(s/def ::description string?)
+(s/def ::data map?)
+
 (s/def ::all-data (s/keys :req-un [::all-widgets-data
                                    ::uid
                                    ::current-route
@@ -46,6 +50,8 @@
                                          ::logo-text
                                          ::route-widgets
                                          ::route-widget]))
+
+(s/def ::user-site-data (s/keys :req-un [::name ::description ::data]))
 
 (def monolith (atom {}))
 
@@ -161,12 +167,9 @@
 (defn toggle-edit-mode 
   "Toggle edit mode" 
   []
-  (println 
-   (om/transact! 
+  (om/transact! 
     (edit-mode) 
-    (fn [dabool] [(not (first dabool))])) 
-    )
-  )
+    (fn [dabool] [(not (first dabool))])))
 
 (defn firebase-empty->clj-empty 
   "Goiing from firebase representation of empty vector to a clj empty vector" 
@@ -238,7 +241,7 @@
                    (:sites remote-map))))))))
 
 (s/fdef user-site-index 
-  :args (s/cat :uid ::authed-uid-raw :data string? :chan ::channel)
+  :args (s/cat :uid ::authed-uid-raw :site-name string? :chan ::channel)
   :ret ::channel)
 
 (defn user-site-index 
@@ -249,8 +252,10 @@
       (get-user-sites uid c) 
       (put! chan (u/index-of-key-val (<! c) :name site-name)))))
 
-(s/fdef user-site-count 
-  :args (s/cat :uid ::authed-uid-raw :data map? :chan ::channel))
+(s/fdef save-site-data 
+        :args (s/cat :uid ::authed-uid-raw 
+                     :data ::user-site-data 
+                     :idx-or-name (s/or :idx int? :site-name string?)))
 
 (defn save-site-data 
   "Save a user's site data by site name or index" 
@@ -285,12 +290,15 @@
   "Save data as a new site" 
   []
   (go 
-   (let [uid (uid)
-        c (chan)
-        _ (user-site-count (first @uid) c)
-        data (all-data)]
-    (save-site-data 
-      (first @uid) 
-      (update @data :site-name (fn [x] [(str (first x) "-" (u/uid 4))])) 
-      (<! c)))))
+    (let [uid (uid)
+          c (chan)
+          _ (user-site-count (first @uid) c)
+          data (all-data)
+          site-name (str (first (:site-name @data)) "-" (u/uid 4)) ]
+      (save-site-data 
+        (first @uid) 
+        {:name site-name
+         :description "Change me"
+         :data (update @data :site-name (fn [x] [site-name]))}
+        (<! c)))))
 
