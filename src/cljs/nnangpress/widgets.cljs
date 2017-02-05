@@ -668,7 +668,9 @@
                  (dom/b nil (str " | Username:  " (first @user-email-obs)))
                  (dom/b nil (str " | Site name:  " (first @site-name-obs) " | " ))
                  (dom/button #js {:onClick (fn [_] (mn/new-site))}
-                             "Save new site"))))))
+                             "Save new site")
+                 (dom/button #js {:onClick (fn [_] (mn/save-site-data))}
+                             "Update current site"))))))
 
 (defn select-widget-wrapper [{:keys [widget-name widget-uid] :as data} owner]
   (reify

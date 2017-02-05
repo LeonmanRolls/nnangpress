@@ -246,33 +246,44 @@
 
 (defn user-site-index 
   "Get the index of a user's site" 
-  [uid site-name chan] 
+  [uid site-name out] 
   (let [c (chan)]
     (go 
       (get-user-sites uid c) 
-      (put! chan (u/index-of-key-val (<! c) :name site-name)))))
+      (put! out (u/index-of-key-val (<! c) :name site-name)))))
 
 (s/fdef save-site-data 
-        :args (s/cat :uid ::authed-uid-raw 
-                     :data ::user-site-data 
-                     :idx-or-name (s/or :idx int? :site-name string?)))
+        :args (s/or 
+                :empty empty? 
+                :three-args (s/cat :uid ::authed-uid-raw 
+                                   :data ::user-site-data 
+                                   :idx-or-name (s/or :idx int? :site-name string?))))
 
 (defn save-site-data 
   "Save a user's site data by site name or index" 
-  [uid data idx-or-site-name]
-  (if 
-    (int? idx-or-site-name)
-    (->
-      (js/firebase.database)
-      (.ref (str "users/" uid "/sites/" idx-or-site-name))
-      (.set (clj->js data)))
-    (let [c (chan)
-          _ (user-site-index uid site-name c)]
-      (go
-        (->
-          (js/firebase.database)
-          (.ref (str "users/" uid "/sites/" (<! c)))
-          (.set (clj->js data)))))))
+  ([]
+   (let [{:keys [site-name] :as all-data} @(all-data)]
+     (save-site-data 
+       (first @(uid)) 
+       {:name (first site-name) 
+        :description "A description"
+        :data all-data}
+       (first site-name))))
+
+  ([uid data idx-or-site-name]
+   (if 
+     (int? idx-or-site-name)
+     (->
+       (js/firebase.database)
+       (.ref (str "users/" uid "/sites/" idx-or-site-name))
+       (.set (clj->js data)))
+     (let [c (chan)
+           _ (user-site-index uid idx-or-site-name c)]
+       (go
+         (->
+           (js/firebase.database)
+           (.ref (str "users/" uid "/sites/" (<! c)))
+           (.set (clj->js data))))))))
 
 (s/fdef user-site-count 
   :args (s/cat :uid ::authed-uid-raw :chan ::channel)

@@ -1,14 +1,3 @@
-            [ajax.core :refer [GET POST]]
-            [cljs.spec :as s :include-macros true]
-            [cljs.spec.test :as ts :include-macros true]
-            [clojure.walk :as wlk]))
-  (wlk/postwalk-demo testes)
-(ns nnangpress.app
-  (:import [goog.history Html5History EventType])
-  (:require-macros [cljs.core.async.macros :refer  [go go-loop]])
-  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
-            [om.dom :as dom :include-macros true]
-            [nnangpress.monolith :as mn]
             [nnangpress.navbars :as nv]
             [nnangpress.widgets :as wgt]
             [nnangpress.core :as cre]
@@ -498,3 +487,14 @@ l
     (fb/firebase-get "nangpress-data/site-name" c)
     (println "rtn" (<! c))))
 (start-repl)
+(ns nnangpress.repl
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [nnangpress.monolith :as mn]
+            [nnangpress.utils :as u]
+            [nnangpress.widgets :as wgts]
+            [nnangpress.firebase :as fb]
+            [cljs.reader :as rdr]
+            [cljs.spec :as s]
+            [cljs.spec.test :as ts :include-macros true]
+            [cljs.core.async :refer [put! chan <!]]))
+(mn/site-name)
