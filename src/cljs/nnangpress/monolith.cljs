@@ -13,7 +13,9 @@
 (s/def ::edit-mode vector?)
 (s/def ::logo-text vector?)
 (s/def ::route-widget map?)
+(s/def ::route-widgets map?)
 (s/def ::email vector?)
+(s/def ::site-name vector?)
 
 (s/def ::uid vector?)
 (s/def ::authed-uid-raw (s/and #(not (empty? %)) string?))
@@ -29,9 +31,30 @@
                                    ::logo-text
                                    ::route-widget]))
 
+(s/def ::site-data (s/keys :req-un [::all-widgets-data
+                                    ::uid
+                                    ::site-name
+                                    ::current-route
+                                    ::edit-mode
+                                    ::logo-text
+                                    ::route-widget]))
+
+(s/def ::nangpress-data (s/keys :req-un [::all-widgets-data
+                                         ::uid
+                                         ::current-route
+                                         ::edit-mode
+                                         ::logo-text
+                                         ::route-widgets
+                                         ::route-widget]))
+
 (def monolith (atom {}))
 
-(defn monolith-watcher-init [monolith]
+(set-validator! 
+  monolith
+  (fn [new-data]
+    (s/valid? ::site-data new-data)))
+
+#_(defn monolith-watcher-init [monolith]
   (add-watch monolith :watcher
              (fn  [key atom old-state new-state]
                (let [uid "SGXvf26OEpeVDQ79XIH2V71fVnT2"
@@ -138,9 +161,12 @@
 (defn toggle-edit-mode 
   "Toggle edit mode" 
   []
-  (om/transact! 
+  (println 
+   (om/transact! 
     (edit-mode) 
-    (fn [dabool] [(not (first dabool))])))
+    (fn [dabool] [(not (first dabool))])) 
+    )
+  )
 
 (defn firebase-empty->clj-empty 
   "Goiing from firebase representation of empty vector to a clj empty vector" 
@@ -172,14 +198,19 @@
         x)) 
     data))
 
+(s/fdef reset-monolith-atom 
+        :args (s/cat :data ::site-data))
+
+(defn reset-monolith-atom [data]
+  (reset! monolith data))
+
 (s/fdef nnangpress-data->monolith 
-        :args (s/cat :nnangpress-data any? :current-user any?))
+        :args (s/cat :nangpress-data ::nangpress-data :current-user any?))
 
 (defn nnangpress-data->monolith
-  "Going from system data to system + user data" 
+  "Going from system data to system + user data and setting monolith atom" 
   [nnangpress-data current-user]
-  (reset! 
-    monolith 
+  (reset-monolith-atom 
     (assoc 
       (dissoc nnangpress-data :route-widgets)  
       :uid [(if current-user (.-uid current-user) "")] 
