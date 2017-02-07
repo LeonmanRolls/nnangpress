@@ -37,9 +37,10 @@
 
 (comment
 
-(let [c (chan)]
-  (go 
-    (fb/firebase-get "nangpress-data/site-name" c)
-    (println "rtn" (<! c))))
+  (let [c (chan)]
+    (go 
+      (fb/firebase-get "nangpress-data/site-name" c)
+      (println "rtn" (<! c))))
+
   )
 

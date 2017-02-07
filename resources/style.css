@@ -182,7 +182,7 @@ p {
   text-align: left;
   height: 100%;
   padding-left: 160px;
-  margin-top: 100px;
+  margin-top: 88px;
   padding-right: 160px;
   line-height: 2;
   letter-spacing: 0.1em;
@@ -195,10 +195,10 @@ p {
   color: white;
   margin-top: 10px;
   padding: 20px;
-  border: 2px solid #c0392b;
-  text-transform: uppercase;
+  border: 2px solid #CE4072;
   font-weight: 700;
-  background-color: rgba(29,29,27,0.4);
+  background-color: rgba(29,29,27,0.9);
+  margin-bottom: 20px;
 }
 
 .box-paragraph-clear {

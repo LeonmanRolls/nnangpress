@@ -8,7 +8,8 @@
     [nnangpress.core :as cre]
     [nnangpress.routing :as rt]
     [goog.dom :as gdom]
-    [cljs.spec :as s]))
+    [cljs.spec :as s]
+    [clojure.set :as st]))
 
 (declare widget-data-type)
 
@@ -641,19 +642,198 @@
 
     om/IWillMount
     (will-mount [_]
-      (let [uid-obs (om/observe owner (mn/uid))]
-        (->
-          (js/firebase.database)
-          (.ref (str "users/" (first @uid-obs)  "/sites"))
-          (.once "value")
-          (.then (fn [snapshot]
-                   (let [remote-map (js->clj (.val snapshot) :keywordize-keys true)]
-                     (om/update! user-sites remote-map)))))))
+      (let [uid-obs (om/observe owner (mn/uid))
+            advertise? (om/get-state owner :advertise?)]
+        (when (not advertise?)
+          (->
+            (js/firebase.database)
+            (.ref (str "users/" (first @uid-obs)  "/sites"))
+            (.once "value")
+            (.then (fn [snapshot]
+                     (let [remote-map (js->clj (.val snapshot) :keywordize-keys true)]
+                       (om/update! user-sites remote-map))))))))
 
     om/IRenderState
     (render-state [_ {:keys [display-site] :as state}]
       (apply dom/div nil
              (om/build-all display-site user-sites)))))
+
+(defmethod widget-data-type 11 [_]
+  (s/keys :req-un [::widget-uid ::object-id ::widget-name ::inner-html]))
+
+(defmethod widget-data 11 [_]
+  {:widget-uid 11 
+   :object-id (u/uid)
+   :widget-name "Standard text widget"
+   :inner-html ["<p> Hi there </p>"]
+   :visible? true
+   :tags [{:tag "Entrepreneurship"} {:tag "Open Source"} {:tag "Collaboration"}
+          {:tag "PHP"} {:tag "Javascript"} {:tag "Clojure(script)"}]})
+
+(defn tag [data owner]
+  (reify 
+    om/IRender 
+    (render [_]
+      (dom/li #js {:style #js {:float "left" :background "#CE4072" :paddingRight "10px" 
+                               :paddingLeft "10px" :margin "0px"}} 
+              (:tag data)))))
+
+;Project widget
+(defmethod widget 11 [{:keys [tags visible?] :as data} owner]
+  (reify
+    om/IInitState
+    (init-state [_]
+      {:uuid (random-uuid)
+       :advertise? false})
+
+    om/IDidMount
+    (did-mount [_]
+      (let [uuid (.toString (om/get-state owner :uuid))
+            advertise? (om/get-state owner :advertise?)
+            edit-mode-obs (om/observe owner (mn/edit-mode))]
+
+        (when (and (first @edit-mode-obs) (not advertise?))
+          (js/Medium. #js {:element (.getElementById js/document uuid)
+                           :mode js/Medium.richMode
+                           :placeholder "Your Text here"
+                           :modifiers #js {:q (fn [event element]
+                                                (om/update!
+                                                  data
+                                                  :inner-html
+                                                  [(.-innerHTML (gdom/getElement uuid))]))}}))))
+
+    om/IDidUpdate
+    (did-update [_ _ _]
+      (let [uuid (.toString (om/get-state owner :uuid))
+            advertise? (om/get-state owner :advertise?)
+            edit-mode-obs (om/observe owner (mn/edit-mode))]
+
+        (when (and (first @edit-mode-obs) (not advertise?))
+          (js/Medium. #js {:element (.getElementById js/document uuid)
+                           :mode js/Medium.richMode
+                           :placeholder "Your Text here"
+                           :modifiers #js {:q (fn [event element]
+                                                (println "save!")
+                                                (om/update!
+                                                  data
+                                                  :inner-html
+                                                  [(.-innerHTML (gdom/getElement uuid))]))}}))))
+
+    om/IRenderState
+    (render-state [_ {:keys [uuid] :as state}]
+      (let [edit-mode-obs (om/observe owner (mn/edit-mode))
+            current-route-obs (om/observe owner (mn/current-route))
+            routes-map-obs (om/observe owner (mn/routes-map))
+            current-widgets (mn/current-widgets
+                              (clojure.string/split (first @current-route-obs) #"/")
+                              routes-map-obs)   
+            filter-widget? (filter (fn [x] (= 12 (get x :widget-uid)))  current-widgets)
+            selected-tags (set (reduce 
+                                 (fn [x {:keys [clicked tagz] :as y}]  
+                                   (if clicked 
+                                     (conj x tagz)
+                                     x)) 
+                                 []
+                                 (:tags (first filter-widget?))))
+            intersect? (not (empty? (st/intersection selected-tags (set (map :tag tags)))))]
+
+        (println "visible?: " visible?)
+        (println "current-widgets: " current-widgets)
+        (println "filter: " filter-widget?)
+        (println "tags: " selected-tags)
+        (println "project tags: " tags)
+        (println "interseciton: " intersect?)
+
+        (dom/div #js {:style #js {:display (if intersect? "inherit" "none")}} 
+                 (apply dom/ul #js {:style #js {:display "inline-block" :margin "0px"}} 
+                        (om/build-all tag tags))
+                 (dom/div #js {:id (.toString uuid)
+                               :style #js {:margin-top "-10px"}
+                               :className "box-paragraph"
+                               :dangerouslySetInnerHTML #js {:__html (first (:inner-html data))}}))))))
+
+(defmethod widget-data-type 12 [_]
+  (s/keys :req-un [::widget-uid ::object-id ::widget-name ::img]))
+
+(defmethod widget-data 12 [_]
+  {:widget-uid 12   
+   :object-id (u/uid)
+   :widget-name "Standard image widget"
+   :tags [{:clicked false :tagz "Entrepreneurship"}{:clicked false :tagz "Open Source"}
+          {:clicked false :tagz "Collaboration"} {:clicked false :tagz "PHP"}
+          {:clicked false :tagz "Javascript"} {:clicked false :tagz "Clojure(script)"}
+          {:clicked false :tagz "Clojure"} {:clicked false :tagz "Clojurescript"}]})
+
+(defn filter-current-route-widgets 
+  "Filter widgets that respond to tags based on selected tags" 
+  [tags owner]
+  (let [selected-tags (reduce 
+                        (fn [x {:keys [clicked tagz] :as y}]
+                          (if clicked (conj x tagz) x)) 
+                        []
+                        tags)
+        current-route-obs (mn/current-route)
+        routes-map-obs (mn/routes-map)
+        current-widgets (mn/current-widgets
+                          (clojure.string/split (first @current-route-obs) #"/")
+                          routes-map-obs)]
+
+    (om/transact! 
+      current-widgets 
+      (fn [widgets]
+        (vec
+          (map 
+            (fn [widget]
+              (let [widget-tags (map #(:tag %) (:tags widget))]
+                (if 
+                  (empty? (st/intersection (set selected-tags) (set widget-tags)))  
+                  (assoc widget :visible? false)
+                  (assoc widget :visible? true))))      
+            widgets))))))
+
+(defn select-tag 
+  "Allow selection of an individual tag" 
+  [{:keys [tagz clicked] :as data} owner]
+  (reify 
+    om/IRenderState
+    (render-state [_ {:keys [tags] :as state}]
+      (dom/li #js {:onClick (fn [_] 
+                              (om/transact! data :clicked (fn [bool] (not bool)))
+                              )
+                   :style #js {:float "left" :border "3px solid #CE4072" 
+                               :padding "5px" :margin "5px" :cursor "pointer"
+                               :background (if clicked "#CE4072" "inherit")}} 
+              tagz))))
+
+;Tag Selector
+(defmethod widget 12 [{:keys [tags] :as data} owner]
+  (reify
+    om/IInitState
+    (init-state [_]
+      {:uuid (random-uuid)
+       :advertise? false})
+
+    om/IDidUpdate
+    (did-update [_ _ _]
+      #_(filter-current-route-widgets tags owner))
+
+    om/IRenderState
+    (render-state [_ {:keys [uuid] :as state}]
+      (let [advertise? (om/get-state owner :advertise?)
+            edit-mode-obs (om/observe owner (mn/edit-mode))]
+
+        #_(filter-current-route-widgets tags owner)
+
+        (dom/div #js {:style #js {:marginBottom "10px"}} 
+                 (dom/p nil "Choose the tags you're interested in:") 
+                 (apply dom/ul #js {:style #js {:display "inline-block" :margin "0px"}}
+                        (om/build-all select-tag tags {:state {:tags tags}}))
+
+                 #_(when (and (first @edit-mode-obs) (not advertise?))
+                     (dom/input #js {:value (:img data)
+                                     :style #js {:width "100%"}
+                                     :onChange (fn [e]
+                                                 (om/update! data :img (.. e -target -value)))})))))))
 
 (defn admin-toolbar [data owner]
   (reify

@@ -1,8 +1,3 @@
-            [nnangpress.navbars :as nv]
-            [nnangpress.widgets :as wgt]
-            [nnangpress.core :as cre]
-            [nnangpress.utils :as u]
-            [nnangpress.routing :as rt]
             [cljs.reader :as rdr]
             [goog.events :as ev]
             [goog.dom :as gdom]
@@ -498,3 +493,8 @@ l
             [cljs.spec.test :as ts :include-macros true]
             [cljs.core.async :refer [put! chan <!]]))
 (mn/site-name)
+(all-data_
+)
+(all-data)
+(mn/all-data)
+(= false #{})
