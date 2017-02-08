@@ -313,3 +313,7 @@
          :data (update @data :site-name (fn [x] [site-name]))}
         (<! c)))))
 
+(defn rm-vec-by-key
+  "Remove item from cursor by a map value"
+ [] 
+  )

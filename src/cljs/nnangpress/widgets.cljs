@@ -56,6 +56,9 @@
   (input-listener 
     id  
     (fn [x] 
+      (println "data: " data)
+      (println "ikey: " ikey)
+      (println "x: " (.-innerText (.-target x))) 
       (om/update! data ikey (-> x .-target .-innerText)))))
 ;Dom Helpers ---
 
@@ -794,11 +797,13 @@
   {:widget-uid 12   
    :object-id (u/uid)
    :widget-name "Standard image widget"
-   :tags [{:clicked true :tagz "Entrepreneurship"}{:clicked true :tagz "Open Source"}
+   :tags [{:addtag true} {:clicked true :tagz "Entrepreneurship"}
+          {:clicked true :tagz "Open Source"} {:clicked true :tagz "Clojurescript"}
           {:clicked true :tagz "Collaboration"} {:clicked true :tagz "PHP"}
           {:clicked true :tagz "Javascript"} {:clicked true :tagz "Clojure(script)"}
-          {:clicked true :tagz "Clojure"} {:clicked true :tagz "Clojurescript"}
-          {:addtag true}]})
+          {:clicked true :tagz "Clojure"}]})
+
+(def default-tag {:clicked true :tagz "Change me"})
 
 (defmulti select-tag 
   "Allow selection of an individual tag"
@@ -816,27 +821,44 @@
       (content-editable-updater (om/get-state owner :uid) data :tagz))
 
     om/IRenderState
-    (render-state [_ {:keys [uid] :as state}]
+    (render-state [_ {:keys [uid tags] :as state}]
       (let [edit-mode-obs (om/observe owner (mn/edit-mode))]
-        (dom/li #js {:onClick (fn [_] 
+        (dom/li #js {:onClick (fn [x] 
+                                (.dir js/console x)
                                 (when (not (first edit-mode-obs))
                                   (om/transact! data :clicked (fn [bool] (not bool)))))
-                   :style #js {:float "left" :border "3px solid #CE4072" 
-                               :padding "5px" :margin "5px" :cursor "pointer"
-                               :background (if clicked "#CE4072" "inherit")}} 
-              (dom/p #js {:id uid :contentEditable (first edit-mode-obs)} tagz))))))
+                     :style #js {:float "left" :border "3px solid #CE4072" :position "relative"
+                                 :padding "5px" :margin "5px" :cursor "pointer"
+                                 :background (if clicked "#CE4072" "inherit")}} 
+                (when (first edit-mode-obs)
+                  (dom/img #js {:style #js {:width "20px" :right "-10px" :top "-10px" 
+                                            :position "absolute"}
+                                :src "http://www.stabilita.sk/media/image/cross-icon.png"
+                                :onClick (fn [_] 
+                                           (om/transact! 
+                                             tags 
+                                             (fn [xs]
+                                               (vec (remove #(= (:tagz %) tagz) xs)))))}))
+                (dom/p #js {:id uid :contentEditable (first edit-mode-obs)} tagz))))))
 
 (defmethod select-tag false 
   [{:keys [tagz clicked] :as data} owner]
   (reify 
     om/IRenderState
     (render-state [_ {:keys [tags] :as state}]
-      (dom/li #js {:onClick (fn [_] 
-                              #_(om/transact! data :clicked (fn [bool] (not bool))))
-                   :style #js {:float "left" :border "3px solid #CE4072" 
-                               :padding "5px" :margin "5px" :cursor "pointer"
-                               :background (if clicked "#CE4072" "inherit")}} 
-              "Add Tag +"))))
+      (let [edit-mode-obs (om/observe owner (mn/edit-mode))]
+        (if 
+          (first edit-mode-obs)
+          (dom/li #js {:onClick (fn [_] 
+                                  (om/transact! 
+                                    tags 
+                                    (fn [tags] 
+                                      (vec (conj (conj (rest tags) default-tag) (first tags))))))
+                       :style #js {:float "left" :border "3px solid #CE4072" 
+                                   :padding "5px" :margin "5px" :cursor "pointer"
+                                   :background (if clicked "#CE4072" "inherit")}} 
+                  "Add Tag +") 
+          (dom/div nil ""))))))
 
 ;Tag Selector
 (defmethod widget 12 [{:keys [tags] :as data} owner]
