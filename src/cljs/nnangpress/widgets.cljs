@@ -82,6 +82,14 @@
                                           :inner-html
                                           [(.-innerHTML (gdom/getElement uuid))]))}}))
 
+(defn ref-vec-insert-second 
+  "Transact in the second (idx 1) spot" 
+  [ref-vec new-elem]
+  (om/transact! 
+    ref-vec 
+    (fn [xs] 
+      (vec (conj (conj (rest xs) new-elem) (first xs))))))
+
 ;Medium text block
 (defmethod widget 001 [data owner]
   (reify
@@ -671,8 +679,8 @@
    :widget-name "Standard text widget"
    :inner-html ["<p> Hi there </p>"]
    :visible? true
-   :tags [{:tag "Entrepreneurship"} {:tag "Open Source"} {:tag "Collaboration"} {:tag "PHP"}
-          {:tag "Javascript"} {:tag "Clojure(script)"} {:edit true}]})
+   :tags [{:edit true} {:tag "Entrepreneurship"} {:tag "Open Source"} {:tag "Collaboration"} 
+          {:tag "PHP"} {:tag "Javascript"} {:tag "Clojure(script)"} ]})
 
 (defmulti tag 
   "Project tags"
@@ -692,9 +700,11 @@
 (defmethod tag false
   [data owner]
   (reify 
-    om/IRender 
-    (render [_]
-      (dom/li #js {:style #js {:float "left" :background "#CE4072" :paddingRight "10px" 
+    om/IRenderState
+    (render-state [_ state]
+      (dom/li #js {:onClick (fn [_] 
+                              (ref-vec-insert-second (:tags state) {:tag "Change me"}))
+                   :style #js {:float "left" :background "#CE4072" :paddingRight "10px" 
                                :paddingLeft "10px" :marginLeft "10px"}} 
               "Add Tag +"))))
 
@@ -801,6 +811,8 @@
 
                 (dom/p #js {:id uid :contentEditable (first edit-mode-obs)} tagz))))))
 
+
+
 (defmethod select-tag false 
   [{:keys [tagz clicked] :as data} owner]
   (reify 
@@ -810,10 +822,7 @@
         (if 
           (first edit-mode-obs)
           (dom/li #js {:onClick (fn [_] 
-                                  (om/transact! 
-                                    tags 
-                                    (fn [tags] 
-                                      (vec (conj (conj (rest tags) default-tag) (first tags))))))
+                                  (ref-vec-insert-second tags default-tag))
                        :style #js {:float "left" :border "3px solid #CE4072" 
                                    :padding "5px" :margin "5px" :cursor "pointer"
                                    :background (if clicked "#CE4072" "inherit")}} 
@@ -836,13 +845,7 @@
         (dom/div #js {:style #js {:marginBottom "10px"}} 
                  (dom/p nil "Choose the tags you're interested in:") 
                  (apply dom/ul #js {:style #js {:display "inline-block" :margin "0px"}}
-                        (om/build-all select-tag tags {:state {:tags tags}}))
-
-                 #_(when (and (first @edit-mode-obs) (not advertise?))
-                     (dom/input #js {:value (:img data)
-                                     :style #js {:width "100%"}
-                                     :onChange (fn [e]
-                                                 (om/update! data :img (.. e -target -value)))})))))))
+                        (om/build-all select-tag tags {:state {:tags tags}})))))))
 
 (defn admin-toolbar [data owner]
   (reify
