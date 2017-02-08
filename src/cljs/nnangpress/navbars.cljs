@@ -121,15 +121,14 @@
   (reify
     om/IInitState
     (init-state  [_]
-      {:depth 0
-       :max-depth 3
+      {:depth 1
        :str-beautify (fn [s]
                        (->
                          (subs s 1)
                          (clojure.string/replace #"-" " ")))})
 
     om/IRenderState
-    (render-state [_ {:keys [depth max-depth str-beautify] :as state}]
+    (render-state [_ {:keys [depth str-beautify] :as state}]
       (let [curr-route (first (om/observe owner (mn/current-route)))
             active? (u/string-contains? curr-route route-name)
             routes-map-obs (om/observe owner (mn/routes-map))
@@ -137,7 +136,7 @@
 
         (cond
           (= "/" route-name)
-          (apply dom/ul #js {}
+          (apply dom/ul #js {:style #js {:borderTop "1px solid white"}}
                  (concat
                    (om/build-all nav-menu children {:state {:depth (inc depth)}})
                    (when (first @edit-mode-obs)
@@ -193,7 +192,7 @@
     (render [this]
       (dom/div #js {:id "the-nav" :className "main-nav"}
 
-               (dom/div #js {:className "nav-aux"}
+               #_(dom/div #js {:className "nav-aux"}
                         (om/build nav-hint {}))
 
                (dom/div #js {:className "nav-menu"

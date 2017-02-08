@@ -36,6 +36,28 @@
    :widget-name "Standard text widget"
    :inner-html ["<p> Hi there </p>"]})
 
+;Dom Helpers ---
+(defn get-node-by-id 
+  "Get a dom node by id" 
+  [id]
+  (js/document.getElementById id))
+
+(defn input-listener 
+  "Listen to an input event on a contentEditable element" 
+  [id cb]
+  (-> 
+    (get-node-by-id id)
+    (.addEventListener "input" cb)))
+
+(defn content-editable-updater 
+  "Update cursor given the id of the corresponding contentEditable node" 
+  [id data ikey]
+  (input-listener 
+    id  
+    (fn [x] 
+      (om/update! data ikey (-> x .-target .-innerText)))))
+;Dom Helpers ---
+
 ;Medium text block
 (defmethod widget 001 [data owner]
   (reify
@@ -120,13 +142,13 @@
     (did-mount [_]
       (let [uid (om/get-state owner :uid)
             slider-init (om/get-state owner :slider-init)]
-        (slider-init uid)))
+        #_(slider-init uid)))
 
     om/IDidUpdate
     (did-update [_ _ _]
       (let [uid (om/get-state owner :uid)
             slider-init (om/get-state owner :slider-init)]
-        (slider-init uid)))
+        #_(slider-init uid)))
 
     om/IRenderState
     (render-state [_ {:keys [uid img-partial default-img advertise?] :as state}]
@@ -667,16 +689,50 @@
    :widget-name "Standard text widget"
    :inner-html ["<p> Hi there </p>"]
    :visible? true
-   :tags [{:tag "Entrepreneurship"} {:tag "Open Source"} {:tag "Collaboration"}
-          {:tag "PHP"} {:tag "Javascript"} {:tag "Clojure(script)"}]})
+   :tags [{:tag "Entrepreneurship"} {:tag "Open Source"} {:tag "Collaboration"} {:tag "PHP"}
+          {:tag "Javascript"} {:tag "Clojure(script)"} {:edit true}]})
 
-(defn tag [data owner]
+(defmulti tag 
+  "Project tags"
+  (fn [data owner] (contains? data :tag)))
+
+(defmethod tag true
+  [data owner]
   (reify 
     om/IRender 
     (render [_]
       (dom/li #js {:style #js {:float "left" :background "#CE4072" :paddingRight "10px" 
                                :paddingLeft "10px" :margin "0px"}} 
               (:tag data)))))
+
+(defmethod tag false
+  [data owner]
+  (reify 
+    om/IRender 
+    (render [_]
+      (dom/li #js {:style #js {:float "left" :background "#CE4072" :paddingRight "10px" 
+                               :paddingLeft "10px" :marginLeft "10px"}} 
+              "Add Tag +"))))
+
+(defn tag-intersect? 
+  "Check if a widget's tags intersect with tags chosen by a tag filter widget" 
+  [owner tags]
+  (let [current-route-obs (om/observe owner (mn/current-route))
+        routes-map-obs (om/observe owner (mn/routes-map))
+        current-widgets (mn/current-widgets
+                          (clojure.string/split (first @current-route-obs) #"/")
+                          routes-map-obs)   
+        filter-widget? (filter (fn [x] (= 12 (get x :widget-uid)))  current-widgets)
+        selected-tags (set 
+                        (reduce 
+                          (fn [x {:keys [clicked tagz] :as y}]  
+                            (if clicked 
+                              (conj x tagz)
+                              x)) 
+                          []
+                          (:tags (first filter-widget?))))
+        intersect? (not (empty? (st/intersection selected-tags (set (map :tag tags)))))]
+    intersect?))
 
 ;Project widget
 (defmethod widget 11 [{:keys [tags visible?] :as data} owner]
@@ -713,7 +769,6 @@
                            :mode js/Medium.richMode
                            :placeholder "Your Text here"
                            :modifiers #js {:q (fn [event element]
-                                                (println "save!")
                                                 (om/update!
                                                   data
                                                   :inner-html
@@ -721,30 +776,9 @@
 
     om/IRenderState
     (render-state [_ {:keys [uuid] :as state}]
-      (let [edit-mode-obs (om/observe owner (mn/edit-mode))
-            current-route-obs (om/observe owner (mn/current-route))
-            routes-map-obs (om/observe owner (mn/routes-map))
-            current-widgets (mn/current-widgets
-                              (clojure.string/split (first @current-route-obs) #"/")
-                              routes-map-obs)   
-            filter-widget? (filter (fn [x] (= 12 (get x :widget-uid)))  current-widgets)
-            selected-tags (set (reduce 
-                                 (fn [x {:keys [clicked tagz] :as y}]  
-                                   (if clicked 
-                                     (conj x tagz)
-                                     x)) 
-                                 []
-                                 (:tags (first filter-widget?))))
-            intersect? (not (empty? (st/intersection selected-tags (set (map :tag tags)))))]
+      (let [edit-mode-obs (om/observe owner (mn/edit-mode))]
 
-        (println "visible?: " visible?)
-        (println "current-widgets: " current-widgets)
-        (println "filter: " filter-widget?)
-        (println "tags: " selected-tags)
-        (println "project tags: " tags)
-        (println "interseciton: " intersect?)
-
-        (dom/div #js {:style #js {:display (if intersect? "inherit" "none")}} 
+        (dom/div #js {:style #js {:display (if (tag-intersect? owner tags) "inherit" "none")}} 
                  (apply dom/ul #js {:style #js {:display "inline-block" :margin "0px"}} 
                         (om/build-all tag tags))
                  (dom/div #js {:id (.toString uuid)
@@ -759,51 +793,47 @@
   {:widget-uid 12   
    :object-id (u/uid)
    :widget-name "Standard image widget"
-   :tags [{:clicked false :tagz "Entrepreneurship"}{:clicked false :tagz "Open Source"}
-          {:clicked false :tagz "Collaboration"} {:clicked false :tagz "PHP"}
-          {:clicked false :tagz "Javascript"} {:clicked false :tagz "Clojure(script)"}
-          {:clicked false :tagz "Clojure"} {:clicked false :tagz "Clojurescript"}]})
+   :tags [{:clicked true :tagz "Entrepreneurship"}{:clicked true :tagz "Open Source"}
+          {:clicked true :tagz "Collaboration"} {:clicked true :tagz "PHP"}
+          {:clicked true :tagz "Javascript"} {:clicked true :tagz "Clojure(script)"}
+          {:clicked true :tagz "Clojure"} {:clicked true :tagz "Clojurescript"}
+          {:addtag true}]})
 
-(defn filter-current-route-widgets 
-  "Filter widgets that respond to tags based on selected tags" 
-  [tags owner]
-  (let [selected-tags (reduce 
-                        (fn [x {:keys [clicked tagz] :as y}]
-                          (if clicked (conj x tagz) x)) 
-                        []
-                        tags)
-        current-route-obs (mn/current-route)
-        routes-map-obs (mn/routes-map)
-        current-widgets (mn/current-widgets
-                          (clojure.string/split (first @current-route-obs) #"/")
-                          routes-map-obs)]
+(defmulti select-tag 
+  "Allow selection of an individual tag"
+  (fn [data owner] (contains? data :tagz)))
 
-    (om/transact! 
-      current-widgets 
-      (fn [widgets]
-        (vec
-          (map 
-            (fn [widget]
-              (let [widget-tags (map #(:tag %) (:tags widget))]
-                (if 
-                  (empty? (st/intersection (set selected-tags) (set widget-tags)))  
-                  (assoc widget :visible? false)
-                  (assoc widget :visible? true))))      
-            widgets))))))
+(defmethod select-tag true 
+  [{:keys [tagz clicked] :as data} owner]
+  (reify 
+    om/IInitState 
+    (init-state [_]
+      {:uid (u/uid)})
 
-(defn select-tag 
-  "Allow selection of an individual tag" 
+    om/IDidMount 
+    (did-mount [_]
+      (content-editable-updater (om/get-state owner :uid) data :tagz))
+
+    om/IRenderState
+    (render-state [_ {:keys [uid] :as state}]
+      (dom/li #js {:onClick (fn [_] 
+                              (om/transact! data :clicked (fn [bool] (not bool))))
+                   :style #js {:float "left" :border "3px solid #CE4072" 
+                               :padding "5px" :margin "5px" :cursor "pointer"
+                               :background (if clicked "#CE4072" "inherit")}} 
+              (dom/p #js {:id uid :contentEditable true} tagz)))))
+
+(defmethod select-tag false 
   [{:keys [tagz clicked] :as data} owner]
   (reify 
     om/IRenderState
     (render-state [_ {:keys [tags] :as state}]
       (dom/li #js {:onClick (fn [_] 
-                              (om/transact! data :clicked (fn [bool] (not bool)))
-                              )
+                              #_(om/transact! data :clicked (fn [bool] (not bool))))
                    :style #js {:float "left" :border "3px solid #CE4072" 
                                :padding "5px" :margin "5px" :cursor "pointer"
                                :background (if clicked "#CE4072" "inherit")}} 
-              tagz))))
+              "Add Tag +"))))
 
 ;Tag Selector
 (defmethod widget 12 [{:keys [tags] :as data} owner]
@@ -813,16 +843,10 @@
       {:uuid (random-uuid)
        :advertise? false})
 
-    om/IDidUpdate
-    (did-update [_ _ _]
-      #_(filter-current-route-widgets tags owner))
-
     om/IRenderState
     (render-state [_ {:keys [uuid] :as state}]
       (let [advertise? (om/get-state owner :advertise?)
             edit-mode-obs (om/observe owner (mn/edit-mode))]
-
-        #_(filter-current-route-widgets tags owner)
 
         (dom/div #js {:style #js {:marginBottom "10px"}} 
                  (dom/p nil "Choose the tags you're interested in:") 

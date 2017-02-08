@@ -1,5 +1,3 @@
-            [cljs.reader :as rdr]
-            [goog.events :as ev]
             [goog.dom :as gdom]
             [ajax.core :refer [GET POST]]
             [cljs.spec :as s :include-macros true]
@@ -498,3 +496,5 @@ l
 (all-data)
 (mn/all-data)
 (= false #{})
+(tag)
+tag
