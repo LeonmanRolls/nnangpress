@@ -689,24 +689,44 @@
 (defmethod tag true
   [data owner]
   (reify 
+    om/IInitState 
+    (init-state [_]
+      {:uid (u/uid)})
+
+    om/IDidMount 
+    (did-mount [_]
+      (content-editable-updater (om/get-state owner :uid) data :tag))
+
     om/IRenderState 
-    (render-state [_ state]
+    (render-state [_ {:keys [uid tags] :as state}]
       (let [edit-mode-obs (om/observe owner (mn/edit-mode))]
         (dom/li #js {:style #js {:float "left" :background "#CE4072" :paddingRight "10px" 
                                  :paddingLeft "10px" :margin "0px" :position "relative"}} 
-                (when (first edit-mode-obs) (delete-img (:tags state) :tag (:tag data)))
-                (:tag data))))))
+                (when (first edit-mode-obs) (delete-img tags :tag (:tag data)))
+
+                (dom/p #js {:id uid :contentEditable (first edit-mode-obs)} (:tag data)))))))
+
+(defn edit-mode-sense 
+  "Display empty div or what you feed me" 
+  [owner food]
+  (let [edit-mode-obs (om/observe owner (mn/edit-mode))]
+    (if 
+      (first edit-mode-obs)
+      food 
+      (dom/div nil ""))))
 
 (defmethod tag false
   [data owner]
   (reify 
     om/IRenderState
     (render-state [_ state]
-      (dom/li #js {:onClick (fn [_] 
-                              (ref-vec-insert-second (:tags state) {:tag "Change me"}))
-                   :style #js {:float "left" :background "#CE4072" :paddingRight "10px" 
-                               :paddingLeft "10px" :marginLeft "10px"}} 
-              "Add Tag +"))))
+      (edit-mode-sense 
+        owner
+        (dom/li #js {:onClick (fn [_] 
+                                (ref-vec-insert-second (:tags state) {:tag "Change me"}))
+                     :style #js {:float "left" :background "#CE4072" :paddingRight "10px" 
+                                 :paddingLeft "10px" :marginRight "10px"}} 
+                "Add Tag +")))))
 
 (defn tag-intersect? 
   "Check if a widget's tags intersect with tags chosen by a tag filter widget" 
@@ -818,16 +838,14 @@
   (reify 
     om/IRenderState
     (render-state [_ {:keys [tags] :as state}]
-      (let [edit-mode-obs (om/observe owner (mn/edit-mode))]
-        (if 
-          (first edit-mode-obs)
-          (dom/li #js {:onClick (fn [_] 
-                                  (ref-vec-insert-second tags default-tag))
-                       :style #js {:float "left" :border "3px solid #CE4072" 
-                                   :padding "5px" :margin "5px" :cursor "pointer"
-                                   :background (if clicked "#CE4072" "inherit")}} 
-                  "Add Tag +") 
-          (dom/div nil ""))))))
+      (edit-mode-sense 
+        owner
+        (dom/li #js {:onClick (fn [_] 
+                                (ref-vec-insert-second tags default-tag))
+                     :style #js {:float "left" :border "3px solid #CE4072" 
+                                 :padding "5px" :margin "5px" :cursor "pointer"
+                                 :background (if clicked "#CE4072" "inherit")}} 
+                "Add Tag +")))))
 
 ;Tag Selector
 (defmethod widget 12 [{:keys [tags] :as data} owner]
