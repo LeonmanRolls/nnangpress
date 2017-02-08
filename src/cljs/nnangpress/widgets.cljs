@@ -90,6 +90,23 @@
     (fn [xs] 
       (vec (conj (conj (rest xs) new-elem) (first xs))))))
 
+(defn edit-mode-sense 
+  "Display empty div or what you feed me" 
+  [owner food]
+  (let [edit-mode-obs (om/observe owner (mn/edit-mode))]
+    (if 
+      (first edit-mode-obs)
+      food 
+      (dom/div nil ""))))
+
+(defn current-widgets-builder [owner]
+  (let [routes-map-obs (om/observe owner (mn/routes-map))
+        current-route-obs (om/observe owner (mn/current-route))
+        current-widgets (mn/current-widgets
+                          (clojure.string/split (first @current-route-obs) #"/")
+                          routes-map-obs)]
+    current-widgets))
+
 ;Medium text block
 (defmethod widget 001 [data owner]
   (reify
@@ -706,14 +723,7 @@
 
                 (dom/p #js {:id uid :contentEditable (first edit-mode-obs)} (:tag data)))))))
 
-(defn edit-mode-sense 
-  "Display empty div or what you feed me" 
-  [owner food]
-  (let [edit-mode-obs (om/observe owner (mn/edit-mode))]
-    (if 
-      (first edit-mode-obs)
-      food 
-      (dom/div nil ""))))
+
 
 (defmethod tag false
   [data owner]
@@ -886,11 +896,7 @@
   (reify
     om/IRender
     (render [_]
-      (let [routes-map-obs (om/observe owner (mn/routes-map))
-            current-route-obs (om/observe owner (mn/current-route))
-            current-widgets (mn/current-widgets
-                              (clojure.string/split (first @current-route-obs) #"/")
-                              routes-map-obs)]
+      (let [current-widgets (current-widgets-builder owner)]
 
         (dom/div #js {:className "selectWidget"}
                  widget-name
@@ -905,17 +911,13 @@
   (reify
     om/IRender
     (render [_]
-      (let [edit-mode-obs (om/observe owner (mn/edit-mode))
-            routes-map-obs (om/observe owner (mn/routes-map))
-            current-route-obs (om/observe owner (mn/current-route))
-            current-widgets (mn/current-widgets
-                              (clojure.string/split (first @current-route-obs) #"/")
-                              routes-map-obs)]
-        (dom/div nil
-                 (when (first @edit-mode-obs)
-                   (dom/button #js{:onClick (fn [_]
-                                              (ref-vec-map-delete 
-                                                current-widgets :object-id object-id))}
-                               "Delete"))
-                 (om/build widget data))))))
+      (dom/div nil
+               (edit-mode-sense 
+                 owner
+                 (dom/button #js{:onClick (fn [_]
+                                            (ref-vec-map-delete 
+                                              (current-widgets-builder owner)
+                                              :object-id object-id))}
+                             "Delete"))
+               (om/build widget data)))))
 
