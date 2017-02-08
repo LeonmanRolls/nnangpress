@@ -49,6 +49,7 @@
     (get-node-by-id id)
     (.addEventListener "input" cb)))
 
+;Move to monolith
 (defn content-editable-updater 
   "Update cursor given the id of the corresponding contentEditable node" 
   [id data ikey]
@@ -816,12 +817,14 @@
 
     om/IRenderState
     (render-state [_ {:keys [uid] :as state}]
-      (dom/li #js {:onClick (fn [_] 
-                              (om/transact! data :clicked (fn [bool] (not bool))))
+      (let [edit-mode-obs (om/observe owner (mn/edit-mode))]
+        (dom/li #js {:onClick (fn [_] 
+                                (when (not (first edit-mode-obs))
+                                  (om/transact! data :clicked (fn [bool] (not bool)))))
                    :style #js {:float "left" :border "3px solid #CE4072" 
                                :padding "5px" :margin "5px" :cursor "pointer"
                                :background (if clicked "#CE4072" "inherit")}} 
-              (dom/p #js {:id uid :contentEditable true} tagz)))))
+              (dom/p #js {:id uid :contentEditable (first edit-mode-obs)} tagz))))))
 
 (defmethod select-tag false 
   [{:keys [tagz clicked] :as data} owner]
