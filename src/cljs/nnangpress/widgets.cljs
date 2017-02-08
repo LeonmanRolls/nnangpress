@@ -36,7 +36,6 @@
    :widget-name "Standard text widget"
    :inner-html ["<p> Hi there </p>"]})
 
-;Dom Helpers ---
 (defn get-node-by-id 
   "Get a dom node by id" 
   [id]
@@ -49,18 +48,39 @@
     (get-node-by-id id)
     (.addEventListener "input" cb)))
 
-;Move to monolith
 (defn content-editable-updater 
   "Update cursor given the id of the corresponding contentEditable node" 
   [id data ikey]
   (input-listener 
     id  
     (fn [x] 
-      (println "data: " data)
-      (println "ikey: " ikey)
-      (println "x: " (.-innerText (.-target x))) 
       (om/update! data ikey (-> x .-target .-innerText)))))
-;Dom Helpers ---
+
+(defn ref-vec-map-delete 
+  "Givec a cursor vector, remove an element based on the val of a map in the vector" 
+  [vec-ref ikey match-val]
+  (om/transact! vec-ref 
+                (fn [xs]
+                  (vec (remove #(= (ikey %) match-val) xs)))))
+
+(defn delete-img 
+  "Add a delete button to the component, parent must be position relative"
+  [vec-ref ikey match-val]
+  (dom/img #js {:style #js {:width "20px" :right "-10px" :top "-10px" 
+                            :position "absolute"}
+                :src "http://www.stabilita.sk/media/image/cross-icon.png"
+                :onClick (fn [_] 
+                           (ref-vec-map-delete vec-ref ikey match-val))}))
+
+(defn medium-init [uuid data]
+  (js/Medium. #js {:element (.getElementById js/document uuid)
+                   :mode js/Medium.richMode
+                   :placeholder "Your Text here"
+                   :modifiers #js {:q (fn [event element]
+                                        (om/update!
+                                          data
+                                          :inner-html
+                                          [(.-innerHTML (gdom/getElement uuid))]))}}))
 
 ;Medium text block
 (defmethod widget 001 [data owner]
@@ -77,14 +97,7 @@
             edit-mode-obs (om/observe owner (mn/edit-mode))]
 
         (when (and (first @edit-mode-obs) (not advertise?))
-          (js/Medium. #js {:element (.getElementById js/document uuid)
-                           :mode js/Medium.richMode
-                           :placeholder "Your Text here"
-                           :modifiers #js {:q (fn [event element]
-                                                (om/update!
-                                                  data
-                                                  :inner-html
-                                                  [(.-innerHTML (gdom/getElement uuid))]))}}))))
+          (medium-init uuid data))))
 
     om/IDidUpdate
     (did-update [_ _ _]
@@ -93,14 +106,7 @@
             edit-mode-obs (om/observe owner (mn/edit-mode))]
 
         (when (and (first @edit-mode-obs) (not advertise?))
-          (js/Medium. #js {:element (.getElementById js/document uuid)
-                           :mode js/Medium.richMode
-                           :placeholder "Your Text here"
-                           :modifiers #js {:q (fn [event element]
-                                                (om/update!
-                                                  data
-                                                  :inner-html
-                                                  [(.-innerHTML (gdom/getElement uuid))]))}}))))
+          (medium-init uuid data))))
 
     om/IRenderState
     (render-state [_ {:keys [uuid] :as state}]
@@ -220,14 +226,7 @@
             edit-mode-obs (om/observe owner (mn/edit-mode))]
 
         (when (and (first @edit-mode-obs) (not advertise?))
-          (js/Medium. #js {:element (.getElementById js/document uuid)
-                           :mode js/Medium.richMode
-                           :placeholder "Your Text here"
-                           :modifiers #js {:q (fn [event element]
-                                                (om/update!
-                                                  data
-                                                  :inner-html
-                                                  [(.-innerHTML (gdom/getElement uuid))]))}}))))
+          (medium-init uuid data))))
 
     om/IDidUpdate
     (did-update [_ _ _]
@@ -236,14 +235,7 @@
             edit-mode-obs (om/observe owner (mn/edit-mode))]
 
         (when (and (first @edit-mode-obs) (not advertise?))
-          (js/Medium. #js {:element (.getElementById js/document uuid)
-                           :mode js/Medium.richMode
-                           :placeholder "Your Text here"
-                           :modifiers #js {:q (fn [event element]
-                                                (om/update!
-                                                  data
-                                                  :inner-html
-                                                  [(.-innerHTML (gdom/getElement uuid))]))}}))))
+          (medium-init uuid data))))
 
     om/IRenderState
     (render-state [_ {:keys [uuid] :as state}]
@@ -344,14 +336,7 @@
             edit-mode-obs (om/observe owner (mn/edit-mode))]
 
         (when (and (first @edit-mode-obs) (not advertise?))
-          (js/Medium. #js {:element (.getElementById js/document uuid)
-                           :mode js/Medium.richMode
-                           :placeholder "Your Text here"
-                           :modifiers #js {:q (fn [event element]
-                                                (om/update!
-                                                  data
-                                                  :inner-html
-                                                  [(.-innerHTML (gdom/getElement uuid))]))}}))))
+          (medium-init uuid data))))
 
     om/IDidUpdate
     (did-update [_ _ _]
@@ -360,14 +345,7 @@
             edit-mode-obs (om/observe owner (mn/edit-mode))]
 
         (when (and (first @edit-mode-obs) (not advertise?))
-          (js/Medium. #js {:element (.getElementById js/document uuid)
-                           :mode js/Medium.richMode
-                           :placeholder "Your Text here"
-                           :modifiers #js {:q (fn [event element]
-                                                (om/update!
-                                                  data
-                                                  :inner-html
-                                                  [(.-innerHTML (gdom/getElement uuid))]))}}))))
+          (medium-init uuid data))))
 
     om/IRenderState
     (render-state [_ {:keys [uuid] :as state}]
@@ -703,11 +681,13 @@
 (defmethod tag true
   [data owner]
   (reify 
-    om/IRender 
-    (render [_]
-      (dom/li #js {:style #js {:float "left" :background "#CE4072" :paddingRight "10px" 
-                               :paddingLeft "10px" :margin "0px"}} 
-              (:tag data)))))
+    om/IRenderState 
+    (render-state [_ state]
+      (let [edit-mode-obs (om/observe owner (mn/edit-mode))]
+        (dom/li #js {:style #js {:float "left" :background "#CE4072" :paddingRight "10px" 
+                                 :paddingLeft "10px" :margin "0px" :position "relative"}} 
+                (when (first edit-mode-obs) (delete-img (:tags state) :tag (:tag data)))
+                (:tag data))))))
 
 (defmethod tag false
   [data owner]
@@ -753,14 +733,7 @@
             edit-mode-obs (om/observe owner (mn/edit-mode))]
 
         (when (and (first @edit-mode-obs) (not advertise?))
-          (js/Medium. #js {:element (.getElementById js/document uuid)
-                           :mode js/Medium.richMode
-                           :placeholder "Your Text here"
-                           :modifiers #js {:q (fn [event element]
-                                                (om/update!
-                                                  data
-                                                  :inner-html
-                                                  [(.-innerHTML (gdom/getElement uuid))]))}}))))
+          (medium-init uuid data))))
 
     om/IDidUpdate
     (did-update [_ _ _]
@@ -769,14 +742,7 @@
             edit-mode-obs (om/observe owner (mn/edit-mode))]
 
         (when (and (first @edit-mode-obs) (not advertise?))
-          (js/Medium. #js {:element (.getElementById js/document uuid)
-                           :mode js/Medium.richMode
-                           :placeholder "Your Text here"
-                           :modifiers #js {:q (fn [event element]
-                                                (om/update!
-                                                  data
-                                                  :inner-html
-                                                  [(.-innerHTML (gdom/getElement uuid))]))}}))))
+          (medium-init uuid data))))
 
     om/IRenderState
     (render-state [_ {:keys [uuid] :as state}]
@@ -784,7 +750,7 @@
 
         (dom/div #js {:style #js {:display (if (tag-intersect? owner tags) "inherit" "none")}} 
                  (apply dom/ul #js {:style #js {:display "inline-block" :margin "0px"}} 
-                        (om/build-all tag tags))
+                        (om/build-all tag tags {:state {:tags tags}}))
                  (dom/div #js {:id (.toString uuid)
                                :style #js {:margin-top "-10px"}
                                :className "box-paragraph"
@@ -824,21 +790,15 @@
     (render-state [_ {:keys [uid tags] :as state}]
       (let [edit-mode-obs (om/observe owner (mn/edit-mode))]
         (dom/li #js {:onClick (fn [x] 
-                                (.dir js/console x)
                                 (when (not (first edit-mode-obs))
                                   (om/transact! data :clicked (fn [bool] (not bool)))))
                      :style #js {:float "left" :border "3px solid #CE4072" :position "relative"
                                  :padding "5px" :margin "5px" :cursor "pointer"
                                  :background (if clicked "#CE4072" "inherit")}} 
+
                 (when (first edit-mode-obs)
-                  (dom/img #js {:style #js {:width "20px" :right "-10px" :top "-10px" 
-                                            :position "absolute"}
-                                :src "http://www.stabilita.sk/media/image/cross-icon.png"
-                                :onClick (fn [_] 
-                                           (om/transact! 
-                                             tags 
-                                             (fn [xs]
-                                               (vec (remove #(= (:tagz %) tagz) xs)))))}))
+                  (delete-img tags :tagz tagz))
+
                 (dom/p #js {:id uid :contentEditable (first edit-mode-obs)} tagz))))))
 
 (defmethod select-tag false 
@@ -933,10 +893,8 @@
         (dom/div nil
                  (when (first @edit-mode-obs)
                    (dom/button #js{:onClick (fn [_]
-                                              (om/transact!
-                                                current-widgets
-                                                (fn [x]
-                                                  (vec (remove #(= (:object-id %) object-id) x)))))}
+                                              (ref-vec-map-delete 
+                                                current-widgets :object-id object-id))}
                                "Delete"))
                  (om/build widget data))))))
 
