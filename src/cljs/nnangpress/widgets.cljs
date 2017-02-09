@@ -23,6 +23,7 @@
 (s/def ::user-sites vector?)
 (s/def ::widget-data (s/multi-spec widget-data-type :widget-uid))
 
+;js node helpers ---
 (defn get-node-by-id 
   "Get a dom node by id" 
   [id]
@@ -34,6 +35,15 @@
   (-> 
     (get-node-by-id id)
     (.addEventListener "input" cb)))
+
+(defn attach-click-listener-by-id 
+  "Attach a click clistener to a node" 
+  [id cb]
+  (-> 
+    js/document 
+    (.getElementById id)
+    (.addEventListener "click" cb)))
+;js node helpers ---
 
 (defn content-editable-updater 
   "Update cursor given the id of the corresponding contentEditable node" 
@@ -63,11 +73,16 @@
   (js/Medium. #js {:element (.getElementById js/document uuid)
                    :mode js/Medium.richMode
                    :placeholder "Your Text here"
+                   :attributes nil
+                   :tags nil
+                   :pasteAsTExt false
                    :modifiers #js {:q (fn [event element]
                                         (om/update!
                                           data
                                           :inner-html
-                                          [(.-innerHTML (gdom/getElement uuid))]))}}))
+                                          [(.-innerHTML (gdom/getElement uuid))]))}})
+  
+  )
 
 (defn ref-vec-insert-second 
   "Transact in the second (idx 1) spot" 
@@ -769,26 +784,45 @@
   (reify
     om/IInitState
     (init-state [_]
-      {:uuid (random-uuid)
+      {:uuid (u/uid)
        :advertise? false})
 
     om/IDidMount
     (did-mount [_]
-      (let [uuid (.toString (om/get-state owner :uuid))
+      (let [uuid (om/get-state owner :uuid)
             advertise? (om/get-state owner :advertise?)
-            edit-mode-obs (om/observe owner (mn/edit-mode))]
+            edit-mode-obs (om/observe owner (mn/edit-mode))
+            article (.getElementById js/document uuid)
+            medium (medium-init uuid data)]
 
-        (when (and (first @edit-mode-obs) (not advertise?))
-          (medium-init uuid data))))
+        (set! 
+          (.-highlight article) 
+          (fn []
+            (when 
+              (not (= (.-activeElement js/document) article))
+              (.select medium))))
+
+        (attach-click-listener-by-id 
+         "asdfg" 
+          (fn []
+            (do 
+(.focus medium)
+              (.invokeElement 
+                medium
+                "b"
+                #js {:title "I am Groot"
+                     :style "color: #66d9ef"} 
+                )
+              )
+            ) 
+          )    
+        ))
 
     om/IDidUpdate
     (did-update [_ _ _]
       (let [uuid (.toString (om/get-state owner :uuid))
             advertise? (om/get-state owner :advertise?)
-            edit-mode-obs (om/observe owner (mn/edit-mode))]
-
-        (when (and (first @edit-mode-obs) (not advertise?))
-          (medium-init uuid data))))
+            edit-mode-obs (om/observe owner (mn/edit-mode))]))
 
     om/IRenderState
     (render-state [_ {:keys [uuid] :as state}]
@@ -797,10 +831,16 @@
         (dom/div #js {:style #js {:display (if (tag-intersect? owner tags) "inherit" "none")}} 
                  (apply dom/ul #js {:style #js {:display "inline-block" :margin "0px"}} 
                         (om/build-all tag tags {:state {:tags tags}}))
-                 (dom/div #js {:id (.toString uuid)
-                               :style #js {:margin-top "-10px"}
-                               :className "box-paragraph"
-                               :dangerouslySetInnerHTML #js {:__html (first (:inner-html data))}}))))))
+                 (dom/div #js {:id uuid
+                               :style #js {:marginTop "-10px"}
+                              ; :className "box-paragraph"
+                               :dangerouslySetInnerHTML #js {:__html (first (:inner-html data))}})
+                 (dom/div nil 
+                          (dom/button #js{:id "asdfg"} "Link") 
+                          (dom/button nil "List") 
+                          (dom/button nil "Image") 
+                          ) 
+                 )))))
 
 (defmethod widget-data-type 12 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::img]))
@@ -846,8 +886,6 @@
                   (delete-img tags :tagz tagz))
 
                 (dom/p #js {:id uid :contentEditable (first edit-mode-obs)} tagz))))))
-
-
 
 (defmethod select-tag false 
   [{:keys [tagz clicked] :as data} owner]
