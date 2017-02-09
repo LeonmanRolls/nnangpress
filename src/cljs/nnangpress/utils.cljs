@@ -40,3 +40,7 @@
   ([] (.toString (random-uuid))) 
   ([length] (subs (.toString (random-uuid)) 0 length)))
 
+(defn vec-swap 
+  "Swap two elements inside a vector" 
+  [v i1 i2] 
+  (assoc v i2 (v i1) i1 (v i2)))­

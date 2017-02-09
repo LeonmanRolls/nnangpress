@@ -313,7 +313,8 @@
          :data (update @data :site-name (fn [x] [site-name]))}
         (<! c)))))
 
-(defn rm-vec-by-key
-  "Remove item from cursor by a map value"
- [] 
-  )
+(defn ref-vec-swap 
+  "Swap two elements of a vector cursor" 
+  [cursor idx1 idx2]
+  (om/transact! cursor (fn [xs] (u/vec-swap xs idx1 idx2))))
+

@@ -20,6 +20,24 @@
 
 (enable-console-print!)
 
+(defn simple-form 
+  "Inputs and submit, input values will be passed to callback" 
+  [cb]
+  (let [uid1 (u/uid) 
+        uid2 (u/uid)]
+    (dom/div nil
+             "Widget Order: "
+             (dom/input #js {:id uid1 
+                             :type "text"})
+             (dom/input #js {:id uid2 
+                             :type "text"})
+
+             (dom/button #js {:onClick (fn [_]
+                                         (cb 
+                                           (.-value (wgt/get-node-by-id uid1))
+                                           (.-value (wgt/get-node-by-id uid2))))} 
+                         "Submit"))))
+
 (defn main-view [data owner]
   (reify
     om/IInitState
@@ -56,15 +74,19 @@
                  (when (first @edit-mode-obs)
                    (dom/div #js {:className "edit"}
 
+                            (simple-form (fn [x y] 
+                                           (mn/ref-vec-swap 
+                                             (:widgets current-route-map) (int x) (int y))))
+
                             (dom/div nil
-                            "Background Image: "
-                            (dom/input #js {:value (:bg-img @current-route-map)
-                                            :style #js {:width "100%"}
-                                            :onChange (fn [e]
-                                                        (om/update!
-                                                          current-route-map
-                                                          :bg-img
-                                                          (.. e -target -value)))}))
+                                     "Background Image: "
+                                     (dom/input #js {:value (:bg-img @current-route-map)
+                                                     :style #js {:width "100%"}
+                                                     :onChange (fn [e]
+                                                                 (om/update!
+                                                                   current-route-map
+                                                                   :bg-img
+                                                                   (.. e -target -value)))}))
 
                             (apply dom/div nil
                                    (om/build-all
@@ -119,7 +141,6 @@
                               (clojure.string/split (first current-route) #"/")
                               (:routes-map route-widget))]
 
-        #_(om/update! active-route @fresh-active-route)
         (set-bg-img bg-img)
         (if
           (:grey-bg? fresh-active-route)

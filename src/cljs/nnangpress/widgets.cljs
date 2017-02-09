@@ -23,19 +23,6 @@
 (s/def ::user-sites vector?)
 (s/def ::widget-data (s/multi-spec widget-data-type :widget-uid))
 
-(defmulti widget-data-type :widget-uid)
-(defmulti widget-data (fn [x] x))
-(defmulti widget (fn [data owner] (:widget-uid data)))
-
-(defmethod widget-data-type 1 [_]
-  (s/keys :req-un [::widget-uid ::object-id ::widget-name ::inner-html]))
-
-(defmethod widget-data 001 [_]
-  {:widget-uid 001
-   :object-id (u/uid)
-   :widget-name "Standard text widget"
-   :inner-html ["<p> Hi there </p>"]})
-
 (defn get-node-by-id 
   "Get a dom node by id" 
   [id]
@@ -106,6 +93,25 @@
                           (clojure.string/split (first @current-route-obs) #"/")
                           routes-map-obs)]
     current-widgets))
+
+(defn ref-conj 
+  "Conj a reference curosr"
+  [ref-cur subject]
+  (om/transact! ref-cur (fn [x] (conj x subject))))
+
+(defmulti widget-data-type :widget-uid)
+(defmulti widget-data (fn [x] x))
+(defmulti widget (fn [data owner] (:widget-uid data)))
+
+(defmethod widget-data-type 1 [_]
+  (s/keys :req-un [::widget-uid ::object-id ::widget-name ::inner-html]))
+
+(defmethod widget-data 001 [_]
+  {:widget-uid 001
+   :object-id (u/uid)
+   :widget-name "Standard text widget"
+   :inner-html ["<p> Hi there </p>"]})
+
 
 ;Medium text block
 (defmethod widget 001 [data owner]
@@ -896,16 +902,14 @@
   (reify
     om/IRender
     (render [_]
-      (let [current-widgets (current-widgets-builder owner)]
-
-        (dom/div #js {:className "selectWidget"}
-                 widget-name
-                 (dom/button #js {:onClick (fn [_] (om/transact!
-                                                     current-widgets
-                                                     (fn [x]
-                                                       (conj x (widget-data widget-uid)))))}
-                             "Add widget")
-                 (om/build widget data {:init-state {:advertise? true}}))))))
+      (dom/div #js {:className "selectWidget"}
+               widget-name
+               (dom/button #js {:onClick (fn [_] 
+                                            (ref-conj 
+                                            (current-widgets-builder owner) 
+                                            (widget-data widget-uid)))}
+                           "Add widget")
+               (om/build widget data {:init-state {:advertise? true}})))))
 
 (defn all-widget-wrapper [{:keys [object-id] :as data} owner]
   (reify
