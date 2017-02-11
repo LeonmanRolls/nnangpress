@@ -193,7 +193,7 @@ p {
 
 .box-paragraph {
   color: white;
-  margin-top: 10px;
+  margin-top: -10px;
   padding: 20px;
   border: 2px solid #CE4072;
   font-weight: 700;

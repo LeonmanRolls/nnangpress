@@ -87,21 +87,16 @@
                                 :modifiers #js {:q (fn [event element]
                                                      (om/update!
                                                        data
-                                                       :inner-html
                                                        [(.-innerHTML (gdom/getElement uuid))]))}})]
-    (println "bla bla: " uuid data link-btn-id)
     (attach-click-listener-by-id 
       link-btn-id 
       (fn []
         (do 
           (.focus medium)
-          (.invokeElement 
-            medium
-            "a"
-            #js {:title "I am a link"
-                 :style "color: #66d9ef"
-                 :target "_blank"
-                 :href "http://www.google.com"}))))))
+          (.invokeElement medium "a" #js {:title "I am a link"
+                                          :style "color: #66d9ef"
+                                          :target "_blank"
+                                          :href "http://www.google.com"}))))))
 
 (defn ref-vec-insert-second 
   "Transact in the second (idx 1) spot" 
@@ -136,6 +131,43 @@
   [ref-cur subject]
   (om/transact! ref-cur (fn [x] (conj x subject))))
 
+(defn rich-text-edit 
+  "Mediumjs rich text editor" 
+  [data owner]
+  (reify
+    om/IInitState
+    (init-state [_]
+      {:uid (u/uid)
+       :advertise? false
+       :link-btn-id (u/uid)})
+
+    om/IDidMount
+    (did-mount [_]
+      (let [uid (om/get-state owner :uid)
+            link-btn-id (om/get-state owner :link-btn-id)
+            edit-mode-obs (first (om/observe owner (mn/edit-mode)))
+            medium (medium-init uid data link-btn-id)]
+        (set-attr-by-id uid "contenteditable" (str edit-mode-obs))))
+
+    om/IDidUpdate
+    (did-update [_ _ _]
+      (let [uid (om/get-state owner :uid)
+            edit-mode-obs (first (mn/edit-mode))]
+        (set-attr-by-id uid "contenteditable" (str edit-mode-obs))))
+
+    om/IRenderState
+    (render-state [_ {:keys [uid link-btn-id] :as state}]
+      (let [edit-mode-obs (first (om/observe owner (mn/edit-mode)))]
+        (dom/div nil 
+                 (dom/div #js {:id uid
+                               :style #js {:marginTop "-10px"}
+                               :dangerouslySetInnerHTML #js {:__html (first data)}})
+
+                 (dom/div nil 
+                          (dom/button #js{:id link-btn-id
+                                          :style #js {:display (edit-mode-display edit-mode-obs)}} 
+                                      "Link")))))))
+
 (defmulti widget-data-type :widget-uid)
 (defmulti widget-data (fn [x] x))
 (defmulti widget (fn [data owner] (:widget-uid data)))
@@ -149,40 +181,12 @@
    :widget-name "Standard text widget"
    :inner-html ["<p> Hi there </p>"]})
 
-
 ;Medium text block
 (defmethod widget 001 [data owner]
   (reify
-    om/IInitState
-    (init-state [_]
-      {:uuid (random-uuid)
-       :advertise? false})
-
-    om/IDidMount
-    (did-mount [_]
-      (let [uuid (.toString (om/get-state owner :uuid))
-            advertise? (om/get-state owner :advertise?)
-            edit-mode-obs (om/observe owner (mn/edit-mode))]
-
-        #_(when (and (first @edit-mode-obs) (not advertise?))
-          (medium-init uuid data))))
-
-    om/IDidUpdate
-    (did-update [_ _ _]
-      (let [uuid (.toString (om/get-state owner :uuid))
-            advertise? (om/get-state owner :advertise?)
-            edit-mode-obs (om/observe owner (mn/edit-mode))]
-
-        #_(when (and (first @edit-mode-obs) (not advertise?))
-          (medium-init uuid data))))
-
-    om/IRenderState
-    (render-state [_ {:keys [uuid] :as state}]
-      (let [edit-mode-obs (om/observe owner (mn/edit-mode))]
-
-        (dom/div #js {:id (.toString uuid)
-                      :style #js {:color "black"}
-                      :dangerouslySetInnerHTML #js {:__html (first (:inner-html data))}})))))
+    om/IRender
+    (render [_ ]
+      (om/build rich-text-edit (:inner-html data)))))
 
 (defmethod widget-data-type 2 [_]
   (s/keys :req-un [::widget-uid ::object-id ::imgs]))
@@ -282,36 +286,10 @@
 ;Boxed medium text
 (defmethod widget 003 [data owner]
   (reify
-    om/IInitState
-    (init-state [_]
-      {:uuid (random-uuid)
-       :advertise? false})
-
-    om/IDidMount
-    (did-mount [_]
-      (let [uuid (.toString (om/get-state owner :uuid))
-            advertise? (om/get-state owner :advertise?)
-            edit-mode-obs (om/observe owner (mn/edit-mode))]
-
-        (when (and (first @edit-mode-obs) (not advertise?))
-          #_(medium-init uuid data))))
-
-    om/IDidUpdate
-    (did-update [_ _ _]
-      (let [uuid (.toString (om/get-state owner :uuid))
-            advertise? (om/get-state owner :advertise?)
-            edit-mode-obs (om/observe owner (mn/edit-mode))]
-
-        (when (and (first @edit-mode-obs) (not advertise?))
-          #_(medium-init uuid data))))
-
-    om/IRenderState
-    (render-state [_ {:keys [uuid] :as state}]
-      (let [edit-mode-obs (om/observe owner (mn/edit-mode))]
-
-        (dom/div #js {:id (.toString uuid)
-                      :className "box-paragraph"
-                      :dangerouslySetInnerHTML #js {:__html (first (:inner-html data))}})))))
+    om/IRender
+    (render [_]
+      (dom/div #js {:className "box-paragraph"}
+               (om/build rich-text-edit (:inner-html data))))))
 
 (defmethod widget-data-type 4 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::text]))
@@ -392,34 +370,10 @@
 ;Clear box red border
 (defmethod widget 005 [data owner]
   (reify
-    om/IInitState
-    (init-state [_]
-      {:uuid (random-uuid)
-       :active? false})
-
-    om/IDidMount
-    (did-mount [_]
-      (let [uuid (.toString (om/get-state owner :uuid))
-            advertise? (om/get-state owner :advertise?)
-            edit-mode-obs (om/observe owner (mn/edit-mode))]
-
-        (when (and (first @edit-mode-obs) (not advertise?))
-          #_(medium-init uuid data))))
-
-    om/IDidUpdate
-    (did-update [_ _ _]
-      (let [uuid (.toString (om/get-state owner :uuid))
-            advertise? (om/get-state owner :advertise?)
-            edit-mode-obs (om/observe owner (mn/edit-mode))]
-
-        (when (and (first @edit-mode-obs) (not advertise?))
-          #_(medium-init uuid data))))
-
-    om/IRenderState
-    (render-state [_ {:keys [uuid] :as state}]
-      (dom/div #js {:id (.toString uuid)
-                    :className "box-paragraph-clear"
-                    :dangerouslySetInnerHTML #js {:__html (first (:inner-html data))}}))))
+    om/IRender
+    (render [_]
+      (dom/div #js {:className "box-paragraph-clear"}
+               (om/build rich-text-edit (:inner-html data))))))
 
 (defmethod widget-data-type 6 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::img]))
@@ -661,7 +615,6 @@
                                                   (.ref (str "users/" (.-uid user)))
                                                   (.once "value")
                                                   (.then (fn [snapshot]
-                                                           (println (js->clj (.-data (.val snapshot)) :keywordize-keys true))
                                                            (om/update! all-data (rdr/read-string (.-data (.val snapshot)))))))
                                                 false)}
                           :signInFlow "popup"
@@ -799,43 +752,6 @@
         intersect? (not (empty? (st/intersection selected-tags (set (map :tag tags)))))]
     intersect?))
 
-(defn rich-text-edit 
-  "Mediumjs rich text editor" 
-  [data owner]
-  (reify
-    om/IInitState
-    (init-state [_]
-      {:uid (u/uid)
-       :advertise? false
-       :link-btn-id (u/uid)})
-
-    om/IDidMount
-    (did-mount [_]
-      (let [uid (om/get-state owner :uid)
-            link-btn-id (om/get-state owner :link-btn-id)
-            edit-mode-obs (first (om/observe owner (mn/edit-mode)))
-            medium (medium-init uid data link-btn-id)]
-        (set-attr-by-id uid "contenteditable" (str edit-mode-obs))))
-
-    om/IDidUpdate
-    (did-update [_ _ _]
-      (let [uid (om/get-state owner :uid)
-            edit-mode-obs (first (mn/edit-mode))]
-        (set-attr-by-id uid "contenteditable" (str edit-mode-obs))))
-
-    om/IRenderState
-    (render-state [_ {:keys [uid link-btn-id] :as state}]
-      (let [edit-mode-obs (first (om/observe owner (mn/edit-mode)))]
-        (dom/div nil 
-                 (dom/div #js {:id uid
-                               :style #js {:marginTop "-10px"}
-                               :dangerouslySetInnerHTML #js {:__html (first (:inner-html data))}})
-
-                 (dom/div nil 
-                          (dom/button #js{:id link-btn-id
-                                          :style #js {:display (edit-mode-display edit-mode-obs)}} 
-                                      "Link")))))))
-
 ;Project widget
 (defmethod widget 11 [{:keys [tags visible?] :as data} owner]
   (reify
@@ -847,7 +763,7 @@
                       (om/build-all tag tags {:state {:tags tags}}))
 
                (dom/div #js {:className "box-paragraph"}
-                        (om/build rich-text-edit data))))))
+                        (om/build rich-text-edit (:inner-html data)))))))
 
 (defmethod widget-data-type 12 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::img]))
