@@ -163,7 +163,9 @@
 
     (go 
       (fb/firebase-get "nangpress-data/" nangpress-data-chan)
-      (mn/nnangpress-data->monolith (<! nangpress-data-chan) current-user)
+      #_(mn/nnangpress-data->monolith (<! nangpress-data-chan) current-user)
+      (mn/reset-monolith-atom! 
+        (mn/raw-nnangpress->renderable (<! nangpress-data-chan) current-user))
       (om/root master mn/monolith
                {:target (. js/document
                            (getElementById "super-container"))}))))

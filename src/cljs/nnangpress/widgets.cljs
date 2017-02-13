@@ -1,4 +1,5 @@
 (ns nnangpress.widgets
+  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require
     [om.core :as om :include-macros true :refer [set-state! update-state!]]
     [om.dom :as dom :include-macros true]
@@ -8,6 +9,7 @@
     [nnangpress.core :as cre]
     [nnangpress.routing :as rt]
     [goog.dom :as gdom]
+    [cljs.core.async :refer [put! chan <!]]
     [cljs.spec :as s]
     [clojure.set :as st]))
 
@@ -47,7 +49,6 @@
 (defn set-attr-by-id 
   "Sett attr of a node by its id" 
   [id attr value]
-  (println "set-attr-by-id: " id attr value)
   (-> 
     (get-node-by-id id) 
     (.setAttribute attr value)))
@@ -77,7 +78,7 @@
                 :onClick (fn [_] 
                            (ref-vec-map-delete vec-ref ikey match-val))}))
 
-(defn medium-init [uuid data link-btn-id]
+(defn medium-init [uuid data link-btn-id link-input-id]
   (let [medium (js/Medium. #js {:element (.getElementById js/document uuid)
                                 :mode js/Medium.richMode
                                 :placeholder "Your Text here"
@@ -92,11 +93,12 @@
       link-btn-id 
       (fn []
         (do 
+          (.dir js/console (get-node-by-id link-input-id))
           (.focus medium)
           (.invokeElement medium "a" #js {:title "I am a link"
                                           :style "color: #66d9ef"
                                           :target "_blank"
-                                          :href "http://www.google.com"}))))))
+                                          :href (.-value (get-node-by-id link-input-id))}))))))
 
 (defn ref-vec-insert-second 
   "Transact in the second (idx 1) spot" 
@@ -139,14 +141,14 @@
     (init-state [_]
       {:uid (u/uid)
        :advertise? false
-       :link-btn-id (u/uid)})
+       :link-btn-id (u/uid)
+       :link-input-id (u/uid)})
 
     om/IDidMount
     (did-mount [_]
-      (let [uid (om/get-state owner :uid)
-            link-btn-id (om/get-state owner :link-btn-id)
+      (let [{:keys [uid link-btn-id link-input-id]} (om/get-state owner)
             edit-mode-obs (first (om/observe owner (mn/edit-mode)))
-            medium (medium-init uid data link-btn-id)]
+            medium (medium-init uid data link-btn-id link-input-id)]
         (set-attr-by-id uid "contenteditable" (str edit-mode-obs))))
 
     om/IDidUpdate
@@ -156,17 +158,16 @@
         (set-attr-by-id uid "contenteditable" (str edit-mode-obs))))
 
     om/IRenderState
-    (render-state [_ {:keys [uid link-btn-id] :as state}]
+    (render-state [_ {:keys [uid link-btn-id link-input-id] :as state}]
       (let [edit-mode-obs (first (om/observe owner (mn/edit-mode)))]
         (dom/div nil 
                  (dom/div #js {:id uid
                                :style #js {:marginTop "-10px"}
                                :dangerouslySetInnerHTML #js {:__html (first data)}})
 
-                 (dom/div nil 
-                          (dom/button #js{:id link-btn-id
-                                          :style #js {:display (edit-mode-display edit-mode-obs)}} 
-                                      "Link")))))))
+                 (dom/div #js {:style #js {:display (edit-mode-display edit-mode-obs)}}
+                          (dom/input #js {:id link-input-id})
+                          (dom/button #js{:id link-btn-id} "Link")))))))
 
 (defmulti widget-data-type :widget-uid)
 (defmulti widget-data (fn [x] x))
@@ -662,13 +663,18 @@
                                     (dom/p nil (str "Site name: " name))
                                     (dom/p nil (str "Site description: " description))
                                     (dom/button
-                                      #js {:onClick (fn [_] (mn/change-site @data))}
+                                      #js {:onClick (fn [_] 
+                                                      (go 
+                                                        (mn/change-site 
+                                                          (<! 
+                                                            (mn/renderable-site->full-monolith @data)))))}
                                       "Go to site")))))})
 
     om/IWillMount
     (will-mount [_]
       (let [uid-obs (om/observe owner (mn/uid))
             advertise? (om/get-state owner :advertise?)]
+        ;Refactor
         (when (not advertise?)
           (->
             (js/firebase.database)
@@ -841,6 +847,19 @@
                  (dom/p nil "Choose the tags you're interested in:") 
                  (apply dom/ul #js {:style #js {:display "inline-block" :margin "0px"}}
                         (om/build-all select-tag tags {:state {:tags tags}})))))))
+
+(defmethod widget-data 13 [_]
+  {:widget-uid 13
+   :object-id (u/uid)
+   :widget-name "Standard text widget"
+   :inner-html ["<p>Facebook like box</p>"]})
+
+;Facebook like
+(defmethod widget 13 [data owner]
+  (reify
+    om/IRender
+    (render [_ ]
+      (dom/div nil "Facebook like box"))))
 
 (defn admin-toolbar [data owner]
   (reify

@@ -1,4 +1,5 @@
 (ns nnangpress.monolith
+  "Functions for reading and updating the monlith"
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
             [om.dom :as dom :include-macros true]
@@ -6,7 +7,8 @@
             [clojure.zip :as z]
             [clojure.spec :as s]
             [clojure.walk :as wlk]
-            [cljs.core.async :refer [put! chan <!]]))
+            [cljs.core.async :refer [put! chan <!]]
+            [nnangpress.firebase :as fb]))
 
 (s/def ::all-widgets-data vector?)
 (s/def ::current-route vector?)
@@ -171,20 +173,6 @@
     (edit-mode) 
     (fn [dabool] [(not (first dabool))])))
 
-(defn firebase-empty->clj-empty 
-  "Goiing from firebase representation of empty vector to a clj empty vector" 
-  [data]
-  (wlk/postwalk 
-    (fn [x]   
-      (if 
-        (and 
-          (vector? x) 
-          (= 1 (count x)) 
-          (= "" (first x))) 
-        [] 
-        x)) 
-    data))
-
 (s/fdef clj-empty->firebase-empty 
         :args (s/cat :data any?))
 
@@ -201,10 +189,10 @@
         x)) 
     data))
 
-(s/fdef reset-monolith-atom 
+(s/fdef reset-monolith-atom! 
         :args (s/cat :data ::site-data))
 
-(defn reset-monolith-atom [data]
+(defn reset-monolith-atom! [data]
   (reset! monolith data))
 
 (s/fdef nnangpress-data->monolith 
@@ -213,7 +201,7 @@
 (defn nnangpress-data->monolith
   "Going from system data to system + user data and setting monolith atom" 
   [nnangpress-data current-user]
-  (reset-monolith-atom 
+  (reset-monolith-atom! 
     (assoc 
       (dissoc nnangpress-data :route-widgets)  
       :uid [(if current-user (.-uid current-user) "")] 
@@ -234,7 +222,7 @@
       data-ref
       (.once "value")
       (.then (fn [snapshot]
-               (let [remote-map (firebase-empty->clj-empty
+               (let [remote-map (fb/firebase-empty->clj-empty
                                   (js->clj (.val snapshot) :keywordize-keys true))]
                  (put! 
                    chan 
@@ -317,4 +305,42 @@
   "Swap two elements of a vector cursor" 
   [cursor idx1 idx2]
   (om/transact! cursor (fn [xs] (u/vec-swap xs idx1 idx2))))
+
+(defn update-monolith-user-data 
+  "Update monolith with current user data" 
+
+  ([monolith]
+   (update-monolith-user-data monolith (fb/current-user)))
+
+  ([monolith current-user]
+   (assoc 
+     monolith  
+     :uid [(if current-user (.-uid current-user) "")] 
+     :email [(if current-user (.-email current-user) "")])))
+
+(defn raw-nnangpress->renderable 
+  "Raw nnangpress to renderable based on user auth status"  
+
+  ([raw-nnangpress]
+   (raw-nnangpress->renderable raw-nnangpress (fb/current-user)))
+
+  ([raw-nnangpress current-user]
+   (-> 
+     (assoc raw-nnangpress :route-widget (if current-user
+                                           (-> raw-nnangpress :route-widgets :userhome)
+                                           (-> raw-nnangpress :route-widgets :homepage)))
+     (update-monolith-user-data current-user)
+     (dissoc :route-widgets))))
+
+(defn renderable-site->full-monolith
+  "Combines a renderable site with system data to form full monolith" 
+
+  ([renderable-site]
+   (let [c (chan)]
+     (go 
+       (fb/firebase-get "nangpress-data/" c)
+       (renderable-site->full-monolith renderable-site (<! c)))))
+
+  ([renderable-site nangpress-system-data] 
+   (merge nangpress-system-data renderable-site)))
 

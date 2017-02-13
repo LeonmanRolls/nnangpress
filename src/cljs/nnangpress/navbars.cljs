@@ -136,7 +136,7 @@
 
         (cond
           (= "/" route-name)
-          (apply dom/ul #js {:style #js {:borderTop "1px solid white"}}
+          (apply dom/ul nil 
                  (concat
                    (om/build-all nav-menu children {:state {:depth (inc depth)}})
                    (when (first @edit-mode-obs)
@@ -148,7 +148,7 @@
                       (om/build cre/remove-element children
                                 {:state {:label "remove nth route"}})])))
 
-          (and (not (empty? children)) (> depth (if (first @edit-mode-obs) 2 1)))
+          (and (not (empty? children)) (> depth (if (first @edit-mode-obs) 2 2)))
           (dom/div #js {:style #js {:position "relative"}}
 
                    (dom/li #js {:className (str "sub-nav-li ")
