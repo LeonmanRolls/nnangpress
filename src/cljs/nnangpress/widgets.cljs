@@ -214,7 +214,7 @@
        :slider-init (fn [uid]
                       (->
                         (js/$ (str "#" uid))
-                        (.royalSlider #js {:keyboardNavEnabled true :controlNavigation "bullets"
+                        (.royalSlider #js {:keyboardNavEnabled false :controlNavigation "bullets"
                                            :autoScaleSlider true :autoScaleSliderWidth 14
                                            :autoScaleSliderHeight 9
                                            :slidesSpacing 0
@@ -225,13 +225,13 @@
     (did-mount [_]
       (let [uid (om/get-state owner :uid)
             slider-init (om/get-state owner :slider-init)]
-        #_(slider-init uid)))
+        (slider-init uid)))
 
     om/IDidUpdate
     (did-update [_ _ _]
       (let [uid (om/get-state owner :uid)
             slider-init (om/get-state owner :slider-init)]
-        #_(slider-init uid)))
+        (slider-init uid)))
 
     om/IRenderState
     (render-state [_ {:keys [uid img-partial default-img advertise?] :as state}]
@@ -255,7 +255,7 @@
                                          om/IRender
                                          (render [_]
                                            (dom/div nil
-                                                    (cre/simple-input-cursor (:url data) data :url)
+                                                    (cre/simple-input-cursor! (:url data) data :url)
                                                     (dom/button
                                                       #js {:onClick (fn [_]
                                                                       (om/transact!
@@ -497,9 +497,9 @@
                                     (render [_]
                                       (if (contains? data :text)
                                         (dom/div nil
-                                                 (cre/simple-input-cursor (:title data) data :title)
-                                                 (cre/simple-input-cursor (:text data) data :text))
-                                        (cre/simple-input-cursor (:data-src data) data :data-src)))))}))
+                                                 (cre/simple-input-cursor! (:title data) data :title)
+                                                 (cre/simple-input-cursor! (:text data) data :text))
+                                        (cre/simple-input-cursor! (:data-src data) data :data-src)))))}))
 
     om/IDidUpdate
     (did-update  [this prev-props prev-state]
@@ -852,14 +852,20 @@
   {:widget-uid 13
    :object-id (u/uid)
    :widget-name "Standard text widget"
-   :inner-html ["<p>Facebook like box</p>"]})
+   :like-box-string "<div class=\"fb-page\" data-href=\"https://www.facebook.com/U1stGamesOfficial/\"  data-width=\"500\" data-height=\"300\" data-small-header=\"true\" data-adapt-container-width=\"true\" data-show-posts=\"false\" data-hide-cover=\"false\" data-show-facepile=\"false\"><div class=\"fb-xfbml-parse-ignore\"><blockquote cite=\"https://www.facebook.com/U1stGamesOfficial/\"><a href=\"https://www.facebook.com/U1stGamesOfficial/\">U1st Games</a></blockquote></div></div>"})
 
 ;Facebook like
-(defmethod widget 13 [data owner]
+(defmethod widget 13 [{:keys [like-box-string] :as data} owner]
   (reify
+
+    om/IDidMount
+    (did-mount [_]
+      (FB.XFBML.parse))
+
     om/IRender
-    (render [_ ]
-      (dom/div nil "Facebook like box"))))
+    (render [_]
+      (dom/div #js {:style #js {:marginTop "-10px" :textAlign "center"}
+                    :dangerouslySetInnerHTML #js {:__html like-box-string}}))))
 
 (defn admin-toolbar [data owner]
   (reify

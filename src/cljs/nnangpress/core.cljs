@@ -24,7 +24,7 @@
                                                           (u/vec-remove x widget-pos)))))}
                    "Submit"))))))
 
-(defn simple-input-cursor [value cursor korks]
+(defn simple-input-cursor! [value cursor korks]
   (dom/input #js {:value value
                   :style #js {:width "100%"}
                   :onChange (fn [e]

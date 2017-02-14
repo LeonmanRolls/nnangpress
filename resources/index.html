@@ -15,6 +15,23 @@
   </head>
   <body>
 
+    <script>
+          window.fbAsyncInit = function() {
+              FB.init({
+                  appId      : '',
+                  xfbml      : true,
+                  version    : 'v2.5'
+              });
+          };
+          (function(d, s, id){
+              var js, fjs = d.getElementsByTagName(s)[0];
+              if (d.getElementById(id)) {return;}
+              js = d.createElement(s); js.id = id;
+              js.src = "//connect.facebook.net/en_US/sdk.js";
+              fjs.parentNode.insertBefore(js, fjs);
+          }(document, 'script', 'facebook-jssdk'));
+    </script>
+
     <button id="sign-in-with-popup">Sign In with Popup</button>
     <div id="firebase">Firebase div</div>
 
@@ -48,5 +65,6 @@
 
     <script src="/js/jquery.royalslider.min.js"></script>
     <script type="text/javascript" src="js/app.js"></script>
+
   </body>
 </html>
