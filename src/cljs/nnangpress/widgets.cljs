@@ -39,12 +39,21 @@
     (.addEventListener "input" cb)))
 
 (defn attach-click-listener-by-id 
-  "Attach a click clistener to a node" 
+  "Attach a click clistener to a node. Returns the callback for removal purposes" 
   [id cb]
   (-> 
     js/document 
     (.getElementById id)
-    (.addEventListener "click" cb)))
+    (.addEventListener "click" cb)
+    cb))
+
+(defn remove-listener 
+  "Remove a listener" 
+  [id cb]
+  (-> 
+    js/document 
+    (.getElementById id)
+    (.removeEventListener "click" cb)))
 
 (defn set-attr-by-id 
   "Sett attr of a node by its id" 
@@ -78,7 +87,10 @@
                 :onClick (fn [_] 
                            (ref-vec-map-delete vec-ref ikey match-val))}))
 
-(defn medium-init [uuid data link-btn-id link-input-id]
+(defn medium-init 
+  "Initializes a medium instance. Returns a function that can be used to destroy instance
+  and related listeners" 
+  [uuid data link-btn-id link-input-id]
   (let [medium (js/Medium. #js {:element (.getElementById js/document uuid)
                                 :mode js/Medium.richMode
                                 :placeholder "Your Text here"
@@ -86,20 +98,27 @@
                                 :tags nil
                                 :pasteAsTExt false
                                 :modifiers #js {:q (fn [event element]
-                                                     (println "q id: " uuid)
                                                      (om/update!
                                                        data
-                                                       [(.-innerHTML (gdom/getElement uuid))]))}})]
-    (attach-click-listener-by-id 
-      link-btn-id 
-      (fn []
-        (do 
-          (.dir js/console (get-node-by-id link-input-id))
-          (.focus medium)
-          (.invokeElement medium "a" #js {:title "I am a link"
-                                          :style "color: #66d9ef"
-                                          :target "_blank"
-                                          :href (.-value (get-node-by-id link-input-id))}))))))
+                                                       [(.-innerHTML (gdom/getElement uuid))]))}})
+
+        cb (attach-click-listener-by-id 
+             link-btn-id 
+             (fn []
+               (do 
+                 (.focus medium)
+                 (.invokeElement 
+                   medium 
+                   "a" 
+                   #js {:title "I am a link"
+                        :style "color: #66d9ef"
+                        :target "_blank"
+                        :href (.-value 
+                                (get-node-by-id link-input-id))}))))]
+
+    (fn []
+      (.destroy medium)
+      (remove-listener link-btn-id cb))))
 
 (defn ref-vec-insert-second 
   "Transact in the second (idx 1) spot" 
@@ -150,7 +169,9 @@
 
       om/IDidUpdate
       (did-update [_ _ _]
-        (let [edit-mode-obs (first (mn/edit-mode))]
+        (let [edit-mode-obs (first (mn/edit-mode))
+              medium-destroy (medium-init uid data link-btn-id link-input-id)]
+          (medium-destroy)
           (medium-init uid data link-btn-id link-input-id)
           (set-attr-by-id uid "contenteditable" (str edit-mode-obs))))
 
