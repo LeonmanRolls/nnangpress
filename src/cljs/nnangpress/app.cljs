@@ -163,7 +163,6 @@
 
     (go 
       (fb/firebase-get "nangpress-data/" nangpress-data-chan)
-      #_(mn/nnangpress-data->monolith (<! nangpress-data-chan) current-user)
       (mn/reset-monolith-atom! 
         (mn/raw-nnangpress->renderable (<! nangpress-data-chan) current-user))
       (om/root master mn/monolith

@@ -86,6 +86,7 @@
                                 :tags nil
                                 :pasteAsTExt false
                                 :modifiers #js {:q (fn [event element]
+                                                     (println "q id: " uuid)
                                                      (om/update!
                                                        data
                                                        [(.-innerHTML (gdom/getElement uuid))]))}})]
@@ -136,38 +137,34 @@
 (defn rich-text-edit 
   "Mediumjs rich text editor" 
   [data owner]
-  (reify
-    om/IInitState
-    (init-state [_]
-      {:uid (u/uid)
-       :advertise? false
-       :link-btn-id (u/uid)
-       :link-input-id (u/uid)})
+  (let [uid (u/uid)
+        advertise? false
+        link-btn-id (u/uid)
+        link-input-id (u/uid)]
+    (reify
+      om/IDidMount
+      (did-mount [_]
+        (let [edit-mode-obs (first (om/observe owner (mn/edit-mode)))]
+          (medium-init uid data link-btn-id link-input-id)
+          (set-attr-by-id uid "contenteditable" (str edit-mode-obs))))
 
-    om/IDidMount
-    (did-mount [_]
-      (let [{:keys [uid link-btn-id link-input-id]} (om/get-state owner)
-            edit-mode-obs (first (om/observe owner (mn/edit-mode)))
-            medium (medium-init uid data link-btn-id link-input-id)]
-        (set-attr-by-id uid "contenteditable" (str edit-mode-obs))))
+      om/IDidUpdate
+      (did-update [_ _ _]
+        (let [edit-mode-obs (first (mn/edit-mode))]
+          (medium-init uid data link-btn-id link-input-id)
+          (set-attr-by-id uid "contenteditable" (str edit-mode-obs))))
 
-    om/IDidUpdate
-    (did-update [_ _ _]
-      (let [uid (om/get-state owner :uid)
-            edit-mode-obs (first (mn/edit-mode))]
-        (set-attr-by-id uid "contenteditable" (str edit-mode-obs))))
+      om/IRenderState
+      (render-state [_ state]
+        (let [edit-mode-obs (first (om/observe owner (mn/edit-mode)))]
+          (dom/div nil 
+                   (dom/div #js {:id uid
+                                 :style #js {:marginTop "-10px"}
+                                 :dangerouslySetInnerHTML #js {:__html (first data)}})
 
-    om/IRenderState
-    (render-state [_ {:keys [uid link-btn-id link-input-id] :as state}]
-      (let [edit-mode-obs (first (om/observe owner (mn/edit-mode)))]
-        (dom/div nil 
-                 (dom/div #js {:id uid
-                               :style #js {:marginTop "-10px"}
-                               :dangerouslySetInnerHTML #js {:__html (first data)}})
-
-                 (dom/div #js {:style #js {:display (edit-mode-display edit-mode-obs)}}
-                          (dom/input #js {:id link-input-id})
-                          (dom/button #js{:id link-btn-id} "Link")))))))
+                   (dom/div #js {:style #js {:display (edit-mode-display edit-mode-obs)}}
+                            (dom/input #js {:id link-input-id})
+                            (dom/button #js{:id link-btn-id} "Link"))))))))
 
 (defmulti widget-data-type :widget-uid)
 (defmulti widget-data (fn [x] x))
@@ -180,14 +177,15 @@
   {:widget-uid 001
    :object-id (u/uid)
    :widget-name "Standard text widget"
-   :inner-html ["<p> Hi there </p>"]})
+   :inner-html [(str "<p>" (u/uid) "</p>" )]})
 
 ;Medium text block
 (defmethod widget 001 [data owner]
-  (reify
-    om/IRender
-    (render [_ ]
-      (om/build rich-text-edit (:inner-html data)))))
+  (let [{:keys [object-id]} data]
+    (reify
+      om/IRender
+      (render [_ ]
+        (dom/div nil (om/build rich-text-edit (:inner-html data)))))))
 
 (defmethod widget-data-type 2 [_]
   (s/keys :req-un [::widget-uid ::object-id ::imgs]))
@@ -857,15 +855,22 @@
 ;Facebook like
 (defmethod widget 13 [{:keys [like-box-string] :as data} owner]
   (reify
-
     om/IDidMount
     (did-mount [_]
       (FB.XFBML.parse))
 
+    om/IDidUpdate
+    (did-update [_ _ _]
+      (FB.XFBML.parse))
+
     om/IRender
     (render [_]
-      (dom/div #js {:style #js {:marginTop "-10px" :textAlign "center"}
-                    :dangerouslySetInnerHTML #js {:__html like-box-string}}))))
+      (dom/div nil 
+               (dom/div #js {:style #js {:marginTop "-10px" :textAlign "center"}
+                             :dangerouslySetInnerHTML #js {:__html like-box-string}})         
+               (edit-mode-sense 
+                 owner 
+                 (cre/simple-input-cursor! like-box-string data :like-box-string))))))
 
 (defn admin-toolbar [data owner]
   (reify
@@ -901,7 +906,7 @@
   (reify
     om/IRender
     (render [_]
-      (dom/div nil
+      (dom/div #js {:style #js {:margin "20px"}} 
                (edit-mode-sense 
                  owner
                  (dom/button #js{:onClick (fn [_]
