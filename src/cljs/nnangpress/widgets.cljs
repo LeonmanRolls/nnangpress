@@ -959,14 +959,10 @@
   (reify
     om/IRender
     (render [_]
-      (dom/div #js {:style #js {:margin "50px"}} 
+      (dom/div #js {:style #js {:margin "50px" :position "relative"}} 
                (edit-mode-sense 
                  owner
-                 (dom/button #js{:onClick (fn [_]
-                                            (mn/ref-vec-map-delete! 
-                                              (mn/current-widgets-builder<< owner)
-                                              :object-id object-id))}
-                             "Delete"))
+                 (delete-button  (mn/current-widgets-builder<< owner) :object-id object-id))
                (om/build widget data)))))
 
 (defn simple-form 
