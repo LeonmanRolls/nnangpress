@@ -1,4 +1,6 @@
 (ns nnangpress.navbars
+  "Besides providing the interface for changing routes navbars are responsible for much of the routing mechanism, 
+  as will as the shape of the data in the route tree."
   (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
             [om.dom :as dom :include-macros true]
             [nnangpress.monolith :as mn]
@@ -9,7 +11,6 @@
 (defmulti navbar (fn [x] (:route-widget-id x)))
 (defmulti navbar-data (fn [x] x))
 
-;navbar 0 ---
 (defmethod navbar-data 0 [_]
   {:route-widget-id 0
    :main-view-style {:style {}}
@@ -23,6 +24,7 @@
                           :inner-html ["<p> Hi there lol</p>"]}]
                :children []}})
 
+;A simple navbar. 
 (defmethod navbar 0 [data owner]
   (reify
     om/IRender
@@ -30,9 +32,7 @@
       (let [edit-mode-obs (om/observe owner (mn/edit-mode))]
         (dom/div #js {:id "the-nav" :className "main-nav"}
                  (when (first @edit-mode-obs) "Default navbar"))))))
-;navbar 0 ---
 
-;navbar 1 ---
 (defmethod navbar-data 1 [_]
   {:route-widget-id 1
    :main-view-style {:style {:paddingLeft "320px"}}
@@ -186,6 +186,7 @@
 
                   (str-beautify route-name)))))))
 
+;A margin navbar
 (defmethod navbar 1 [{:keys [routes-map logo-data nav-style] :as data} owner]
   (reify
     om/IRender
@@ -199,5 +200,4 @@
                              :style (clj->js nav-style)}
                         (om/build nav-menu-logo logo-data)
                         (om/build nav-menu routes-map))))))
-;navbar 1 ---
 

@@ -1,4 +1,6 @@
 (ns nnangpress.routing
+  "Routing for a single page application. The bridge between the route in the browser bar and the application's 
+  route state."
   (:import [goog.history Html5History EventType])
   (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
             [om.dom :as dom :include-macros true]
