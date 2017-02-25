@@ -13,19 +13,21 @@
                   [org.omcljs/om "0.8.6"]
                   [org.clojure/core.async "0.2.395"]
                   [cljs-ajax "0.5.8"]
-                  [replumb "0.2.4"]])
+                  [replumb "0.2.4"]
+                  [it.frbracch/boot-marginalia "0.1.3-1" :scope "test"]
+                  [com.cemerick/url "0.1.1"]])
 
 (require
- '[adzerk.boot-cljs      :refer [cljs]]
- '[adzerk.boot-cljs-repl :refer [cljs-repl start-repl]]
- '[adzerk.boot-reload    :refer [reload]]
- '[pandeiro.boot-http    :refer [serve]])
+  '[adzerk.boot-cljs      :refer [cljs]]
+  '[adzerk.boot-cljs-repl :refer [cljs-repl start-repl]]
+  '[adzerk.boot-reload    :refer [reload]]
+  '[pandeiro.boot-http    :refer [serve]]
+  '[it.frbracch.boot-marginalia :refer [marginalia]])
 
 (deftask build []
   (comp (speak)
-
-        (cljs)
-        ))
+        (marginalia)
+        (cljs)))
 
 (deftask run []
   (comp (serve)
@@ -48,5 +50,4 @@
   []
   (comp (development)
         (run)))
-
 

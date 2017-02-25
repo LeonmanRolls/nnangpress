@@ -237,7 +237,6 @@
                                            :autoScaleSlider true :autoScaleSliderWidth 14
                                            :autoScaleSliderHeight 9
                                            :slidesSpacing 0
-                                           :imageScaleMode "fill"
                                            :fullscreen #js {:enabled true :nativeFS true}})))})
 
     om/IDidMount
@@ -893,6 +892,32 @@
                  owner 
                  (cre/simple-input-cursor! like-box-string data :like-box-string))))))
 
+(defmethod widget-data 14 [_]
+  {:widget-uid 14
+   :object-id (u/uid)
+   :widget-name "Standard text widget"
+   :youtube-video-id "S-0MmK73OdY"})
+
+(defn youtube-string-gen 
+  "Given a youtube video url, return embedable string" 
+  [youtube-video-id]
+  (str 
+    "<iframe id=\"ytplayer\" type=\"text/html\" width=\"640\" height=\"360\" src=\"https://www.youtube.com/embed/" 
+    youtube-video-id  
+    "?autoplay=0\" frameborder=\"0\"></iframe>"))
+
+;Youtube embed
+(defmethod widget 14 [{:keys [youtube-video-id] :as data} owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/div nil 
+               (dom/div #js {:style #js {:marginTop "-10px" :textAlign "center"}
+                             :dangerouslySetInnerHTML #js {:__html (youtube-string-gen youtube-video-id)}})         
+               (edit-mode-sense 
+                 owner 
+                 (cre/simple-input-cursor! youtube-video-id data :youtube-video-id))))))
+
 (defn admin-toolbar [data owner]
   (reify
     om/IRender
@@ -917,9 +942,9 @@
       (dom/div #js {:className "selectWidget"}
                widget-name
                (dom/button #js {:onClick (fn [_] 
-                                            (ref-conj 
-                                            (current-widgets-builder owner) 
-                                            (widget-data widget-uid)))}
+                                           (ref-conj 
+                                             (current-widgets-builder owner) 
+                                             (widget-data widget-uid)))}
                            "Add widget")
                (om/build widget data {:init-state {:advertise? true}})))))
 
@@ -927,7 +952,7 @@
   (reify
     om/IRender
     (render [_]
-      (dom/div #js {:style #js {:margin "20px"}} 
+      (dom/div #js {:style #js {:margin "50px"}} 
                (edit-mode-sense 
                  owner
                  (dom/button #js{:onClick (fn [_]

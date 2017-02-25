@@ -1,4 +1,5 @@
 (ns nnangpress.app
+  "App initializaiton takes place here."
   (:import [goog.history Html5History EventType])
   (:require-macros [cljs.core.async.macros :refer  [go go-loop]])
   (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
@@ -16,7 +17,8 @@
             [ajax.core :refer [GET POST]]
             [cljs.spec :as s :include-macros true]
             [cljs.spec.test :as ts :include-macros true]
-            [cljs.core.async :refer [put! chan <!]]))
+            [cljs.core.async :refer [put! chan <!]]
+            [cemerick.url :as url]))
 
 (enable-console-print!)
 
@@ -38,33 +40,21 @@
                                            (.-value (wgt/get-node-by-id uid2))))} 
                          "Submit"))))
 
-(defn main-view [data owner]
-  (reify
-    om/IInitState
-    (init-state [_]
-      {:add-widget (fn [cursor]
-                     (let [widget-id (js/parseInt
-                                       (.-value
-                                         (om/get-node owner "add-widget")))]
-                       (om/transact! cursor (fn [x]
-                                              (conj x (wgt/widget-data widget-id))))))
-       :remove-widget (fn [cursor]
-                        (let [widget-pos (js/parseInt
-                                           (.-value
-                                             (om/get-node owner "remove-widget")))]
-                          (om/transact! cursor (fn [x]
-                                                 (u/vec-remove x widget-pos)))))})
 
-    om/IRenderState
-    (render-state [_ {:keys [add-widget remove-widget] :as state}]
+(defn main-view 
+  "The main view that builds the displayed widgets for the view as well as the admin panel." 
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
       (let [all-widgets-data-obs (om/observe owner (mn/all-widgets-data))
             edit-mode-obs (om/observe owner (mn/edit-mode))
             main-view-style-obs (om/observe owner (mn/main-view-style))
             routes-map-obs (om/observe owner (mn/routes-map))
             current-route-obs (om/observe owner (mn/current-route))
             current-route-map (mn/current-route-map
-                              (clojure.string/split (first @current-route-obs) #"/")
-                              routes-map-obs)]
+                                (clojure.string/split (first @current-route-obs) #"/")
+                                routes-map-obs)]
 
         (dom/div (clj->js (merge @main-view-style-obs {:className "main-view"}))
 
@@ -93,79 +83,51 @@
                                      wgt/select-widget-wrapper
                                      all-widgets-data-obs)))))))))
 
-(defn master [{:keys [:route-widget :current-route :active-route]
-               :as data} owner]
+
+(defn master 
+  "This component is the master of routing. The current route of the app is considered part of the monolith i.e. 
+  part of the state of the application. So this component has the job of rendering the admin-toolbar, the widgets 
+  for the current route and the navbar (if one has been selected by the user). This is because the navbar 
+  is present in all routes." 
+
+  [{:keys [:route-widget :current-route :active-route]
+    :as data} owner]
   (reify
-    om/IInitState
-    (init-state [_]
-      (let [splitter (fn [x] (last (clojure.string/split x #"/")))]
-        {:flatten-routes (fn [routes-map]
-                           (tree-seq
-                             #(contains? % :children)
-                             #(:children %)
-                             routes-map))
-
-         :set-bg-img (fn [bg-img]
-                       (cond
-                         (u/string-contains? bg-img "#")
-                         (do
-                           (set! (-> js/document .-body .-background) "")
-                           (set!
-                             (-> js/document .-body .-style .-backgroundColor)
-                             bg-img))
-                         (u/string-contains? bg-img "linear")
-                         (set! (-> js/document .-body .-background) bg-img)
-                         :file
-                         (set!
-                           (-> js/document .-body .-background)
-                           bg-img)))
-
-         :get-active-route (fn [flat-routes current-route]
-                             (->>
-                               flat-routes
-                               (filter
-                                 #(=
-                                    (splitter (first current-route))
-                                    (splitter (:route-name %))))
-                               first))}))
-
     om/IRenderState
-    (render-state [_ {:keys [flatten-routes set-bg-img get-active-route] :as state}]
-      (let [{:keys [:bg-img :widgets] :as fresh-active-route} (get-active-route
-                                                                (flatten-routes
-                                                                  (:routes-map route-widget))
-                                                                current-route)
-            routes-map-obs (om/observe owner (mn/routes-map))
-            current-route-obs (om/observe owner (mn/current-route))
-            current-widgets (mn/current-widgets
-                              (clojure.string/split (first current-route) #"/")
-                              (:routes-map route-widget))]
+    (render-state [_ {:keys [flatten-routes] :as state}]
+      (let [{:keys [widgets]} (mn/current-route-map 
+                                (clojure.string/split (first current-route) #"/") 
+                                (:routes-map route-widget))]
 
-        (set-bg-img bg-img)
-        (if
-          (:grey-bg? fresh-active-route)
-          (-> (js/$ "body") (.addClass "grey-out"))
-          (-> (js/$ "body") (.removeClass "grey-out")))
-
-        (dom/div nil
+        (mn/independent-ref-cursor-watcher owner)
+        (dom/div #js {:id "master-container"} 
                  (om/build wgt/admin-toolbar {})
-                 (om/build main-view current-widgets)
-                 (om/build nv/navbar (:route-widget data)))))))
+                 (om/build main-view widgets)
+                 (om/build nv/navbar route-widget))))))
+
+(defn get-query-params<<
+  "Get query params from the current url." 
+  []
+  (:query (url/url (-> js/window .-location .-href))))
 
 (defn init 
-  "Create monolith based on user auth state an init om" 
+  "Start here. Initialize the app. Run instrumentation if dev query paramater is set to true.
+  Create monolith based on user auth state and init om." 
   []
   (let [current-user (-> js/firebase .auth .-currentUser)
         nangpress-data-chan (chan)]
 
-    (println (ts/instrument))
+    (when (= (get (get-query-params<<) "dev") "true")
+      (println "Instrumentation on.")      
+      (println (ts/instrument)))
+
     (mn/ref-cursor-init mn/monolith)
+    (mn/monolith-watcher-init mn/monolith)
 
     (go 
       (fb/firebase-get "nangpress-data/" nangpress-data-chan)
       (mn/reset-monolith-atom! 
         (mn/raw-nnangpress->renderable (<! nangpress-data-chan) current-user))
-      (om/root master mn/monolith
-               {:target (. js/document
-                           (getElementById "super-container"))}))))
+
+      (om/root master mn/monolith {:target (. js/document (getElementById "super-container"))}))))
 

@@ -1,5 +1,5 @@
 (ns nnangpress.monolith
-  "Functions for reading and updating the monlith"
+  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
             [om.dom :as dom :include-macros true]
@@ -62,22 +62,8 @@
   (fn [new-data]
     (s/valid? ::site-data new-data)))
 
-#_(defn monolith-watcher-init [monolith]
-  (add-watch monolith :watcher
-             (fn  [key atom old-state new-state]
-               (let [uid "SGXvf26OEpeVDQ79XIH2V71fVnT2"
-                     user-data-ref (->
-                                     (js/firebase.database)
-                                     (.ref (str "users/" uid)))]
-                 (prn "-- Atom Changed --")
-                 (->
-                   user-data-ref
-                   (.set #js {:username "wellwell"
-                              :email "leon.talbert@gmail.com"
-                              :data  (pr-str @monolith)}))))))
-
 (defn current-route-map 
-  "Get the whole data map for the current route"
+  "Get the whole data map for the current route, reqires a seq of the route segments."
   [route routes-map]
   (let [xs (rest route)
         fxs (first xs)
@@ -85,6 +71,24 @@
     (cond
       (empty? xs) routes-map
       :else (current-route-map xs (get (:children routes-map) idx)))))
+
+
+
+(defn monolith-watcher-init [monolith]
+  (add-watch monolith :watcher
+             (fn  [key atom old-state new-state]
+               (let [uid "SGXvf26OEpeVDQ79XIH2V71fVnT2"
+                     user-data-ref (->
+                                     (js/firebase.database)
+                                     (.ref (str "users/" uid)))]
+                 (prn "-- Atom Changed --")
+                 (prn (keys new-state))
+
+                 #_(->
+                     user-data-ref
+                     (.set #js {:username "wellwell"
+                                :email "leon.talbert@gmail.com"
+                                :data  (pr-str @monolith)}))))))
 
 (defn current-widgets 
   "Get the widget(s) data for the current route" 
@@ -132,6 +136,8 @@
 
   (defn logo-hint []
     (om/ref-cursor (-> (om/root-cursor monolith) :route-widget :routes-map :nav-hint))))
+
+
 
 (s/fdef update-all
         :args (s/cat :data ::all-data))
@@ -343,4 +349,51 @@
 
   ([renderable-site nangpress-system-data] 
    (merge nangpress-system-data renderable-site)))
+
+(defn set-bg-img 
+  "Set background colour or image." 
+  [bg-img]
+  (cond
+    (u/string-contains? bg-img "#")
+    (do
+      (set! (-> js/document .-body .-background) "")
+      (set!
+        (-> js/document .-body .-style .-backgroundColor)
+        bg-img))
+    (u/string-contains? bg-img "linear")
+    (set! (-> js/document .-body .-background) bg-img)
+    :file
+    (set!
+      (-> js/document .-body .-background)
+      bg-img)))
+
+(defn set-bg-grey 
+  "If they current route desires a grey background, then make it so, if not, remove the css class." 
+  [grey-bg?]
+  (if
+    grey-bg? 
+    (-> (js/$ "body") (.addClass "grey-out"))
+    (-> (js/$ "body") (.removeClass "grey-out"))))
+
+(defn independent-ref-cursor-watcher 
+  "Utilizes reference cursors using the react comopnent associated with the master component (although of course it
+  can work with any component). This is here mainly so that conceptually the monlith can 'watch itself' and make 
+  impure changes outside of react. For example setting the background image based on monolith changes. The background 
+  image is better dealt with outside of react." 
+  [owner]
+  (let [current-route (om/observe owner (current-route))
+        routes-map (om/observe owner (routes-map))
+        {:keys [bg-img grey-bg?]}  (current-route-map (clojure.string/split (first @current-route) #"/") @routes-map)]
+
+    (set-bg-img bg-img)
+    (set-bg-grey grey-bg?)
+    (println "current-route: " (keys 
+                                 (current-route-map
+                                   (clojure.string/split (first @current-route) #"/")
+                                   @routes-map 
+                                   )
+                                 ))
+
+    )
+  )
 
