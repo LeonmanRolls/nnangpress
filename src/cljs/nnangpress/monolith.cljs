@@ -88,16 +88,6 @@
                                   :email "leon.talbert@gmail.com"
                                   :data  (pr-str @monolith)}))))))
 
-(defn current-widgets 
-  "Get the widget(s) data for the current route" 
-  [route routes-map]
-  (let [xs (rest route)
-        fxs (first xs)
-        idx (u/index-of (vec (map :route-name (:children routes-map))) (str "/" fxs))]
-    (cond
-      (empty? xs) (:widgets routes-map)
-      :else (current-widgets xs (get (:children routes-map) idx)))))
-
 (defn ref-cursor-init 
   "Defines our monolith API" 
   [monolith]
@@ -135,7 +125,26 @@
   (defn logo-hint []
     (om/ref-cursor (-> (om/root-cursor monolith) :route-widget :routes-map :nav-hint))))
 
+(defn current-widgets 
+  "Get the widget(s) data for the current route" 
+  [route routes-map]
+  (let [xs (rest route)
+        fxs (first xs)
+        idx (u/index-of (vec (map :route-name (:children routes-map))) (str "/" fxs))]
+    (cond
+      (empty? xs) (:widgets routes-map)
+      :else (current-widgets xs (get (:children routes-map) idx)))))
 
+(defn current-widgets-builder<< 
+  "A wrapper around the raw current-widgets function. Initializes required reference cursors in order to return the 
+  current widgets cursor." 
+  [owner]
+  (let [routes-map-obs (om/observe owner (routes-map))
+        current-route-obs (om/observe owner (current-route))
+        current-widgets (current-widgets
+                          (clojure.string/split (first @current-route-obs) #"/")
+                          routes-map-obs)]
+    current-widgets))
 
 (s/fdef update-all
         :args (s/cat :data ::all-data))
@@ -348,7 +357,7 @@
   ([renderable-site nangpress-system-data] 
    (merge nangpress-system-data renderable-site)))
 
-(defn set-bg-img 
+(defn set-bg-img! 
   "Set background colour or image." 
   [bg-img]
   (cond
@@ -365,7 +374,7 @@
       (-> js/document .-body .-background)
       bg-img)))
 
-(defn set-bg-grey 
+(defn set-bg-grey! 
   "If they current route desires a grey background, then make it so, if not, remove the css class." 
   [grey-bg?]
   (if
@@ -383,6 +392,26 @@
         routes-map (om/observe owner (routes-map))
         {:keys [bg-img grey-bg?]}  (current-route-map (clojure.string/split (first @current-route) #"/") @routes-map)]
 
-    (set-bg-img bg-img)
-    (set-bg-grey grey-bg?)))
+    (set-bg-img! bg-img)
+    (set-bg-grey! grey-bg?)))
+
+(defn ref-vec-map-delete!
+  "Givec a cursor vector, remove an element based on the val of a map in the vector" 
+  [vec-ref ikey match-val]
+  (om/transact! vec-ref 
+                (fn [xs]
+                  (vec (remove #(= (ikey %) match-val) xs)))))
+
+(defn ref-vec-insert-second!
+  "Transact in the second (idx 1) spot" 
+  [ref-vec new-elem]
+  (om/transact! 
+    ref-vec 
+    (fn [xs] 
+      (vec (conj (conj (rest xs) new-elem) (first xs))))))
+
+(defn ref-conj!
+  "Conj a reference curosr"
+  [ref-cur subject]
+  (om/transact! ref-cur (fn [x] (conj x subject))))
 

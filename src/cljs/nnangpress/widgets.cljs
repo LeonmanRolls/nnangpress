@@ -1,4 +1,8 @@
 (ns nnangpress.widgets
+  "Widgets are the main 'unit' of display in nnangpress. Widgets can be added and deleted by the user. A widget 
+  comprises a react component and its supporting data. These are both implemented as multimethods. So if the user 
+  selects a new widget, the widget's id is passed to a multimethod that returns the data for that widget. When a 
+  widget is rendered, the multimethod returns the corresponding react component."
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require
     [om.core :as om :include-macros true :refer [set-state! update-state!]]
@@ -26,7 +30,8 @@
 (s/def ::user-sites vector?)
 (s/def ::widget-data (s/multi-spec widget-data-type :widget-uid))
 
-;js node helpers ---
+;##js DOM helpers 
+
 (defn get-node-by-id 
   "Get a dom node by id" 
   [id]
@@ -67,7 +72,6 @@
   "Get query params from the current url." 
   []
   (:query (url/url (-> js/window .-location .-href))))
-;js node helpers ---
 
 (defn content-editable-updater 
   "Update cursor given the id of the corresponding contentEditable node" 
@@ -77,25 +81,34 @@
     (fn [x] 
       (om/update! data ikey (-> x .-target .-innerText)))))
 
-(defn ref-vec-map-delete 
-  "Givec a cursor vector, remove an element based on the val of a map in the vector" 
-  [vec-ref ikey match-val]
-  (om/transact! vec-ref 
-                (fn [xs]
-                  (vec (remove #(= (ikey %) match-val) xs)))))
+;##Helper components.
 
-(defn delete-img 
-  "Add a delete button to the component, parent must be position relative"
+(defn delete-button 
+  "Add a delete button to the component, parent must be position relative. The 'parent' reference cursor vector 
+  and details identifying the specific element in that vector that this component is appearing over should be 
+  provided. "
   [vec-ref ikey match-val]
   (dom/img #js {:style #js {:width "20px" :right "-10px" :top "-10px" 
                             :position "absolute"}
                 :src "http://www.stabilita.sk/media/image/cross-icon.png"
                 :onClick (fn [_] 
-                           (ref-vec-map-delete vec-ref ikey match-val))}))
+                           (mn/ref-vec-map-delete! vec-ref ikey match-val))}))
+
+(defn edit-mode-sense 
+  "Display empty div or what you feed me. Intended for componentes that are only meant to be down in edit mode." 
+  [owner food]
+  (let [edit-mode-obs (om/observe owner (mn/edit-mode))]
+    (if 
+      (first edit-mode-obs)
+      food 
+      (dom/div nil ""))))
+
+(defn edit-mode-display [edit-mode]
+  (if edit-mode "inherit" "none"))
 
 (defn medium-init 
-  "Initializes a medium instance. Returns a function that can be used to destroy instance
-  and related listeners" 
+  "Helper for mediumjs components. Initializes a medium instance. Returns a function that can be used to destroy 
+  instance and related listeners" 
   [uuid data link-btn-id link-input-id]
   (let [medium (js/Medium. #js {:element (.getElementById js/document uuid)
                                 :mode js/Medium.richMode
@@ -125,39 +138,6 @@
     (fn []
       (.destroy medium)
       (remove-listener link-btn-id cb))))
-
-(defn ref-vec-insert-second 
-  "Transact in the second (idx 1) spot" 
-  [ref-vec new-elem]
-  (om/transact! 
-    ref-vec 
-    (fn [xs] 
-      (vec (conj (conj (rest xs) new-elem) (first xs))))))
-
-(defn edit-mode-sense 
-  "Display empty div or what you feed me" 
-  [owner food]
-  (let [edit-mode-obs (om/observe owner (mn/edit-mode))]
-    (if 
-      (first edit-mode-obs)
-      food 
-      (dom/div nil ""))))
-
-(defn edit-mode-display [edit-mode]
-  (if edit-mode "inherit" "none"))
-
-(defn current-widgets-builder [owner]
-  (let [routes-map-obs (om/observe owner (mn/routes-map))
-        current-route-obs (om/observe owner (mn/current-route))
-        current-widgets (mn/current-widgets
-                          (clojure.string/split (first @current-route-obs) #"/")
-                          routes-map-obs)]
-    current-widgets))
-
-(defn ref-conj 
-  "Conj a reference curosr"
-  [ref-cur subject]
-  (om/transact! ref-cur (fn [x] (conj x subject))))
 
 (defn rich-text-edit 
   "Mediumjs rich text editor" 
@@ -193,21 +173,34 @@
                             (dom/input #js {:id link-input-id})
                             (dom/button #js{:id link-btn-id} "Link"))))))))
 
-(defmulti widget-data-type :widget-uid)
-(defmulti widget-data (fn [x] x))
-(defmulti widget (fn [data owner] (:widget-uid data)))
+;##Wdigets 
+;The main widget multimethods. 
+
+(defmulti widget-data-type 
+  "Spec multimethod." 
+  :widget-uid)
+
+(defmulti widget-data 
+  "Data for widget components." 
+  (fn [x] x))
+
+(defmulti widget 
+  "Components for displaying widgets." 
+  (fn [data owner] (:widget-uid data)))
 
 (defmethod widget-data-type 1 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::inner-html]))
 
-(defmethod widget-data 001 [_]
+(defmethod widget-data 001  
+  [_]
   {:widget-uid 001
    :object-id (u/uid)
    :widget-name "Standard text widget"
    :inner-html [(str "<p>" (u/uid) "</p>" )]})
 
-;Medium text block
-(defmethod widget 001 [data owner]
+;Basic mediumjs widget
+(defmethod widget 001  
+  [data owner]
   (let [{:keys [object-id]} data]
     (reify
       om/IRender
@@ -225,6 +218,7 @@
           {:object-id (u/uid)
            :url "http://placekitten.com/900/600"}]})
 
+;Image slider widget.
 (defmethod widget 002 [{:keys [imgs] :as data} owner]
   (reify
     om/IInitState
@@ -308,7 +302,7 @@
    :widget-name "Standard text widget"
    :inner-html ["<p> Hi there </p>"]})
 
-;Boxed medium text
+;Boxed mediumjs text widget
 (defmethod widget 003 [data owner]
   (reify
     om/IRender
@@ -450,6 +444,7 @@
            :data-width "320"
            :data-height "400"}]})
 
+;Image and text grid  
 (defmethod widget 007 [{:keys [imgs] :as data} owner]
   (reify
     om/IInitState
@@ -673,7 +668,7 @@
                  :description "Another cool site"
                  :data {:a "placeholder"}}]})
 
-;Your sites
+;The user's sites as seen when on the user homepage. Not meant to be a user selectable widget.  
 (defmethod widget 10 [{:keys [user-sites] :as data} owner]
   (reify
     om/IInitState
@@ -745,7 +740,7 @@
       (let [edit-mode-obs (om/observe owner (mn/edit-mode))]
         (dom/li #js {:style #js {:float "left" :background "#CE4072" :paddingRight "10px" 
                                  :paddingLeft "10px" :margin "0px" :position "relative"}} 
-                (when (first edit-mode-obs) (delete-img tags :tag (:tag data)))
+                (when (first edit-mode-obs) (delete-button tags :tag (:tag data)))
 
                 (dom/p #js {:id uid :contentEditable (first edit-mode-obs)} (:tag data)))))))
 
@@ -757,7 +752,7 @@
       (edit-mode-sense 
         owner
         (dom/li #js {:onClick (fn [_] 
-                                (ref-vec-insert-second (:tags state) {:tag "Change me"}))
+                                (mn/ref-vec-insert-second! (:tags state) {:tag "Change me"}))
                      :style #js {:float "left" :background "#CE4072" :paddingRight "10px" 
                                  :paddingLeft "10px" :marginRight "10px"}} 
                 "Add Tag +")))))
@@ -782,7 +777,7 @@
         intersect? (not (empty? (st/intersection selected-tags (set (map :tag tags)))))]
     intersect?))
 
-;Project widget
+;Text widget with tags, allows the widget's display to be turned on and off by a filter widget.  
 (defmethod widget 11 [{:keys [tags visible?] :as data} owner]
   (reify
     om/IRender
@@ -836,7 +831,7 @@
                                  :background (if clicked "#CE4072" "inherit")}} 
 
                 (when (first edit-mode-obs)
-                  (delete-img tags :tagz tagz))
+                  (delete-button tags :tagz tagz))
 
                 (dom/p #js {:id uid :contentEditable (first edit-mode-obs)} tagz))))))
 
@@ -848,13 +843,13 @@
       (edit-mode-sense 
         owner
         (dom/li #js {:onClick (fn [_] 
-                                (ref-vec-insert-second tags default-tag))
+                                (mn/ref-vec-insert-second! tags default-tag))
                      :style #js {:float "left" :border "3px solid #CE4072" 
                                  :padding "5px" :margin "5px" :cursor "pointer"
                                  :background (if clicked "#CE4072" "inherit")}} 
                 "Add Tag +")))))
 
-;Tag Selector
+;Tag filter. Will filter widget visibility for any widget that has tag data associated with it. 
 (defmethod widget 12 [{:keys [tags] :as data} owner]
   (reify
     om/IInitState
@@ -878,7 +873,7 @@
    :widget-name "Standard text widget"
    :like-box-string "<div class=\"fb-page\" data-href=\"https://www.facebook.com/U1stGamesOfficial/\"  data-width=\"500\" data-height=\"300\" data-small-header=\"true\" data-adapt-container-width=\"true\" data-show-posts=\"false\" data-hide-cover=\"false\" data-show-facepile=\"false\"><div class=\"fb-xfbml-parse-ignore\"><blockquote cite=\"https://www.facebook.com/U1stGamesOfficial/\"><a href=\"https://www.facebook.com/U1stGamesOfficial/\">U1st Games</a></blockquote></div></div>"})
 
-;Facebook like
+;Facebook like box
 (defmethod widget 13 [{:keys [like-box-string] :as data} owner]
   (reify
     om/IDidMount
@@ -924,7 +919,9 @@
                  owner 
                  (cre/simple-input-cursor! youtube-video-id data :youtube-video-id))))))
 
-(defn admin-toolbar [data owner]
+(defn admin-toolbar 
+  "Toolbar to aid in editing the site and provide information. Should not be visible when ordinarily visting the site." 
+  [data owner]
   (reify
     om/IRender
     (render [_]
@@ -941,20 +938,24 @@
                  (dom/button #js {:onClick (fn [_] (mn/save-site-data))}
                              "Update current site"))))))
 
-(defn select-widget-wrapper [{:keys [widget-name widget-uid] :as data} owner]
+(defn select-widget-wrapper 
+  "Primarily for edit mode. Allows the widget this wraps to be added to the current route." 
+  [{:keys [widget-name widget-uid] :as data} owner]
   (reify
     om/IRender
     (render [_]
       (dom/div #js {:className "selectWidget"}
                widget-name
                (dom/button #js {:onClick (fn [_] 
-                                           (ref-conj 
-                                             (current-widgets-builder owner) 
+                                           (mn/ref-conj! 
+                                             (mn/current-widgets-builder<< owner) 
                                              (widget-data widget-uid)))}
                            "Add widget")
                (om/build widget data {:init-state {:advertise? true}})))))
 
-(defn all-widget-wrapper [{:keys [object-id] :as data} owner]
+(defn all-widget-wrapper 
+  "Wrap all displayed widgets." 
+  [{:keys [object-id] :as data} owner]
   (reify
     om/IRender
     (render [_]
@@ -962,8 +963,8 @@
                (edit-mode-sense 
                  owner
                  (dom/button #js{:onClick (fn [_]
-                                            (ref-vec-map-delete 
-                                              (current-widgets-builder owner)
+                                            (mn/ref-vec-map-delete! 
+                                              (mn/current-widgets-builder<< owner)
                                               :object-id object-id))}
                              "Delete"))
                (om/build widget data)))))
