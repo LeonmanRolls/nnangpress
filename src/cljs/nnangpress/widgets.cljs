@@ -11,7 +11,8 @@
     [goog.dom :as gdom]
     [cljs.core.async :refer [put! chan <!]]
     [cljs.spec :as s]
-    [clojure.set :as st]))
+    [clojure.set :as st]
+    [cemerick.url :as url]))
 
 (declare widget-data-type)
 
@@ -61,6 +62,11 @@
   (-> 
     (get-node-by-id id) 
     (.setAttribute attr value)))
+
+(defn get-query-params<<
+  "Get query params from the current url." 
+  []
+  (:query (url/url (-> js/window .-location .-href))))
 ;js node helpers ---
 
 (defn content-editable-updater 
@@ -961,4 +967,22 @@
                                               :object-id object-id))}
                              "Delete"))
                (om/build widget data)))))
+
+(defn simple-form 
+  "Inputs and submit, input values will be passed to callback." 
+  [cb]
+  (let [uid1 (u/uid) 
+        uid2 (u/uid)]
+    (dom/div nil
+             "Widget Order: "
+             (dom/input #js {:id uid1 
+                             :type "text"})
+             (dom/input #js {:id uid2 
+                             :type "text"})
+
+             (dom/button #js {:onClick (fn [_]
+                                         (cb 
+                                           (.-value (get-node-by-id uid1))
+                                           (.-value (get-node-by-id uid2))))} 
+                         "Submit"))))
 

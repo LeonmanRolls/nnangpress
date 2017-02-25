@@ -72,23 +72,21 @@
       (empty? xs) routes-map
       :else (current-route-map xs (get (:children routes-map) idx)))))
 
-
-
 (defn monolith-watcher-init [monolith]
-  (add-watch monolith :watcher
-             (fn  [key atom old-state new-state]
-               (let [uid "SGXvf26OEpeVDQ79XIH2V71fVnT2"
-                     user-data-ref (->
-                                     (js/firebase.database)
-                                     (.ref (str "users/" uid)))]
-                 (prn "-- Atom Changed --")
-                 (prn (keys new-state))
+    (add-watch monolith :watcher
+               (fn  [key atom old-state new-state]
+                 (let [uid "SGXvf26OEpeVDQ79XIH2V71fVnT2"
+                       user-data-ref (->
+                                       (js/firebase.database)
+                                       (.ref (str "users/" uid)))]
+                   (prn "-- Atom Changed --")
+                   (prn (keys new-state))
 
-                 #_(->
-                     user-data-ref
-                     (.set #js {:username "wellwell"
-                                :email "leon.talbert@gmail.com"
-                                :data  (pr-str @monolith)}))))))
+                   #_(->
+                       user-data-ref
+                       (.set #js {:username "wellwell"
+                                  :email "leon.talbert@gmail.com"
+                                  :data  (pr-str @monolith)}))))))
 
 (defn current-widgets 
   "Get the widget(s) data for the current route" 
@@ -386,14 +384,5 @@
         {:keys [bg-img grey-bg?]}  (current-route-map (clojure.string/split (first @current-route) #"/") @routes-map)]
 
     (set-bg-img bg-img)
-    (set-bg-grey grey-bg?)
-    (println "current-route: " (keys 
-                                 (current-route-map
-                                   (clojure.string/split (first @current-route) #"/")
-                                   @routes-map 
-                                   )
-                                 ))
-
-    )
-  )
+    (set-bg-grey grey-bg?)))
 
