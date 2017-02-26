@@ -918,10 +918,7 @@
 
 (def admin-toolbar-button-style
   "Style for admin toolbar button." 
-  {:background "transparent"
-   :color "white"
-   :letterSpacing "1px"
-   :marginRight "5px"})
+  {:background "transparent", :color "white", :letterSpacing "1px", :marginRight "5px"})
 
 (defn admin-toolbar-button
   "Button for admin toolbar. Calls callback when clicked" 
