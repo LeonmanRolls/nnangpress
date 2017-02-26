@@ -6,7 +6,8 @@
             [nnangpress.monolith :as mn]
             [nnangpress.utils :as u]
             [nnangpress.core :as cre]
-            [nnangpress.routing :as rt]))
+            [nnangpress.routing :as rt]
+            [nnangpress.widgets :as wgt]))
 
 (defmulti navbar (fn [x] (:route-widget-id x)))
 (defmulti navbar-data (fn [x] x))
@@ -115,20 +116,37 @@
                      :onClick (partial rt/js-link @routes-map-obs "/")}
                 "Leon Talbert")))))
 
+(defn str-beautify 
+  "Remove hyphens from a string" 
+  [s]
+  (->
+    (subs s 1)
+    (clojure.string/replace #"-" " ")))
+
+(defn list-item [active? routes-map route-name]
+  (dom/li #js {:className (str "nav-li " (when active? "active-li"))
+               :onClick (partial rt/js-link routes-map route-name)}
+
+          (dom/div #js {:className (str (when active? "active-text"))}
+                   (str-beautify route-name))))
+
+(defn positions
+  [pred coll]
+  (keep-indexed (fn [idx x]
+                  (when (pred x)
+                    idx))
+                coll))
+
 (defn nav-menu
   [{:keys [:route-name :background :widgets :children] :as all} owner]
 
   (reify
     om/IInitState
     (init-state  [_]
-      {:depth 1
-       :str-beautify (fn [s]
-                       (->
-                         (subs s 1)
-                         (clojure.string/replace #"-" " ")))})
+      {:depth 1})
 
     om/IRenderState
-    (render-state [_ {:keys [depth str-beautify] :as state}]
+    (render-state [_ {:keys [depth prev-children] :as state}]
       (let [curr-route (first (om/observe owner (mn/current-route)))
             active? (u/string-contains? curr-route route-name)
             routes-map-obs (om/observe owner (mn/routes-map))
@@ -138,7 +156,7 @@
           (= "/" route-name)
           (apply dom/ul nil 
                  (concat
-                   (om/build-all nav-menu children {:state {:depth (inc depth)}})
+                   (om/build-all nav-menu children {:state {:depth (inc depth) :prev-children children }})
                    (when (first @edit-mode-obs)
                      [(dom/button #js {:onClick (fn [_]
                                                   (om/transact!
@@ -151,25 +169,30 @@
           (and (not (empty? children)) (> depth (if (first @edit-mode-obs) 2 2)))
           (dom/div #js {:style #js {:position "relative"}}
 
+                   #_(println (:route-name (first prev-children)))
+                   #_(println "route-name: " route-name)
+                   #_(println (positions (fn [x] (do (println "x: " (:route-name x) " - " (= (:route-name x) "/LoL-comedy")) 
+                                                 (= (:route-name x) "/LoL-comedy"))) 
+                                       prev-children))
+                   (wgt/delete-button prev-children :route-name route-name)
+
+
                    (dom/li #js {:className (str "sub-nav-li ")
                                 :onClick (partial rt/js-link @routes-map-obs route-name)}
 
                            (dom/div #js {:className (str (when active? "active-text"))}
-                                    (str-beautify route-name))))
+                                    (str-beautify route-name)))
+                   )
 
           (not (empty? children))
           (dom/div #js {:style #js {:position "relative"}}
 
-                   (dom/li #js {:className (str "nav-li " (when active? "active-li"))
-                                :onClick (partial rt/js-link @routes-map-obs route-name)}
-
-                           (dom/div #js {:className (str (when active? "active-text"))}
-                                    (str-beautify route-name)))
+                   (list-item active? @routes-map-obs route-name)
 
                    (when active?
                      (apply dom/ul #js {:className "nav-ul"}
                             (concat
-                              (om/build-all nav-menu children {:state {:depth (inc depth)}})
+                              (om/build-all nav-menu children {:state {:depth (inc depth) :prev-children children}})
                               (when (first @edit-mode-obs)
                                 [(dom/button #js {:onClick (fn [_]
                                                              (om/transact!
