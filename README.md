@@ -102,6 +102,9 @@ jquery plugins.
 - In general once a file gets to 1000 lines of code it should broken into smaller namespaces. This is to avoid 
 analysis paralysis. 
 
+- Local state is useful for information that we don't want persisted, or for data that we want to rever to a default 
+behaviour each time the app starts. 
+
 #Glossary 
 
 ! - At the end of a function name means the function makes a change in the outside worlds. 

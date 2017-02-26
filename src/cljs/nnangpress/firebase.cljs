@@ -4,6 +4,28 @@
     [clojure.walk :as wlk]
     [cljs.core.async :refer [put! chan <!]]))
 
+(defn sign-in-ui-config-gen 
+  "Configuration for firebase login flow"
+  [cb]
+  #js {:callbacks
+       #js {:signInSuccess (fn [user credential redirectUrl]
+                             (println "sucessful sign in")
+                             (.dir js/console user)
+                             cb
+                             #_(->
+                               (js/firebase.database)
+                               (.ref (str "users/" (.-uid user)))
+                               (.once "value")
+                               (.then (fn [snapshot]
+                                        #_(om/update! all-data (rdr/read-string (.-data (.val snapshot)))))))
+                             false)}
+       :signInFlow "popup"
+       :signInOptions (array
+                        #js {:provider
+                             js/firebase.auth.EmailAuthProvider.PROVIDER_ID})
+       :tosUrl "https://google.com"
+       :credentialHelper js/firebaseui.auth.CredentialHelper.NONE})
+
 (defn firebase-empty->clj-empty 
   "Goiing from firebase representation of empty vector to a clj empty vector" 
   [data]
@@ -36,10 +58,19 @@
   (-> js/firebase .auth .-currentUser))
 
 (defn firebase-signout 
-  "Sign out current user." 
-  []
+  "Sign out current user and execute callback." 
+  [cb]
   (-> 
     js/firebase
     (.auth)
     (.signOut)
-    (.then (fn [_] (println "User signed out.")))))
+    (.then (fn [_] (println "User signed out.") (cb)))))
+
+(defn fb-initiate-auth
+  "Initiate firebase auth dialog." 
+  [firebase-root-id]
+  (.start
+    (js/firebaseui.auth.AuthUI. (js/firebase.auth))
+    (str "#" firebase-root-id)
+    (sign-in-ui-config-gen identity)))
+

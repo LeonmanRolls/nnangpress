@@ -402,10 +402,11 @@
   {:widget-uid 006
    :object-id (u/uid)
    :widget-name "Standard image widget"
-   :img "http://solariarchitects.com/img/leaderboards/group_photo_everyday_zoomed.jpg"})
+   :img "http://solariarchitects.com/img/leaderboards/group_photo_everyday_zoomed.jpg"
+   :style {:width "60%"}})
 
 ;Simple Image
-(defmethod widget 006 [{:keys [img object-id] :as data} owner]
+(defmethod widget 006 [{:keys [style img object-id] :as data} owner]
   (reify
     om/IInitState
     (init-state [_]
@@ -417,8 +418,8 @@
       (let [advertise? (om/get-state owner :advertise?)
             edit-mode-obs (om/observe owner (mn/edit-mode))]
 
-        (dom/div nil
-                 (dom/img #js {:style #js {:width "100%"}
+        (dom/div #js {:style #js {:textAlign "center"}} 
+                 (dom/img #js {:style (clj->js style)
                                :src (:img data)})
                  (when (and (first @edit-mode-obs) (not advertise?))
                    (dom/input #js {:value (:img data)
@@ -615,44 +616,40 @@
 (defmethod widget-data 9 [_]
   {:widget-uid 9
    :object-id (u/uid)
-   :widget-name "Sign in widget"})
+   :widget-name "Sign in widget"
+   :style {:fontSize "20px"
+           :outline "none"
+           :height "80px"
+           :width "300px"
+           :borderRadius "40px"
+           :background "black"
+           :border "5px solid #3498db"
+           :color "#3498db" 
+           :letterSpacing "1px"
+           :cursor "pointer"
+           :display "inherit"}})
 
 ;Sign in
-(defmethod widget 9 [data owner]
+(defmethod widget 9 [{:keys [style]} owner]
   (reify
     om/IInitState
     (init-state [_]
-      {:advertise? false})
+      {:advertise? false
+       :local-style {:display ""}})
 
-    om/IRender
-    (render [_]
-      (let [all-data (om/observe owner (mn/all-data))
-            uiconfig #js {:callbacks
-                          #js {:signInSuccess (fn [user credential redirectUrl]
-                                                (println "sucessful sign in")
-                                                (.dir js/console user)
-                                                (->
-                                                  (js/firebase.database)
-                                                  (.ref (str "users/" (.-uid user)))
-                                                  (.once "value")
-                                                  (.then (fn [snapshot]
-                                                           (om/update! all-data (rdr/read-string (.-data (.val snapshot)))))))
-                                                false)}
-                          :signInFlow "popup"
-                          :signInOptions (array
-                                           #js {:provider
-                                                js/firebase.auth.EmailAuthProvider.PROVIDER_ID})
-                          :tosUrl "https://google.com"
-                          :credentialHelper js/firebaseui.auth.CredentialHelper.NONE}]
+    om/IRenderState
+    (render-state [_ {:keys [local-style]}]
+      (let [all-data (om/observe owner (mn/all-data))]
 
         (dom/div #js {:style #js {:textAlign "center"}}
-                 (dom/div #js {:id "firebase"})
+                 (dom/div #js {:id "firebase"} "")
                  (dom/button
-                   #js {:onClick (fn [_] (.start
-                                           (js/firebaseui.auth.AuthUI. (js/firebase.auth))
-                                           "#firebase"
-                                           uiconfig))}
-                   "Sign in"))))))
+                   #js {:id "firebase-button"
+                        :style (clj->js (merge style local-style))
+                        :onClick (fn [_] 
+                                   (mn/update-local-style! owner :display "none")
+                                   (fb/fb-initiate-auth "firebase"))}
+                   "Sign up / Sign in"))))))
 
 (defmethod widget-data-type 10 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::user-sites]))
@@ -919,26 +916,36 @@
                  owner 
                  (cre/simple-input-cursor! youtube-video-id data :youtube-video-id))))))
 
+(def admin-toolbar-button-style
+  "Style for admin toolbar button." 
+  {:background "transparent"
+   :color "white"
+   :letterSpacing "1px"
+   :marginRight "5px"})
+
+(defn admin-toolbar-button
+  "Button for admin toolbar. Calls callback when clicked" 
+  [cb button-title]
+  (dom/button #js {:style (clj->js admin-toolbar-button-style)
+                   :onClick (fn [_] (cb))} 
+              button-title))
+
 (defn admin-toolbar 
   "Toolbar to aid in editing the site and provide information. Should not be visible when ordinarily visting the site." 
   [data owner]
   (reify
-    om/IRender
-    (render [_]
+    om/IRenderState
+    (render-state [_ {:keys [local-style]}]
       (let [user-email-obs (om/observe owner (mn/user-email))
             site-name-obs (om/observe owner (mn/site-name))]
         (dom/div #js {:className "admin-toolbar"}
                  (dom/b nil "Welcome to Nnangpress alpha | ")
-                 (dom/button #js {:onClick (fn [_] (mn/toggle-edit-mode))}
-                             "Toggle edit mode")
-                 (dom/b nil (str " | Username:  " (first @user-email-obs)))
+                 (dom/b nil (str " Username:  " (first @user-email-obs)))
                  (dom/b nil (str " | Site name:  " (first @site-name-obs) " | " ))
-                 (dom/button #js {:onClick (fn [_] (mn/new-site))}
-                             "Save new site")
-                 (dom/button #js {:onClick (fn [_] (mn/save-site-data))}
-                             "Update current site")
-                 (dom/button #js {:onClick (fn [_] (fb/firebase-signout))}
-                             "Sign Out"))))))
+                 (admin-toolbar-button mn/toggle-edit-mode "Toggle edit mode")
+                 (admin-toolbar-button mn/new-site "Save new site")
+                 (admin-toolbar-button mn/save-site-data "Update current site")
+                 (admin-toolbar-button (fn [_] (fb/firebase-signout identity)) "Sign Out"))))))
 
 (defn select-widget-wrapper 
   "Primarily for edit mode. Allows the widget this wraps to be added to the current route." 
