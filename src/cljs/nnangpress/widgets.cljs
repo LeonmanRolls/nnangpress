@@ -12,6 +12,7 @@
     [nnangpress.monolith :as mn]
     [nnangpress.core :as cre]
     [nnangpress.routing :as rt]
+    [nnangpress.firebase :as fb]
     [goog.dom :as gdom]
     [cljs.core.async :refer [put! chan <!]]
     [cljs.spec :as s]
@@ -645,8 +646,7 @@
                           :credentialHelper js/firebaseui.auth.CredentialHelper.NONE}]
 
         (dom/div #js {:style #js {:textAlign "center"}}
-                 "hi there"
-                 (dom/div #js {:id "#firebase"} "")
+                 (dom/div #js {:id "firebase"})
                  (dom/button
                    #js {:onClick (fn [_] (.start
                                            (js/firebaseui.auth.AuthUI. (js/firebase.auth))
@@ -936,7 +936,9 @@
                  (dom/button #js {:onClick (fn [_] (mn/new-site))}
                              "Save new site")
                  (dom/button #js {:onClick (fn [_] (mn/save-site-data))}
-                             "Update current site"))))))
+                             "Update current site")
+                 (dom/button #js {:onClick (fn [_] (fb/firebase-signout))}
+                             "Sign Out"))))))
 
 (defn select-widget-wrapper 
   "Primarily for edit mode. Allows the widget this wraps to be added to the current route." 

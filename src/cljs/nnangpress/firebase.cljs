@@ -35,3 +35,11 @@
   []
   (-> js/firebase .auth .-currentUser))
 
+(defn firebase-signout 
+  "Sign out current user." 
+  []
+  (-> 
+    js/firebase
+    (.auth)
+    (.signOut)
+    (.then (fn [_] (println "User signed out.")))))

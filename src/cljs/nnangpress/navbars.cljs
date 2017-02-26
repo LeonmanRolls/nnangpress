@@ -176,7 +176,6 @@
                                        prev-children))
                    (wgt/delete-button prev-children :route-name route-name)
 
-
                    (dom/li #js {:className (str "sub-nav-li ")
                                 :onClick (partial rt/js-link @routes-map-obs route-name)}
 
