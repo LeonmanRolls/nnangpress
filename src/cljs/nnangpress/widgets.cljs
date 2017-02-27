@@ -939,7 +939,7 @@
                  (dom/b nil "Welcome to Nnangpress alpha | ")
                  (dom/b nil (str " Username:  " (first @user-email-obs)))
                  (dom/b nil (str " | Site name:  " (first @site-name-obs) " | " ))
-                 (admin-toolbar-button #(om/transact! sidebar-data :sidebar-visible u/toggle) "New toggle")
+                 (admin-toolbar-button #(om/transact! sidebar-data :sidebar-visible u/toggle) "Menu")
                  (admin-toolbar-button mn/toggle-edit-mode "Toggle edit mode")
                  (admin-toolbar-button mn/new-site "Save new site")
                  (admin-toolbar-button mn/save-site-data "Update current site")
@@ -952,12 +952,15 @@
     om/IRender
     (render [_]
       (dom/div #js {:className "selectWidget"}
-               widget-name
-               (dom/button #js {:onClick (fn [_] 
-                                           (mn/ref-conj! 
-                                             (mn/current-widgets-builder<< owner) 
-                                             (widget-data widget-uid)))}
-                           "Add widget")
+               (dom/div #js {:style #js {:borderBottom "1px solid white" :marginBottom "10px"}} 
+                        (dom/span nil widget-name)
+                        (dom/button #js {:style #js {:float "right", :background "transparent", :color "white", 
+                                                     :cursor "pointer"}
+                                         :onClick (fn [_] 
+                                                    (mn/ref-conj! 
+                                                      (mn/current-widgets-builder<< owner) 
+                                                      (widget-data widget-uid)))}
+                                    "Add widget"))
                (om/build widget data {:init-state {:advertise? true}})))))
 
 (defn all-widget-wrapper 

@@ -109,7 +109,8 @@
           "Default menu"))
 
 (defn admin-sidebar 
-  "Sidebar primarily for selecting widgets." 
+  "Sidebar primarily for selecting widgets and other settings that are not appropriate for editing directly indside of 
+  the site." 
   [{:keys [sidebar-data]} owner]
   (reify 
     om/IRender
@@ -120,7 +121,7 @@
                     :style #js {:width "400px" :display (if (:sidebar-visible sidebar-data) "" "none")}} 
 
                (dom/p #js {:style (clj->js sidebar-header-p)} 
-                      "Nangpress Settings"
+                      "Nangpress Menu"
                       (dom/i #js {:style (clj->js sidebar-close-icon)
                                   :className "fa fa-times fa-2x"
                                   :onClick #(om/transact! sidebar-data :sidebar-visible u/toggle)})
