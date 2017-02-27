@@ -67,20 +67,24 @@
  "Display sidebar content based on sidebar state." 
   identity)
 
-;<i class="fa fa-chevron-down"></i>
-
-(defn sidebar-li [label]
-  (dom/li #js {:style #js {:borderBottom "2px solid white" :padding "10px"}} 
+(defn sidebar-li [label cb]
+  (dom/li #js {:onClick cb
+               :style #js {:borderBottom "2px solid white" :padding "10px"}} 
           label
           (dom/i #js {:style #js {:float "right"}
                       :className "fa fa-chevron-right"})))
+
+(defn update-sidebar-page!   
+  "Effectively routing, change the current page of the admin sidebar." 
+  [sidebar-page]
+  (om/transact! (mn/sidebar-data) :sidebar-page (fn [_] sidebar-page)))
 
 ;Base sidebar menu
 (defmethod sidebar-content "base-menu"
   [_] 
   (dom/ul #js {:style #js {:fontWeight "600", :padding "5px", :cursor "pointer", :marginTop "0px"}} 
-          (sidebar-li "route settings")
-          (sidebar-li "add a widget")))
+          (sidebar-li "route settings" #(update-sidebar-page! "route-settings"))
+          (sidebar-li "add a widget" #(update-sidebar-page! "widget-select"))))
 
 (defmethod sidebar-content :default
   [_] 

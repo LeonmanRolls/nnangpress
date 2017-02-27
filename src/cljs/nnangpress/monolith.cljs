@@ -92,6 +92,9 @@
   "Defines our monolith API" 
   [monolith]
 
+  (defn sidebar-data []
+    (om/ref-cursor (:sidebar-data (om/root-cursor monolith))))
+
   (defn site-name []
     (om/ref-cursor (:site-name (om/root-cursor monolith))))
 
