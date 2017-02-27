@@ -929,7 +929,7 @@
 
 (defn admin-toolbar 
   "Toolbar to aid in editing the site and provide information. Should not be visible when ordinarily visting the site." 
-  [data owner]
+  [{:keys [sidebar-data]} owner]
   (reify
     om/IRenderState
     (render-state [_ {:keys [local-style]}]
@@ -939,6 +939,7 @@
                  (dom/b nil "Welcome to Nnangpress alpha | ")
                  (dom/b nil (str " Username:  " (first @user-email-obs)))
                  (dom/b nil (str " | Site name:  " (first @site-name-obs) " | " ))
+                 (admin-toolbar-button #(om/transact! sidebar-data :sidebar-visible u/toggle) "New toggle")
                  (admin-toolbar-button mn/toggle-edit-mode "Toggle edit mode")
                  (admin-toolbar-button mn/new-site "Save new site")
                  (admin-toolbar-button mn/save-site-data "Update current site")

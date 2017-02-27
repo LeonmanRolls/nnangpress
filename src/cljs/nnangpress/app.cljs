@@ -63,6 +63,52 @@
                                      wgt/select-widget-wrapper
                                      all-widgets-data-obs)))))))))
 
+(defmulti sidebar-content 
+ "Display sidebar content based on sidebar state." 
+  identity)
+
+;<i class="fa fa-chevron-down"></i>
+
+(defn sidebar-li [label]
+  (dom/li #js {:style #js {:borderBottom "2px solid white" :padding "10px"}} 
+          label
+          (dom/i #js {:style #js {:float "right"}
+                      :className "fa fa-chevron-right"})))
+
+;Base sidebar menu
+(defmethod sidebar-content "base-menu"
+  [_] 
+  (dom/ul #js {:style #js {:fontWeight "600", :padding "5px", :cursor "pointer", :marginTop "0px"}} 
+          (sidebar-li "route settings")
+          (sidebar-li "add a widget")))
+
+(defmethod sidebar-content :default
+  [_] 
+  (dom/ul #js {:style #js {:fontWeight "600", :padding "5px", :cursor "pointer", :marginTop "0px"}} 
+          "Default menu"))
+
+(def sidebar-header-p {:border "5px solid #7f8c8d", :padding "10px", :background "#95a5a6", :fontWeight "600"})
+(def sidebar-close-icon {:float "right", :margin-top "-5px", :cursor "pointer"})
+
+(defn admin-sidebar 
+  "Sidebar primarily for selecting widgets." 
+  [{:keys [sidebar-data]} owner]
+  (reify 
+    om/IRender
+    (render 
+      [_]
+      (dom/div #js {:id "mySidenav"
+                    :className "sidenav"
+                    :style #js {:width "300px" :display (if (:sidebar-visible sidebar-data) "" "none")}} 
+
+               (dom/p #js {:style (clj->js sidebar-header-p)} 
+                      "Nangpress Settings"
+                      (dom/i #js {:style (clj->js sidebar-close-icon)
+                                  :className "fa fa-times fa-2x"
+                                  :onClick #(om/transact! sidebar-data :sidebar-visible u/toggle)}))
+
+               (sidebar-content (:sidebar-page sidebar-data))))))
+
 (defn master 
   "This component is the master of routing. The current route of the app is considered part of the monolith i.e. 
   part of the state of the application. So this component has the job of rendering the admin-toolbar, the widgets 
@@ -80,7 +126,8 @@
 
         (mn/independent-ref-cursor-watcher owner)
         (dom/div #js {:id "master-container"} 
-                 (om/build wgt/admin-toolbar {})
+                 (om/build admin-sidebar data)
+                 (om/build wgt/admin-toolbar data)
                  (om/build main-view widgets)
                  (om/build nv/navbar route-widget))))))
 
