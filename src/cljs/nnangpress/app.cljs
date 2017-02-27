@@ -109,7 +109,10 @@
                       "Nangpress Settings"
                       (dom/i #js {:style (clj->js sidebar-close-icon)
                                   :className "fa fa-times fa-2x"
-                                  :onClick #(om/transact! sidebar-data :sidebar-visible u/toggle)}))
+                                  :onClick #(om/transact! sidebar-data :sidebar-visible u/toggle)})
+                      (dom/i #js {:style (clj->js (merge sidebar-close-icon {:marginRight "10px"}))
+                                  :className "fa fa-home fa-2x"
+                                  :onClick #(update-sidebar-page! "base-menu")}))
 
                (sidebar-content (:sidebar-page sidebar-data))))))
 
