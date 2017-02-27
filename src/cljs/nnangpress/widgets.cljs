@@ -900,7 +900,7 @@
   "Given a youtube video url, return embedable string" 
   [youtube-video-id]
   (str 
-    "<iframe id=\"ytplayer\" type=\"text/html\" width=\"640\" height=\"360\" src=\"https://www.youtube.com/embed/" 
+    "<iframe id=\"ytplayer\" type=\"text/html\" width=\"100%\" height=\"360\" src=\"https://www.youtube.com/embed/" 
     youtube-video-id  
     "?autoplay=0\" frameborder=\"0\"></iframe>"))
 
@@ -978,7 +978,6 @@
   (let [uid1 (u/uid) 
         uid2 (u/uid)]
     (dom/div nil
-             "Widget Order: "
              (dom/input #js {:id uid1 
                              :type "text"})
              (dom/input #js {:id uid2 

@@ -21,51 +21,25 @@
 
 (enable-console-print!)
 
+(def sidebar-header-p {:border "5px solid #7f8c8d", :padding "10px", :background "#95a5a6", :fontWeight "600"})
+(def sidebar-close-icon {:float "right", :margin-top "-5px", :cursor "pointer"})
+
 (defn main-view 
   "The main view that builds the displayed widgets for the view as well as the admin panel." 
   [data owner]
   (reify
     om/IRender
     (render [_]
-      (let [all-widgets-data-obs (om/observe owner (mn/all-widgets-data))
-            edit-mode-obs (om/observe owner (mn/edit-mode))
-            main-view-style-obs (om/observe owner (mn/main-view-style))
-            routes-map-obs (om/observe owner (mn/routes-map))
-            current-route-obs (om/observe owner (mn/current-route))
-            current-route-map (mn/current-route-map
-                                (clojure.string/split (first @current-route-obs) #"/")
-                                routes-map-obs)]
+      (let [main-view-style-obs (om/observe owner (mn/main-view-style))]
 
         (dom/div (clj->js (merge @main-view-style-obs {:className "main-view"}))
 
                  (apply dom/div nil
-                        (om/build-all wgt/all-widget-wrapper data))
-
-                 (when (first @edit-mode-obs)
-                   (dom/div #js {:className "edit"}
-
-                            (wgt/simple-form (fn [x y] 
-                                           (mn/ref-vec-swap 
-                                             (:widgets current-route-map) (int x) (int y))))
-
-                            (dom/div nil
-                                     "Background Image: "
-                                     (dom/input #js {:value (:bg-img @current-route-map)
-                                                     :style #js {:width "100%"}
-                                                     :onChange (fn [e]
-                                                                 (om/update!
-                                                                   current-route-map
-                                                                   :bg-img
-                                                                   (.. e -target -value)))}))
-
-                            (apply dom/div nil
-                                   (om/build-all
-                                     wgt/select-widget-wrapper
-                                     all-widgets-data-obs)))))))))
+                        (om/build-all wgt/all-widget-wrapper data)))))))
 
 (defmulti sidebar-content 
  "Display sidebar content based on sidebar state." 
-  identity)
+  (fn [sidebar-page owner] sidebar-page))
 
 (defn sidebar-li [label cb]
   (dom/li #js {:onClick cb
@@ -81,18 +55,58 @@
 
 ;Base sidebar menu
 (defmethod sidebar-content "base-menu"
-  [_] 
-  (dom/ul #js {:style #js {:fontWeight "600", :padding "5px", :cursor "pointer", :marginTop "0px"}} 
+  [data owner] 
+  (dom/ul #js {:style #js {:fontWeight "600", :cursor "pointer", :marginTop "0px"}} 
           (sidebar-li "route settings" #(update-sidebar-page! "route-settings"))
           (sidebar-li "add a widget" #(update-sidebar-page! "widget-select"))))
 
+(defn current-route-map-ref-cur 
+  "" 
+  [owner]
+  (let [current-route-obs (om/observe owner (mn/current-route))
+        routes-map-obs (om/observe owner (mn/routes-map))]
+    (mn/current-route-map
+      (clojure.string/split (first @current-route-obs) #"/")
+      routes-map-obs)))
+
+;Setting that apply to a specific route. Will be applied to the route the user is currently on.
+(defmethod sidebar-content "route-settings"
+  [data owner] 
+  (let [current-route-map (current-route-map-ref-cur owner)]
+
+    (dom/div nil 
+             (dom/u nil "Route Settings")
+             (dom/div nil
+                      "Background Image: "
+                      (dom/input #js {:value (:bg-img @current-route-map)
+                                      :style #js {:width "100%"}
+                                      :onChange (fn [e]
+                                                  (om/update!
+                                                    current-route-map
+                                                    :bg-img
+                                                    (.. e -target -value)))}))
+
+             (dom/br "")
+             (dom/u nil "Swap widgets by index")
+             (wgt/simple-form (fn [x y] 
+                                (mn/ref-vec-swap 
+                                  (:widgets current-route-map) (int x) (int y)))))))
+
+(defmethod sidebar-content "widget-select"
+  [data owner] 
+  (let [all-widgets-data-obs (om/observe owner (mn/all-widgets-data))]
+    (dom/div nil 
+             (dom/u nil "Select a widget")
+             (dom/br nil "")
+             (apply dom/div nil
+                    (om/build-all
+                      wgt/select-widget-wrapper
+                      all-widgets-data-obs)))))
+
 (defmethod sidebar-content :default
-  [_] 
+  [data owner] 
   (dom/ul #js {:style #js {:fontWeight "600", :padding "5px", :cursor "pointer", :marginTop "0px"}} 
           "Default menu"))
-
-(def sidebar-header-p {:border "5px solid #7f8c8d", :padding "10px", :background "#95a5a6", :fontWeight "600"})
-(def sidebar-close-icon {:float "right", :margin-top "-5px", :cursor "pointer"})
 
 (defn admin-sidebar 
   "Sidebar primarily for selecting widgets." 
@@ -103,7 +117,7 @@
       [_]
       (dom/div #js {:id "mySidenav"
                     :className "sidenav"
-                    :style #js {:width "300px" :display (if (:sidebar-visible sidebar-data) "" "none")}} 
+                    :style #js {:width "400px" :display (if (:sidebar-visible sidebar-data) "" "none")}} 
 
                (dom/p #js {:style (clj->js sidebar-header-p)} 
                       "Nangpress Settings"
@@ -114,7 +128,8 @@
                                   :className "fa fa-home fa-2x"
                                   :onClick #(update-sidebar-page! "base-menu")}))
 
-               (sidebar-content (:sidebar-page sidebar-data))))))
+               (dom/div #js {:style #js {:padding "5px" :fontWeight "600"}} 
+                        (sidebar-content (:sidebar-page sidebar-data) owner))))))
 
 (defn master 
   "This component is the master of routing. The current route of the app is considered part of the monolith i.e. 

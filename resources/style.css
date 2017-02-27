@@ -42,6 +42,10 @@ p {
   margin: 0px;
 }
 
+input {
+    border: 0px;
+}
+
 .edit {
   color: white;
   background: #494949;
@@ -485,8 +489,10 @@ color: white !important;
     z-index: 100; /* Stay on top */
     bottom: 0;
     left: 0;
-    background-color: #111; /* Black*/
+    background: rgba(0,0,0,0.9); /* Black*/
     transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
 /*Side menu End --------------------------------------------------------------------------------*/
 
