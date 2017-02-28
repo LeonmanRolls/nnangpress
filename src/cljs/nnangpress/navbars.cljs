@@ -5,9 +5,9 @@
             [om.dom :as dom :include-macros true]
             [nnangpress.monolith :as mn]
             [nnangpress.utils :as u]
+            [nnangpress.components.common :as cc]
             [nnangpress.core :as cre]
-            [nnangpress.routing :as rt]
-            [nnangpress.widgets :as wgt]))
+            [nnangpress.routing :as rt]))
 
 (defmulti navbar (fn [x] (:route-widget-id x)))
 (defmulti navbar-data (fn [x] x))
@@ -174,7 +174,7 @@
                    #_(println (positions (fn [x] (do (println "x: " (:route-name x) " - " (= (:route-name x) "/LoL-comedy")) 
                                                  (= (:route-name x) "/LoL-comedy"))) 
                                        prev-children))
-                   (wgt/delete-button prev-children :route-name route-name)
+                   (cc/delete-button prev-children :route-name route-name)
 
                    (dom/li #js {:className (str "sub-nav-li ")
                                 :onClick (partial rt/js-link @routes-map-obs route-name)}

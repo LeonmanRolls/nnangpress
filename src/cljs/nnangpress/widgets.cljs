@@ -13,11 +13,12 @@
     [nnangpress.core :as cre]
     [nnangpress.routing :as rt]
     [nnangpress.firebase :as fb]
+    [nnangpress.dom :as ndom]
+    [nnangpress.components.common :as cc]
     [goog.dom :as gdom]
     [cljs.core.async :refer [put! chan <!]]
     [cljs.spec :as s]
-    [clojure.set :as st]
-    [cemerick.url :as url]))
+    [clojure.set :as st]))
 
 (declare widget-data-type master admin-sidebar main-view)
 
@@ -30,82 +31,6 @@
 (s/def ::img string?)
 (s/def ::user-sites vector?)
 (s/def ::widget-data (s/multi-spec widget-data-type :widget-uid))
-
-;##js DOM helpers 
-
-(defn get-node-by-id 
-  "Get a dom node by id" 
-  [id]
-  (js/document.getElementById id))
-
-(defn input-listener 
-  "Listen to an input event on a contentEditable element" 
-  [id cb]
-  (-> 
-    (get-node-by-id id)
-    (.addEventListener "input" cb)))
-
-(defn attach-click-listener-by-id 
-  "Attach a click clistener to a node. Returns the callback for removal purposes" 
-  [id cb]
-  (-> 
-    js/document 
-    (.getElementById id)
-    (.addEventListener "click" cb)
-    cb))
-
-(defn remove-listener 
-  "Remove a listener" 
-  [id cb]
-  (-> 
-    js/document 
-    (.getElementById id)
-    (.removeEventListener "click" cb)))
-
-(defn set-attr-by-id 
-  "Sett attr of a node by its id" 
-  [id attr value]
-  (-> 
-    (get-node-by-id id) 
-    (.setAttribute attr value)))
-
-(defn get-query-params<<
-  "Get query params from the current url." 
-  []
-  (:query (url/url (-> js/window .-location .-href))))
-
-(defn content-editable-updater 
-  "Update cursor given the id of the corresponding contentEditable node" 
-  [id data ikey]
-  (input-listener 
-    id  
-    (fn [x] 
-      (om/update! data ikey (-> x .-target .-innerText)))))
-
-;##Helper components.
-
-(defn delete-button 
-  "Add a delete button to the component, parent must be position relative. The 'parent' reference cursor vector 
-  and details identifying the specific element in that vector that this component is appearing over should be 
-  provided. "
-  [vec-ref ikey match-val]
-  (dom/img #js {:style #js {:width "20px" :right "-10px" :top "-10px" 
-                            :position "absolute"}
-                :src "http://www.stabilita.sk/media/image/cross-icon.png"
-                :onClick (fn [_] 
-                           (mn/ref-vec-map-delete! vec-ref ikey match-val))}))
-
-(defn edit-mode-sense 
-  "Display empty div or what you feed me. Intended for componentes that are only meant to be down in edit mode." 
-  [owner food]
-  (let [edit-mode-obs (om/observe owner (mn/edit-mode))]
-    (if 
-      (first edit-mode-obs)
-      food 
-      (dom/div nil ""))))
-
-(defn edit-mode-display [edit-mode]
-  (if edit-mode "inherit" "none"))
 
 (defn medium-init 
   "Helper for mediumjs components. Initializes a medium instance. Returns a function that can be used to destroy 
@@ -122,7 +47,7 @@
                                                        data
                                                        [(.-innerHTML (gdom/getElement uuid))]))}})
 
-        cb (attach-click-listener-by-id 
+        cb (ndom/attach-click-listener-by-id 
              link-btn-id 
              (fn []
                (do 
@@ -134,11 +59,11 @@
                         :style "color: #66d9ef"
                         :target "_blank"
                         :href (.-value 
-                                (get-node-by-id link-input-id))}))))]
+                                (ndom/get-node-by-id link-input-id))}))))]
 
     (fn []
       (.destroy medium)
-      (remove-listener link-btn-id cb))))
+      (ndom/remove-listener link-btn-id cb))))
 
 (defn rich-text-edit 
   "Mediumjs rich text editor" 
@@ -152,7 +77,7 @@
       (did-mount [_]
         (let [edit-mode-obs (first (om/observe owner (mn/edit-mode)))]
           (medium-init uid data link-btn-id link-input-id)
-          (set-attr-by-id uid "contenteditable" (str edit-mode-obs))))
+          (ndom/set-attr-by-id uid "contenteditable" (str edit-mode-obs))))
 
       om/IDidUpdate
       (did-update [_ _ _]
@@ -160,7 +85,7 @@
               medium-destroy (medium-init uid data link-btn-id link-input-id)]
           (medium-destroy)
           (medium-init uid data link-btn-id link-input-id)
-          (set-attr-by-id uid "contenteditable" (str edit-mode-obs))))
+          (ndom/set-attr-by-id uid "contenteditable" (str edit-mode-obs))))
 
       om/IRenderState
       (render-state [_ state]
@@ -170,7 +95,7 @@
                                  :style #js {:marginTop "-10px"}
                                  :dangerouslySetInnerHTML #js {:__html (first data)}})
 
-                   (dom/div #js {:style #js {:display (edit-mode-display edit-mode-obs)}}
+                   (dom/div #js {:style #js {:display (cc/edit-mode-display edit-mode-obs)}}
                             (dom/input #js {:id link-input-id})
                             (dom/button #js{:id link-btn-id} "Link"))))))))
 
@@ -651,24 +576,7 @@
                                    (fb/fb-initiate-auth 
                                      "firebase"
                                      (fn [user]
-                                       (mn/auth-state-load-site! master "super-container")
-                                       #_(go 
-                                       (let [c (chan)]
-                                         (fb/firebase-get "nangpress-data/" c)
-                                         (mn/reset-monolith-atom! 
-                                           (mn/raw-nnangpress->renderable (<! c) (-> js/firebase .auth .-currentUser)))
-                                         )  
-                                         )
-                                       
-                                     #_(->
-                                       (js/firebase.database)
-                                       (.ref (str "users/" (.-uid user)))
-                                       (.once "value")
-                                       (.then (fn [snapshot]
-                                                (println "snapshot: " (.val snapshot)))))  
-                                       
-                                       )
-                                     ))}
+                                       (mn/auth-state-load-site! master "super-container"))))}
                    "Sign up / Sign in"))))))
 
 (defmethod widget-data-type 10 [_]
@@ -750,14 +658,14 @@
 
     om/IDidMount 
     (did-mount [_]
-      (content-editable-updater (om/get-state owner :uid) data :tag))
+      (ndom/content-editable-updater (om/get-state owner :uid) data :tag))
 
     om/IRenderState 
     (render-state [_ {:keys [uid tags] :as state}]
       (let [edit-mode-obs (om/observe owner (mn/edit-mode))]
         (dom/li #js {:style #js {:float "left" :background "#CE4072" :paddingRight "10px" 
                                  :paddingLeft "10px" :margin "0px" :position "relative"}} 
-                (when (first edit-mode-obs) (delete-button tags :tag (:tag data)))
+                (when (first edit-mode-obs) (cc/delete-button tags :tag (:tag data)))
 
                 (dom/p #js {:id uid :contentEditable (first edit-mode-obs)} (:tag data)))))))
 
@@ -766,7 +674,7 @@
   (reify 
     om/IRenderState
     (render-state [_ state]
-      (edit-mode-sense 
+      (cc/edit-mode-sense 
         owner
         (dom/li #js {:onClick (fn [_] 
                                 (mn/ref-vec-insert-second! (:tags state) {:tag "Change me"}))
@@ -835,7 +743,7 @@
 
     om/IDidMount 
     (did-mount [_]
-      (content-editable-updater (om/get-state owner :uid) data :tagz))
+      (ndom/content-editable-updater (om/get-state owner :uid) data :tagz))
 
     om/IRenderState
     (render-state [_ {:keys [uid tags] :as state}]
@@ -848,7 +756,7 @@
                                  :background (if clicked "#CE4072" "inherit")}} 
 
                 (when (first edit-mode-obs)
-                  (delete-button tags :tagz tagz))
+                  (cc/delete-button tags :tagz tagz))
 
                 (dom/p #js {:id uid :contentEditable (first edit-mode-obs)} tagz))))))
 
@@ -857,7 +765,7 @@
   (reify 
     om/IRenderState
     (render-state [_ {:keys [tags] :as state}]
-      (edit-mode-sense 
+      (cc/edit-mode-sense 
         owner
         (dom/li #js {:onClick (fn [_] 
                                 (mn/ref-vec-insert-second! tags default-tag))
@@ -906,7 +814,7 @@
       (dom/div nil 
                (dom/div #js {:style #js {:marginTop "-10px" :textAlign "center"}
                              :dangerouslySetInnerHTML #js {:__html like-box-string}})         
-               (edit-mode-sense 
+               (cc/edit-mode-sense 
                  owner 
                  (cre/simple-input-cursor! like-box-string data :like-box-string))))))
 
@@ -932,217 +840,7 @@
       (dom/div nil 
                (dom/div #js {:style #js {:marginTop "-10px" :textAlign "center"}
                              :dangerouslySetInnerHTML #js {:__html (youtube-string-gen youtube-video-id)}})         
-               (edit-mode-sense 
+               (cc/edit-mode-sense 
                  owner 
                  (cre/simple-input-cursor! youtube-video-id data :youtube-video-id))))))
-
-(def admin-toolbar-button-style
-  "Style for admin toolbar button." 
-  {:background "transparent", :color "white", :letterSpacing "1px", :marginRight "5px"})
-
-(defn admin-toolbar-button
-  "Button for admin toolbar. Calls callback when clicked" 
-  [cb button-title]
-  (dom/button #js {:style (clj->js admin-toolbar-button-style)
-                   :onClick (fn [_] (cb))} 
-              button-title))
-
-(defn admin-toolbar 
-  "Toolbar to aid in editing the site and provide information. Should not be visible when ordinarily visting the site." 
-  [{:keys [sidebar-data]} owner]
-  (reify
-    om/IRenderState
-    (render-state [_ {:keys [local-style]}]
-      (let [user-email-obs (om/observe owner (mn/user-email))
-            site-name-obs (om/observe owner (mn/site-name))]
-        (dom/div #js {:className "admin-toolbar"}
-                 (dom/b nil "Welcome to Nnangpress alpha | ")
-                 (dom/b nil (str " Username:  " (first @user-email-obs)))
-                 (dom/b nil (str " | Site name:  " (first @site-name-obs) " | " ))
-                 (admin-toolbar-button #(om/transact! sidebar-data :sidebar-visible u/toggle) "Menu")
-                 (admin-toolbar-button mn/toggle-edit-mode "Toggle edit mode")
-                 (admin-toolbar-button mn/new-site "Save new site")
-                 (admin-toolbar-button mn/save-site-data "Update current site")
-                 (admin-toolbar-button (fn [_] (fb/firebase-signout identity)) "Sign Out"))))))
-
-(defn select-widget-wrapper 
-  "Primarily for edit mode. Allows the widget this wraps to be added to the current route." 
-  [{:keys [widget-name widget-uid] :as data} owner]
-  (reify
-    om/IRender
-    (render [_]
-      (dom/div #js {:className "selectWidget"}
-               (dom/div #js {:style #js {:borderBottom "1px solid white" :marginBottom "10px"}} 
-                        (dom/span nil widget-name)
-                        (dom/button #js {:style #js {:float "right", :background "transparent", :color "white", 
-                                                     :cursor "pointer"}
-                                         :onClick (fn [_] 
-                                                    (mn/ref-conj! 
-                                                      (mn/current-widgets-builder<< owner) 
-                                                      (widget-data widget-uid)))}
-                                    "Add widget"))
-               (om/build widget data {:init-state {:advertise? true}})))))
-
-(defn all-widget-wrapper 
-  "Wrap all displayed widgets." 
-  [{:keys [object-id] :as data} owner]
-  (reify
-    om/IRender
-    (render [_]
-      (dom/div #js {:style #js {:margin "50px" :position "relative"}} 
-               (edit-mode-sense 
-                 owner
-                 (delete-button  (mn/current-widgets-builder<< owner) :object-id object-id))
-               (om/build widget data)))))
-
-(defn simple-form 
-  "Inputs and submit, input values will be passed to callback." 
-  [cb]
-  (let [uid1 (u/uid) 
-        uid2 (u/uid)]
-    (dom/div nil
-             (dom/input #js {:id uid1 
-                             :type "text"})
-             (dom/input #js {:id uid2 
-                             :type "text"})
-
-             (dom/button #js {:onClick (fn [_]
-                                         (cb 
-                                           (.-value (get-node-by-id uid1))
-                                           (.-value (get-node-by-id uid2))))} 
-                         "Submit"))))
-
-(def sidebar-header-p {:border "5px solid #7f8c8d", :padding "10px", :background "#95a5a6", :fontWeight "600"})
-(def sidebar-close-icon {:float "right", :margin-top "-5px", :cursor "pointer"})
-
-(defn main-view 
-  "The main view that builds the displayed widgets for the view as well as the admin panel." 
-  [data owner]
-  (reify
-    om/IRender
-    (render [_]
-      (let [main-view-style-obs (om/observe owner (mn/main-view-style))]
-
-        (dom/div (clj->js (merge @main-view-style-obs {:className "main-view"}))
-
-                 (apply dom/div nil
-                        (om/build-all all-widget-wrapper data)))))))
-
-(defmulti sidebar-content 
- "Display sidebar content based on sidebar state." 
-  (fn [sidebar-page owner] sidebar-page))
-
-(defn sidebar-li [label cb]
-  (dom/li #js {:onClick cb
-               :style #js {:borderBottom "2px solid white" :padding "10px"}} 
-          label
-          (dom/i #js {:style #js {:float "right"}
-                      :className "fa fa-chevron-right"})))
-
-(defn update-sidebar-page!   
-  "Effectively routing, change the current page of the admin sidebar." 
-  [sidebar-page]
-  (om/transact! (mn/sidebar-data) :sidebar-page (fn [_] sidebar-page)))
-
-;Base sidebar menu
-(defmethod sidebar-content "base-menu"
-  [data owner] 
-  (dom/ul #js {:style #js {:fontWeight "600", :cursor "pointer", :marginTop "0px"}} 
-          (sidebar-li "route settings" #(update-sidebar-page! "route-settings"))
-          (sidebar-li "add a widget" #(update-sidebar-page! "widget-select"))))
-
-(defn current-route-map-ref-cur 
-  "" 
-  [owner]
-  (let [current-route-obs (om/observe owner (mn/current-route))
-        routes-map-obs (om/observe owner (mn/routes-map))]
-    (mn/current-route-map
-      (clojure.string/split (first @current-route-obs) #"/")
-      routes-map-obs)))
-
-;Setting that apply to a specific route. Will be applied to the route the user is currently on.
-(defmethod sidebar-content "route-settings"
-  [data owner] 
-  (let [current-route-map (current-route-map-ref-cur owner)]
-
-    (dom/div nil 
-             (dom/u nil "Route Settings")
-             (dom/div nil
-                      "Background Image: "
-                      (dom/input #js {:value (:bg-img @current-route-map)
-                                      :style #js {:width "100%"}
-                                      :onChange (fn [e]
-                                                  (om/update!
-                                                    current-route-map
-                                                    :bg-img
-                                                    (.. e -target -value)))}))
-
-             (dom/br "")
-             (dom/u nil "Swap widgets by index")
-             (simple-form (fn [x y] 
-                                (mn/ref-vec-swap 
-                                  (:widgets current-route-map) (int x) (int y)))))))
-
-(defmethod sidebar-content "widget-select"
-  [data owner] 
-  (let [all-widgets-data-obs (om/observe owner (mn/all-widgets-data))]
-    (dom/div nil 
-             (dom/u nil "Select a widget")
-             (dom/br nil "")
-             (apply dom/div nil
-                    (om/build-all
-                      select-widget-wrapper
-                      all-widgets-data-obs)))))
-
-(defmethod sidebar-content :default
-  [data owner] 
-  (dom/ul #js {:style #js {:fontWeight "600", :padding "5px", :cursor "pointer", :marginTop "0px"}} 
-          "Default menu"))
-
-(defn admin-sidebar 
-  "Sidebar primarily for selecting widgets and other settings that are not appropriate for editing directly indside of 
-  the site." 
-  [{:keys [sidebar-data]} owner]
-  (reify 
-    om/IRender
-    (render 
-      [_]
-      (dom/div #js {:id "mySidenav"
-                    :className "sidenav"
-                    :style #js {:width "400px" :display (if (:sidebar-visible sidebar-data) "" "none")}} 
-
-               (dom/p #js {:style (clj->js sidebar-header-p)} 
-                      "Nangpress Menu"
-                      (dom/i #js {:style (clj->js sidebar-close-icon)
-                                  :className "fa fa-times fa-2x"
-                                  :onClick #(om/transact! sidebar-data :sidebar-visible u/toggle)})
-                      (dom/i #js {:style (clj->js (merge sidebar-close-icon {:marginRight "10px"}))
-                                  :className "fa fa-home fa-2x"
-                                  :onClick #(update-sidebar-page! "base-menu")}))
-
-               (dom/div #js {:style #js {:padding "5px" :fontWeight "600"}} 
-                        (sidebar-content (:sidebar-page sidebar-data) owner))))))
-
-(defn master 
-  "This component is the master of routing. The current route of the app is considered part of the monolith i.e. 
-  part of the state of the application. So this component has the job of rendering the admin-toolbar, the widgets 
-  for the current route and the navbar (if one has been selected by the user). This is because the navbar 
-  is present in all routes." 
-
-  [{:keys [:route-widget :current-route :active-route :email]
-    :as data} owner]
-  (reify
-    om/IRenderState
-    (render-state [_ {:keys [flatten-routes] :as state}]
-      (let [{:keys [widgets]} (mn/current-route-map 
-                                (clojure.string/split (first current-route) #"/") 
-                                (:routes-map route-widget))]
-
-        (mn/independent-ref-cursor-watcher owner)
-        (dom/div #js {:id "master-container"} 
-                 (om/build admin-sidebar data)
-                 (when (not (= "" (first @email))) (om/build admin-toolbar data))
-                 (om/build main-view widgets)
-                 #_(om/build nv/navbar route-widget)
-                 )))))
 
