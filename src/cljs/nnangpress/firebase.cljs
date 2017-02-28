@@ -4,14 +4,18 @@
     [clojure.walk :as wlk]
     [cljs.core.async :refer [put! chan <!]]))
 
+(defn load-user-home-site 
+  "" 
+  [])
+
 (defn sign-in-ui-config-gen 
-  "Configuration for firebase login flow"
+  "Configuration for firebase login flow. Callback will have access to user data."
   [cb]
   #js {:callbacks
        #js {:signInSuccess (fn [user credential redirectUrl]
                              (println "sucessful sign in")
                              (.dir js/console user)
-                             cb
+                             (cb user)
                              #_(->
                                (js/firebase.database)
                                (.ref (str "users/" (.-uid user)))
@@ -68,9 +72,9 @@
 
 (defn fb-initiate-auth
   "Initiate firebase auth dialog." 
-  [firebase-root-id]
+  [firebase-root-id cb]
   (.start
     (js/firebaseui.auth.AuthUI. (js/firebase.auth))
     (str "#" firebase-root-id)
-    (sign-in-ui-config-gen identity)))
+    (sign-in-ui-config-gen cb)))
 

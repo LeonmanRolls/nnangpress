@@ -423,5 +423,14 @@
   [owner key val]
  (om/update-state! owner :local-style (fn [x] (update x key (fn [_] val)))) )
 
-
+(defn auth-state-load-site!
+  "Load site based on the auth state and/or the particular user. Also initializes the root component." 
+  [root-component root-node-id]
+  (go 
+    (let [current-user (-> js/firebase .auth .-currentUser)
+          c (chan)]
+      (fb/firebase-get "nangpress-data/" c)
+      (reset-monolith-atom! 
+        (raw-nnangpress->renderable (<! c) current-user))
+      (om/root root-component monolith {:target (. js/document (getElementById root-node-id))}))))
 

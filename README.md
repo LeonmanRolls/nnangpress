@@ -107,8 +107,10 @@ behaviour each time the app starts.
 
 #Glossary 
 
-! - At the end of a function name means the function makes a change in the outside worlds. 
+! - At the end of a function name means the function makes a change to application state only. 
+
+!! - A function that makes a change outside of application state, such as saving directly to database or 
+making a change to the DOM outside of react. Ideally we won't see too many of these.
 
 << - Means the functions reads data from the outside world
-
 

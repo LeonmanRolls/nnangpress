@@ -19,7 +19,7 @@
     [clojure.set :as st]
     [cemerick.url :as url]))
 
-(declare widget-data-type)
+(declare widget-data-type master admin-sidebar main-view)
 
 (s/def ::widget-uid int?)
 (s/def ::object-id string?)
@@ -648,7 +648,27 @@
                         :style (clj->js (merge style local-style))
                         :onClick (fn [_] 
                                    (mn/update-local-style! owner :display "none")
-                                   (fb/fb-initiate-auth "firebase"))}
+                                   (fb/fb-initiate-auth 
+                                     "firebase"
+                                     (fn [user]
+                                       (mn/auth-state-load-site! master "super-container")
+                                       #_(go 
+                                       (let [c (chan)]
+                                         (fb/firebase-get "nangpress-data/" c)
+                                         (mn/reset-monolith-atom! 
+                                           (mn/raw-nnangpress->renderable (<! c) (-> js/firebase .auth .-currentUser)))
+                                         )  
+                                         )
+                                       
+                                     #_(->
+                                       (js/firebase.database)
+                                       (.ref (str "users/" (.-uid user)))
+                                       (.once "value")
+                                       (.then (fn [snapshot]
+                                                (println "snapshot: " (.val snapshot)))))  
+                                       
+                                       )
+                                     ))}
                    "Sign up / Sign in"))))))
 
 (defmethod widget-data-type 10 [_]
@@ -991,4 +1011,138 @@
                                            (.-value (get-node-by-id uid1))
                                            (.-value (get-node-by-id uid2))))} 
                          "Submit"))))
+
+(def sidebar-header-p {:border "5px solid #7f8c8d", :padding "10px", :background "#95a5a6", :fontWeight "600"})
+(def sidebar-close-icon {:float "right", :margin-top "-5px", :cursor "pointer"})
+
+(defn main-view 
+  "The main view that builds the displayed widgets for the view as well as the admin panel." 
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (let [main-view-style-obs (om/observe owner (mn/main-view-style))]
+
+        (dom/div (clj->js (merge @main-view-style-obs {:className "main-view"}))
+
+                 (apply dom/div nil
+                        (om/build-all all-widget-wrapper data)))))))
+
+(defmulti sidebar-content 
+ "Display sidebar content based on sidebar state." 
+  (fn [sidebar-page owner] sidebar-page))
+
+(defn sidebar-li [label cb]
+  (dom/li #js {:onClick cb
+               :style #js {:borderBottom "2px solid white" :padding "10px"}} 
+          label
+          (dom/i #js {:style #js {:float "right"}
+                      :className "fa fa-chevron-right"})))
+
+(defn update-sidebar-page!   
+  "Effectively routing, change the current page of the admin sidebar." 
+  [sidebar-page]
+  (om/transact! (mn/sidebar-data) :sidebar-page (fn [_] sidebar-page)))
+
+;Base sidebar menu
+(defmethod sidebar-content "base-menu"
+  [data owner] 
+  (dom/ul #js {:style #js {:fontWeight "600", :cursor "pointer", :marginTop "0px"}} 
+          (sidebar-li "route settings" #(update-sidebar-page! "route-settings"))
+          (sidebar-li "add a widget" #(update-sidebar-page! "widget-select"))))
+
+(defn current-route-map-ref-cur 
+  "" 
+  [owner]
+  (let [current-route-obs (om/observe owner (mn/current-route))
+        routes-map-obs (om/observe owner (mn/routes-map))]
+    (mn/current-route-map
+      (clojure.string/split (first @current-route-obs) #"/")
+      routes-map-obs)))
+
+;Setting that apply to a specific route. Will be applied to the route the user is currently on.
+(defmethod sidebar-content "route-settings"
+  [data owner] 
+  (let [current-route-map (current-route-map-ref-cur owner)]
+
+    (dom/div nil 
+             (dom/u nil "Route Settings")
+             (dom/div nil
+                      "Background Image: "
+                      (dom/input #js {:value (:bg-img @current-route-map)
+                                      :style #js {:width "100%"}
+                                      :onChange (fn [e]
+                                                  (om/update!
+                                                    current-route-map
+                                                    :bg-img
+                                                    (.. e -target -value)))}))
+
+             (dom/br "")
+             (dom/u nil "Swap widgets by index")
+             (simple-form (fn [x y] 
+                                (mn/ref-vec-swap 
+                                  (:widgets current-route-map) (int x) (int y)))))))
+
+(defmethod sidebar-content "widget-select"
+  [data owner] 
+  (let [all-widgets-data-obs (om/observe owner (mn/all-widgets-data))]
+    (dom/div nil 
+             (dom/u nil "Select a widget")
+             (dom/br nil "")
+             (apply dom/div nil
+                    (om/build-all
+                      select-widget-wrapper
+                      all-widgets-data-obs)))))
+
+(defmethod sidebar-content :default
+  [data owner] 
+  (dom/ul #js {:style #js {:fontWeight "600", :padding "5px", :cursor "pointer", :marginTop "0px"}} 
+          "Default menu"))
+
+(defn admin-sidebar 
+  "Sidebar primarily for selecting widgets and other settings that are not appropriate for editing directly indside of 
+  the site." 
+  [{:keys [sidebar-data]} owner]
+  (reify 
+    om/IRender
+    (render 
+      [_]
+      (dom/div #js {:id "mySidenav"
+                    :className "sidenav"
+                    :style #js {:width "400px" :display (if (:sidebar-visible sidebar-data) "" "none")}} 
+
+               (dom/p #js {:style (clj->js sidebar-header-p)} 
+                      "Nangpress Menu"
+                      (dom/i #js {:style (clj->js sidebar-close-icon)
+                                  :className "fa fa-times fa-2x"
+                                  :onClick #(om/transact! sidebar-data :sidebar-visible u/toggle)})
+                      (dom/i #js {:style (clj->js (merge sidebar-close-icon {:marginRight "10px"}))
+                                  :className "fa fa-home fa-2x"
+                                  :onClick #(update-sidebar-page! "base-menu")}))
+
+               (dom/div #js {:style #js {:padding "5px" :fontWeight "600"}} 
+                        (sidebar-content (:sidebar-page sidebar-data) owner))))))
+
+(defn master 
+  "This component is the master of routing. The current route of the app is considered part of the monolith i.e. 
+  part of the state of the application. So this component has the job of rendering the admin-toolbar, the widgets 
+  for the current route and the navbar (if one has been selected by the user). This is because the navbar 
+  is present in all routes." 
+
+  [{:keys [:route-widget :current-route :active-route :email]
+    :as data} owner]
+  (reify
+    om/IRenderState
+    (render-state [_ {:keys [flatten-routes] :as state}]
+      (let [{:keys [widgets]} (mn/current-route-map 
+                                (clojure.string/split (first current-route) #"/") 
+                                (:routes-map route-widget))]
+
+        (mn/independent-ref-cursor-watcher owner)
+        (dom/div #js {:id "master-container"} 
+                 (om/build admin-sidebar data)
+                 (when (not (= "" (first @email))) (om/build admin-toolbar data))
+                 (om/build main-view widgets)
+                 #_(om/build nv/navbar route-widget)
+                 )))))
 
