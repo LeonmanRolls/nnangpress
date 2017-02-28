@@ -65,7 +65,7 @@
   (reify
     om/IRender
     (render [_]
-      (dom/div #js {:style #js {:margin "50px" :position "relative"}} 
+      (dom/div #js {:style #js {:margin "10px" :position "relative"}} 
                (cc/edit-mode-sense 
                  owner
                  (cc/delete-button  (mn/current-widgets-builder<< owner) :object-id object-id))

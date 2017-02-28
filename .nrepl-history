@@ -1,116 +1,3 @@
-(def testes {:route-name (str "/parent" (subs (u/uid) 0 3))
-               :bg-img "from_uss.jpg"
-               :grey-bg? true
-               :nav-hint ["nav hint"]
-               :nav-hint-style {:color "white"}
-               :widgets [{:widget-uid 001
-                          :object-id (u/uid)
-                          :widget-name "Standard text widget"
-                          :inner-html ["<p> Hi there </p>"]}]
-               :children [{:route-name (str "/child" (subs (u/uid) 0 3))
-                           :bg-img "from_uss.jpg"
-                           :grey-bg? true
-                           :nav-hint ["nav hint"]
-                           :nav-hint-style {:color "white"}
-                           :widgets []
-                           :children []}]})
-  (clj-empty->firebase-empty testes)
-l
-(ns nnangpress.repl
-  (:require [nnangpress.monolith :as mn]
-            [nnangpress.utils :as u]
-            [nnangpress.widgets :as wgts]
-            [cljs.reader :as rdr]
-            [ajax.core :refer [GET POST]]
-            [cljs.spec :as s]
-            [cljs.spec.test :as ts :include-macros true]))
-(-> js/firebase .auth .-currentUser)
-  (def current-user (-> js/firebase .auth .-currentUser))
-  (def db (js/firebase.database))
-  (def data-ref (.ref db (str "users/")))
-current-user
-(.-uid current-user)
-  (def uid (.-uid current-user))
-uid
-  (def data-ref (.ref db (str "users/" uid)))
-(->
-    data-ref
-    (.once "value")
-    (.then (fn [snapshot]
-             (let [remote-map (mn/firebase-empty->clj-empty
-                                (js->clj (.val snapshot) :keywordize-keys true))]
-                  (println remote-map)        
-                            
-               ))))
-l
-  (def cache (atom []))
-(->
-    data-ref
-    (.once "value")
-    (.then (fn [snapshot]
-             (let [remote-map (mn/firebase-empty->clj-empty
-                                (js->clj (.val snapshot) :keywordize-keys true))]
-                  (println remote-map)        
-               (reset! cache remote-map)
-               ))))
-l
-@cache
-  (keys @cache)
-  (:sites @cache)
-(to-array 
-    (:sites @cache)
-    )
-(.indexOf 
-  (to-array 
-    (:sites @cache))  
-    (fn [x]
-     (= (.-name x) "site1") 
-      ))
-(.indexOf 
-    (to-array 
-      (:sites @cache))  
-    (fn [x]
-      (println (.-name x))
-      (= (.-name x) "site1") 
-      ))
-(defn index-of [s v]
-    (loop [idx 0 items s]
-      (println items)
-      (cond
-        (empty? items) nil
-        (= v (first items)) idx
-        :else (recur (inc idx) (rest items)))))
-  (index-of (:sites @cache) "")
-(:sites @cache)
-(defn index-of [s v]
-    (loop [idx 0 items s]
-      (println (count items))
-      (cond
-        (empty? items) nil
-        (= v (first items)) idx
-        :else (recur (inc idx) (rest items)))))
-  (index-of (:sites @cache) "")
-(defn index-of [s v]
-    (loop [idx 0 items s]
-      (println (count items))
-      (cond
-        (empty? items) nil
-        (= "site1" (:name (first items))) idx
-        :else (recur (inc idx) (rest items)))))
-  (index-of (:sites @cache) "")
-(defn index-of [s v]
-    (loop [idx 0 items s]
-      (println (count items))
-      (cond
-        (empty? items) nil
-        (= "site2" (:name (first items))) idx
-        :else (recur (inc idx) (rest items)))))
-  (index-of (:sites @cache) "")
-(defn index-of-key-val [s key val]
-    (loop [idx 0 items s]
-      (println (count items))
-      (cond
-        (empty? items) nil
         (= val (key (first items))) idx
         :else (recur (inc idx) (rest items)))))
   (index-of-key-val (:sites @cache) :name "site1")
@@ -498,3 +385,116 @@ tag
 l
 (fb-write #js {:hi "there"} (str "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0"))
 (fb-write (str "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0") #js {:hi "there"})
+(start-repl)
+(fb-copy "/nangpress-data/route-widgets/userhome/routes-map/widgets/2" 
+ "/nangpress-data/route-widgets/userhome/routes-map/widgets/3")
+(ns nnangpress.firebase
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require 
+    [clojure.walk :as wlk]
+    [cljs.core.async :refer [put! chan <!]]))
+(fb-copy "/nangpress-data/route-widgets/userhome/routes-map/widgets/2" 
+ "/nangpress-data/route-widgets/userhome/routes-map/widgets/3")
+(fb-move "/nangpress-data/route-widgets/userhome/routes-map/widgets/3" 
+ "/nangpress-data/route-widgets/userhome/routes-map/widgets/4")
+(defn fb-move
+  "Copy data from one path to another and delete data at original place."
+  [source dest]
+  (go 
+    (<! fb-copy)
+    (fb-delete source)))
+(defn fb-copy 
+  "Copy data from one path to another"
+  [source dest]
+  (let [c (chan)]
+    (go 
+      (firebase-get source c)
+      (fb-write dest (<! c)))))
+(ns nnangpress.firebase
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require 
+    [clojure.walk :as wlk]
+    [cljs.core.async :refer [put! chan <!]]))
+(defn fb-move
+  "Copy data from one path to another and delete data at original place."
+  [source dest]
+  (go 
+    (<! fb-copy)
+    (fb-delete source)))
+(defn fb-delete
+  "Delete data at path. Use with care! Check for at least two /s to prevent deleting something at the root level." 
+  [path]
+  {:pre [(< 2 (count (clojure.string/split path #"/")))]}
+  (->
+    (js/firebase.database)
+    (.ref path)
+    (.remove)))
+(fb-move "/nangpress-data/route-widgets/userhome/routes-map/widgets/3" 
+ "/nangpress-data/route-widgets/userhome/routes-map/widgets/4")
+(fb-copy "/nangpress-data/route-widgets/userhome/routes-map/widgets/1" 
+ "/nangpress-data/route-widgets/userhome/routes-map/widgets/2")
+(fb-copy "/nangpress-data/route-widgets/userhome/routes-map/widgets/3" 
+ "/nangpress-data/route-widgets/userhome/routes-map/widgets/5")
+(fb-copy "/nangpress-data/route-widgets/userhome/routes-map/widgets/2" 
+ "/nangpress-data/route-widgets/userhome/routes-map/widgets/1")
+(start-repl)
+(ns nnangpress.firebase
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require 
+    [clojure.walk :as wlk]
+    [cljs.core.async :refer [put! chan <!]]))
+(defn fb-copy 
+  "Copy data from one path to another"
+  [source dest]
+  (let [c (chan)]
+    (go 
+      (firebase-get source c)
+      (fb-write dest (<! c)))))
+(defn firebase-get
+  "Get data from firebase database by route"  
+  [route out] 
+  (->
+    (.ref (js/firebase.database) route)
+    (.once "value")
+    (.then (fn [snapshot]
+             (put! out (firebase-empty->clj-empty
+                         (js->clj (.val snapshot) :keywordize-keys true)))))))
+(defn firebase-empty->clj-empty 
+  "Goiing from firebase representation of empty vector to a clj empty vector" 
+  [data]
+  (wlk/postwalk 
+    (fn [x]   
+      (if 
+        (and 
+          (vector? x) 
+          (= 1 (count x)) 
+          (= "" (first x))) 
+        [] 
+        x)) 
+    data))
+(defn fb-copy 
+  "Copy data from one path to another"
+  [source dest]
+  (let [c (chan)]
+    (go 
+      (firebase-get source c)
+      (fb-write dest (<! c)))))
+(defn fb-write 
+  "Wite data to firebase path"
+  [path data]
+  (->
+    (js/firebase.database)
+    (.ref path)
+    (.set (clj->js data))))
+(defn fb-copy 
+  "Copy data from one path to another"
+  [source dest]
+  (let [c (chan)]
+    (go 
+      (firebase-get source c)
+      (fb-write dest (<! c)))))
+(fb-copy "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/4" 
+        "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0"
+)
+(fb-copy "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/5" 
+        "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1")

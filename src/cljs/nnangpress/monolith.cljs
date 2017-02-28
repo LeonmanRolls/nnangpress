@@ -4,6 +4,7 @@
   (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
             [om.dom :as dom :include-macros true]
             [nnangpress.utils :as u]
+            [nnangpress.dom :as ndom]
             [clojure.zip :as z]
             [clojure.spec :as s]
             [clojure.walk :as wlk]
@@ -263,16 +264,29 @@
                                    :data ::user-site-data 
                                    :idx-or-name (s/or :idx int? :site-name string?))))
 
+(defn screenshot-data-uri 
+  "Take a screenshot using html2canvas and returns a data uri string." 
+  [out]
+  (js/html2canvas 
+    (ndom/get-node-by-id "body")
+    #js{:background "#95a5a6"
+        :onrendered (fn [canvas] 
+                      (put! out (.toDataURL canvas)))}))
+
 (defn save-site-data 
   "Save a user's site data by site name or index" 
   ([]
-   (let [{:keys [site-name] :as all-data} @(all-data)]
-     (save-site-data 
-       (first @(uid)) 
-       {:name (first site-name) 
-        :description "A description"
-        :data all-data}
-       (first site-name))))
+   (go 
+     (let [c (chan)
+           _ (screenshot-data-uri c)
+           {:keys [site-name] :as all-data} @(all-data)]
+       (save-site-data 
+         (first @(uid)) 
+         {:name (first site-name) 
+          :description "A description"
+          :screenshot (<! c) 
+          :data all-data}
+         (first site-name)))))
 
   ([uid data idx-or-site-name]
    (if 

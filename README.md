@@ -19,6 +19,9 @@ philosophy of the language it is written in.
 - (fb-delete (str "/users/" uid "/sites/0"))
 - (fb-write (str "/users/" uid "/sites/0") #js {:hi "there"})
 
+- (fb-copy "/nangpress-data/route-widgets/userhome/routes-map/widgets/2" 
+        "/nangpress-data/route-widgets/userhome/routes-map/widgets/1")
+
 ## Deploy
 - boot production build target
 

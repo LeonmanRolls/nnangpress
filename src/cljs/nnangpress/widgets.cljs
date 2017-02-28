@@ -599,19 +599,24 @@
     om/IInitState
     (init-state [_]
       {:advertise? false
-       :display-site (fn [{:keys [name description data] :as all-data} owner]
+       :display-site (fn [{:keys [name description data screenshot] :as all-data} owner]
                        (reify
                          om/IRender
                          (render [_]
-                           (dom/div nil
-                                    (dom/p nil (str "Site name: " name))
-                                    (dom/p nil (str "Site description: " description))
+                           (dom/div #js {:style #js {:position "relative", :height "200px", :margin "10px", 
+                                                     :fontWeight "900" :border "2px solid white" :padding "10px",
+                                                     :background "rgba(0,0,0,0.7)"}} 
+                                    (dom/div nil (str "Site name: " name))
+                                    (dom/div nil (str "Site description: " description))
+                                    (dom/img #js {:style #js {:float "right", :position "absolute", :top "10px", 
+                                                              :right "10px"} 
+                                                  :alt "Loading..." :src screenshot :width "300" :height "200"})
                                     (dom/button
-                                      #js {:onClick (fn [_] 
+                                      #js {:style #js {:background "transparent" :color "white"}
+                                           :onClick (fn [_] 
                                                       (go 
                                                         (mn/change-site 
-                                                          (<! 
-                                                            (mn/renderable-site->full-monolith @data)))))}
+                                                          (<! (mn/renderable-site->full-monolith @data)))))}
                                       "Go to site")))))})
 
     om/IWillMount
@@ -626,8 +631,13 @@
 
     om/IRenderState
     (render-state [_ {:keys [display-site] :as state}]
-      (apply dom/div nil
-             (om/build-all display-site user-sites)))))
+      (dom/div {:style #js {:fontWeight "900"}}
+               (dom/div #js {:style #js {:fontWeight "900", :fontSize "2em", :textAlign "center", 
+                                         :textDecoration "underline"}} 
+                        "Your Sites")
+               (apply dom/div nil
+                      (om/build-all display-site user-sites))        
+               ))))
 
 (defmethod widget-data-type 11 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::inner-html]))
