@@ -69,6 +69,7 @@
                (cc/edit-mode-sense 
                  owner
                  (cc/delete-button  (mn/current-widgets-builder<< owner) :object-id object-id))
+               (println "data: " (keys data))
                (om/build wgt/widget data)))))
 
 (defn simple-form 
@@ -215,6 +216,7 @@
                                 (:routes-map route-widget))]
 
         (mn/independent-ref-cursor-watcher owner)
+
         (dom/div #js {:id "master-container"} 
                  (om/build admin-sidebar data)
                  (when (not (= "" (first @email))) (om/build admin-toolbar data))

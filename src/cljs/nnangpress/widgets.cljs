@@ -617,16 +617,12 @@
     om/IWillMount
     (will-mount [_]
       (let [uid-obs (om/observe owner (mn/uid))
-            advertise? (om/get-state owner :advertise?)]
-        ;Refactor
+            advertise? (om/get-state owner :advertise?)
+            c (chan)]
         (when (not advertise?)
-          (->
-            (js/firebase.database)
-            (.ref (str "users/" (first @uid-obs)  "/sites"))
-            (.once "value")
-            (.then (fn [snapshot]
-                     (let [remote-map (js->clj (.val snapshot) :keywordize-keys true)]
-                       (om/update! user-sites remote-map))))))))
+          (go 
+            (fb/firebase-get (str "users/" (first @uid-obs)  "/sites") c)
+            (om/update! user-sites (vec (filter #(not (nil? %)) (<! c))))))))
 
     om/IRenderState
     (render-state [_ {:keys [display-site] :as state}]

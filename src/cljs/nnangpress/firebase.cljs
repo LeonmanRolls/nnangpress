@@ -16,12 +16,6 @@
                              (println "sucessful sign in")
                              (.dir js/console user)
                              (cb user)
-                             #_(->
-                               (js/firebase.database)
-                               (.ref (str "users/" (.-uid user)))
-                               (.once "value")
-                               (.then (fn [snapshot]
-                                        #_(om/update! all-data (rdr/read-string (.-data (.val snapshot)))))))
                              false)}
        :signInFlow "popup"
        :signInOptions (array
@@ -51,10 +45,8 @@
     (.ref (js/firebase.database) route)
     (.once "value")
     (.then (fn [snapshot]
-             (put! 
-               out 
-               (firebase-empty->clj-empty
-                 (js->clj (.val snapshot) :keywordize-keys true)))))))
+             (put! out (firebase-empty->clj-empty
+                         (js->clj (.val snapshot) :keywordize-keys true)))))))
 
 (defn current-user 
   "Get info on the current user" 
