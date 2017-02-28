@@ -1,46 +1,3 @@
-                          :widget-name "Standard text widget"
-                          :inner-html ["<p> Hi there </p>"]}]
-               :children [{:route-name (str "/child" (subs (u/uid) 0 3))
-                           :bg-img "from_uss.jpg"
-                           :grey-bg? true
-                           :nav-hint ["nav hint"]
-                           :nav-hint-style {:color "white"}
-                           :widgets [""]
-                           :children [""]}]})
-(wlk/postwalk 
-    (fn [x]   
-      (if 
-        (and (vector? x) (= 1 (count x)) (= "" (first x))) 
-        [] 
-        x)) 
-    testes)
-testes
-(defn firebase-empty->clj-empty 
-  "Goiing from firebase representation of empty vector to a clj empty vector" 
-  [data]
-  (wlk/postwalk 
-    (fn [x]   
-      (if 
-        (and 
-          (vector? x) 
-          (= 1 (count x)) 
-          (= "" (first x))) 
-        [] 
-        x)) 
-    data))
-  (firebase-empty->clj-empty testes)
-(defn clj-empty->firebase-empty 
-  "Opposite of firebase-empty->clj-empty" 
-  [data]
-  (wlk/postwalk 
-    (fn [x]   
-      (if 
-        (and 
-          (vector? x) 
-          (empty? x)) 
-        [""] 
-        x)) 
-    data))
 (def testes {:route-name (str "/parent" (subs (u/uid) 0 3))
                :bg-img "from_uss.jpg"
                :grey-bg? true
@@ -498,3 +455,46 @@ tag
 (start-repl)
 (doc defmulti)
 (doc defmethod)
+(+ 2 3)
+(start-repl)
+(+ 2 3)
+(in-ns 'nnangpress.firebase)
+(fb-delete "/nnangpress/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0")
+(ns nnangpress.firebase
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require 
+    [clojure.walk :as wlk]
+    [cljs.core.async :refer [put! chan <!]]))
+(fb-delete "/nnangpress/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0")
+(defn fb-delete
+  "Delete data at path. Use with care! Check for at least two /s to prevent deleting something at the root level." 
+  [path]
+  {:pre [(< 2 (count (clojure.string/split path #"/")))]}
+  (->
+    (js/firebase.database)
+    (.ref path)
+    (.delete)))
+(fb-delete "/nnangpress/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0")
+(defn fb-delete
+  "Delete data at path. Use with care! Check for at least two /s to prevent deleting something at the root level." 
+  [path]
+  {:pre [(< 2 (count (clojure.string/split path #"/")))]}
+  (->
+    (js/firebase.database)
+    (.ref path)
+    (.remove)))
+(fb-delete "/nnangpress/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0")
+(fb-delete "/nnangpress/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0")
+(fb-delete "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0")
+- (fb-write #js {:hi "there"} (str "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0"))
+(defn fb-write 
+  "Wite data to firebase path"
+  [path data]
+  (->
+    (js/firebase.database)
+    (.ref path)
+    (.set (clj->js data))))
+- (fb-write #js {:hi "there"} (str "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0"))
+l
+(fb-write #js {:hi "there"} (str "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0"))
+(fb-write (str "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0") #js {:hi "there"})

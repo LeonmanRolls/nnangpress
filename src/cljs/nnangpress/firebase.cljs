@@ -70,3 +70,35 @@
     (str "#" firebase-root-id)
     (sign-in-ui-config-gen cb)))
 
+(defn fb-delete
+  "Delete data at path. Use with care! Check for at least two /s to prevent deleting something at the root level." 
+  [path]
+  {:pre [(< 2 (count (clojure.string/split path #"/")))]}
+  (->
+    (js/firebase.database)
+    (.ref path)
+    (.remove)))
+
+(defn fb-write 
+  "Wite data to firebase path"
+  [path data]
+  (->
+    (js/firebase.database)
+    (.ref path)
+    (.set (clj->js data))))
+
+(defn fb-copy 
+  "Copy data from one path to another"
+  [source dest]
+  (let [c (chan)]
+    (go 
+      (firebase-get source c)
+      (fb-write dest (<! c)))))
+
+(defn fb-move
+  "Copy data from one path to another and delete data at original place."
+  [source dest]
+  (go 
+    (<! fb-copy)
+    (fb-delete source)))
+

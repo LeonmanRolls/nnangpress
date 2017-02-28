@@ -15,6 +15,10 @@ philosophy of the language it is written in.
 - boot repl --client
 - (start-repl)
 
+###firebase
+- (fb-delete (str "/users/" uid "/sites/0"))
+- (fb-write (str "/users/" uid "/sites/0") #js {:hi "there"})
+
 ## Deploy
 - boot production build target
 
