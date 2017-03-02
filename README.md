@@ -22,6 +22,10 @@ philosophy of the language it is written in.
 - (fb-copy "/nangpress-data/route-widgets/userhome/routes-map/widgets/2" 
         "/nangpress-data/route-widgets/userhome/routes-map/widgets/1")
 
+(fb-copy "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/5" 
+        "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1")
+
+
 ## Deploy
 - boot production build target
 
@@ -111,6 +115,14 @@ analysis paralysis.
 
 - Local state is useful for information that we don't want persisted, or for data that we want to rever to a default 
 behaviour each time the app starts. 
+
+# Future 
+
+- Realtime collaboration
+
+- Have option to allow end users to personalize the site based on their user account. 
+
+- Allow end users to edit the site and send their edits to the site owner as suggestions.
 
 #Glossary 
 

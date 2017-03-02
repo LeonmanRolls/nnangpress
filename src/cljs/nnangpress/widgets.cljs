@@ -68,28 +68,52 @@
 (defn rich-text-edit 
   "Mediumjs rich text editor" 
   [data owner]
-  (let [uid (u/uid)
-        advertise? false
-        link-btn-id (u/uid)
-        link-input-id (u/uid)]
+  (reify
+    om/IInitState
+    (init-state [_]
+      {:uid (u/uid)
+       :advertise? false
+       :link-btn-id (u/uid)
+       :link-input-id (u/uid)})
+
+    om/IDidMount
+    (did-mount [_]
+      (let [{:keys [uid advertise? link-btn-id link-input-id]} (om/get-state owner)
+            edit-mode-obs (first (om/observe owner (mn/edit-mode)))]
+        (medium-init uid data link-btn-id link-input-id)
+        (ndom/set-attr-by-id uid "contenteditable" (str edit-mode-obs))))
+
+    om/IDidUpdate
+    (did-update [_ _ _]
+      (let [{:keys [uid advertise? link-btn-id link-input-id]} (om/get-state owner)
+            edit-mode-obs (first (mn/edit-mode))
+            medium-destroy (medium-init uid data link-btn-id link-input-id)]
+        (medium-destroy)
+        (medium-init uid data link-btn-id link-input-id)
+        (ndom/set-attr-by-id uid "contenteditable" (str edit-mode-obs))))
+
+    om/IRenderState
+    (render-state [_ state]
+      (let [{:keys [uid advertise? link-btn-id link-input-id]} (om/get-state owner)
+            edit-mode-obs (first (om/observe owner (mn/edit-mode)))]
+        (dom/div nil 
+                 (dom/div #js {:id uid
+                               :style #js {:marginTop "-10px"}
+                               :dangerouslySetInnerHTML #js {:__html (first data)}})
+
+                 (dom/div #js {:style #js {:display (cc/edit-mode-display edit-mode-obs)}}
+                          (dom/input #js {:id link-input-id})
+                          (dom/button #js{:id link-btn-id} "Link")))))))
+
+(defn rich-text-edit-cursor 
+  "Directly updates the cursor on contentEditable changes. As opposed to rich-text-edit which uses mediumjs and 
+  DOM methods." 
+  [data owner]
+  (let []
     (reify
-      om/IDidMount
-      (did-mount [_]
-        (let [edit-mode-obs (first (om/observe owner (mn/edit-mode)))]
-          (medium-init uid data link-btn-id link-input-id)
-          (ndom/set-attr-by-id uid "contenteditable" (str edit-mode-obs))))
-
-      om/IDidUpdate
-      (did-update [_ _ _]
-        (let [edit-mode-obs (first (mn/edit-mode))
-              medium-destroy (medium-init uid data link-btn-id link-input-id)]
-          (medium-destroy)
-          (medium-init uid data link-btn-id link-input-id)
-          (ndom/set-attr-by-id uid "contenteditable" (str edit-mode-obs))))
-
       om/IRenderState
       (render-state [_ state]
-        (let [edit-mode-obs (first (om/observe owner (mn/edit-mode)))]
+        (let []
           (dom/div nil 
                    (dom/div #js {:id uid
                                  :style #js {:marginTop "-10px"}
@@ -114,6 +138,10 @@
   "Components for displaying widgets." 
   (fn [data owner] (:widget-uid data)))
 
+(defmethod widget-data :default
+  [data owner]
+  (dom/div nil "Widget multimethod default"))
+
 (defmethod widget-data-type 1 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::inner-html]))
 
@@ -127,11 +155,11 @@
 ;Basic mediumjs widget
 (defmethod widget 001  
   [data owner]
-  (let [{:keys [object-id]} data]
-    (reify
-      om/IRender
-      (render [_ ]
-        (dom/div nil (om/build rich-text-edit (:inner-html data)))))))
+  (reify
+    om/IRender
+    (render [_ ]
+      (dom/div nil 
+               (om/build rich-text-edit (:inner-html data))))))
 
 (defmethod widget-data-type 2 [_]
   (s/keys :req-un [::widget-uid ::object-id ::imgs]))
@@ -586,11 +614,11 @@
   {:widget-uid 10
    :object-id (u/uid)
    :widget-name "Show your sites"
-   :user-sites [{:name "site1"
-                 :description "A cool site"
+   :user-sites [{:name (widget-data 1)
+                 :description (widget-data 1)
                  :data {:a "placeholder"}}
-                {:name "site2"
-                 :description "Another cool site"
+                {:name (widget-data 1)
+                 :description (widget-data 1)
                  :data {:a "placeholder"}}]})
 
 ;The user's sites as seen when on the user homepage. Not meant to be a user selectable widget.  
@@ -606,8 +634,11 @@
                            (dom/div #js {:style #js {:position "relative", :height "200px", :margin "10px", 
                                                      :fontWeight "900" :border "2px solid white" :padding "10px",
                                                      :background "rgba(0,0,0,0.7)"}} 
+                                    
                                     (dom/div nil (str "Site name: " name))
-                                    (dom/div nil (str "Site description: " description))
+                                    (dom/u nil (str "Site description: "))
+                                    (om/build widget description)
+
                                     (dom/img #js {:style #js {:float "right", :position "absolute", :top "10px", 
                                                               :right "10px"} 
                                                   :alt "Loading..." :src screenshot :width "300" :height "200"})
@@ -636,8 +667,7 @@
                                          :textDecoration "underline"}} 
                         "Your Sites")
                (apply dom/div nil
-                      (om/build-all display-site user-sites))        
-               ))))
+                      (om/build-all display-site user-sites))))))
 
 (defmethod widget-data-type 11 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::inner-html]))

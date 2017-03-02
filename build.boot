@@ -26,7 +26,6 @@
 
 (deftask build []
   (comp (speak)
-        (marginalia)
         (cljs)))
 
 (deftask run []

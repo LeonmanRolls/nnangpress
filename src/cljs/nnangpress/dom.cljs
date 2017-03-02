@@ -52,3 +52,12 @@
     (fn [x] 
       (om/update! data ikey (-> x .-target .-innerText)))))
 
+(defn event-listener-cursor 
+  "Listen for events on an input or contentEditable element and update provided cursor accordingly." 
+  [id cursor]
+  (.addEventListener 
+    (get-node-by-id id) 
+    "input" 
+    (fn [x] 
+      (om/update! cursor [(-> x .-srcElement .-innerHTML)]))))
+

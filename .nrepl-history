@@ -1,250 +1,3 @@
-        (= val (key (first items))) idx
-        :else (recur (inc idx) (rest items)))))
-  (index-of-key-val (:sites @cache) :name "site1")
-  (index-of-key-val (:sites @cache) :name "site2")
-(ns nnangpress.repl
-  (:require [nnangpress.monolith :as mn]
-            [nnangpress.utils :as u]
-            [nnangpress.widgets :as wgts]
-            [cljs.reader :as rdr]
-            [ajax.core :refer [GET POST]]
-            [cljs.spec :as s]
-            [cljs.spec.test :as ts :include-macros true]))
-  (keys @cache)
-  (u/index-of-key-val (:sites @cache) :name "site2")
-(ns nnangpress.repl
-  (:require [nnangpress.monolith :as mn]
-            [nnangpress.utils :as u]
-            [nnangpress.widgets :as wgts]
-            [cljs.reader :as rdr]
-            [ajax.core :refer [get post]]
-            [cljs.spec :as s]
-            [cljs.spec.test :as ts :include-macros true]))
-  mn/user-site-index
-(let [c (chan)]
-    (go 
-      (println (<! (mn/user-site-index uid "site2" c)))
-      ))
-(ns nnangpress.repl
-  (:require [nnangpress.monolith :as mn]
-            [nnangpress.utils :as u]
-            [nnangpress.widgets :as wgts]
-            [cljs.reader :as rdr]
-            [ajax.core :refer [get post]]
-            [cljs.spec :as s]
-            [cljs.spec.test :as ts :include-macros true]))
-(ns nnangpress.repl
-  (:require [nnangpress.monolith :as mn]
-            [nnangpress.utils :as u]
-            [nnangpress.widgets :as wgts]
-            [cljs.reader :as rdr]
-            [cljs.spec :as s]
-            [cljs.spec.test :as ts :include-macros true]))
-(let [c (chan)]
-    (go 
-      (println (<! (mn/user-site-index uid "site2" c)))
-      ))
-(ns nnangpress.repl
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [nnangpress.monolith :as mn]
-            [nnangpress.utils :as u]
-            [nnangpress.widgets :as wgts]
-            [cljs.reader :as rdr]
-            [cljs.spec :as s]
-            [cljs.spec.test :as ts :include-macros true]
-            [cljs.core.async :refer [put! chan <!]]))
-(let [c (chan)]
-    (go 
-      (println (<! (mn/user-site-index uid "site2" c)))
-      ))
-(let [c (chan)]
-    (go 
-      (mn/user-site-index uid "site2" c)
-      (println (<! c))
-      ))
-(let [c (chan)]
-    (go 
-      (mn/user-site-index uid "site1" c)
-      (println (<! c))
-      ))
-(defn update-site-data 
-  "Update a user's site data by site name" 
-  [uid site-name data]
-  (let [c (chan)
-        _ (mn/user-site-index uid site-name c)]
-    (go
-      (->
-        (js/firebase.database)
-        (.ref (str "users/" uid "/sites/" "3" "/"))
-        (.set {:test "hi"}) 
-        ))))
-(ns nnangpress.repl
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [nnangpress.monolith :as mn]
-            [nnangpress.utils :as u]
-            [nnangpress.widgets :as wgts]
-            [cljs.reader :as rdr]
-            [cljs.spec :as s]
-            [cljs.spec.test :as ts :include-macros true]
-            [cljs.core.async :refer [put! chan <!]]))
-  (mn/update-site-data "eKWcekJm6GMc4klsRG7CNvteCQN2" "site2" {})
-(->
-    (js/firebase.database)
-    (.ref (str "users/" "eKWcekJm6GMc4klsRG7CNvteCQN2" "/sites/" "3" ))
-    (.set {:test "hi"}) 
-    )
-(->
-    (js/firebase.database)
-    (.ref (str "users/" "eKWcekJm6GMc4klsRG7CNvteCQN2" "/sites/" "3" ))
-    (.set (clj->js {:test "hi"})) 
-    )
-  (mn/update-site-data "eKWcekJm6GMc4klsRG7CNvteCQN2" "site2" {:test 2})
-(->
-    (js/firebase.database)
-    (.ref (str "users/" "eKWcekJm6GMc4klsRG7CNvteCQN2" "/sites/" "3" ))
-    (.set (clj->js {:test "hi"})) 
-    )
-  (mn/update-site-data "eKWcekJm6GMc4klsRG7CNvteCQN2" "site2" {:test "hi"})
-(defn update-site-data 
-  "Update a user's site data by site name" 
-  [uid site-name data]
-  (let [c (chan)
-        _ (user-site-index uid site-name c)]
-    (go
-      (->
-        (js/firebase.database)
-        (.ref (str "users/" uid "/sites/" "3"))
-        (.set (clj->js data)) 
-        ))))
-(defn update-site-data 
-  "Update a user's site data by site name" 
-  [uid site-name data]
-  (let [c (chan)
-        _ (mn/user-site-index uid site-name c)]
-    (go
-      (->
-        (js/firebase.database)
-        (.ref (str "users/" uid "/sites/" "3"))
-        (.set (clj->js data)) 
-        ))))
-  (update-site-data "eKWcekJm6GMc4klsRG7CNvteCQN2" "site2" {:test "hi"})
-  (mn/update-site-data "eKWcekJm6GMc4klsRG7CNvteCQN2" "site2" {:test "hi"})
-(ns nnangpress.repl
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [nnangpress.monolith :as mn]
-            [nnangpress.utils :as u]
-            [nnangpress.widgets :as wgts]
-            [cljs.reader :as rdr]
-            [cljs.spec :as s]
-            [cljs.spec.test :as ts :include-macros true]
-            [cljs.core.async :refer [put! chan <!]]))
-  (mn/update-site-data "eKWcekJm6GMc4klsRG7CNvteCQN2" "site2" {:test "hi"})
-(ns nnangpress.monolith
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
-            [om.dom :as dom :include-macros true]
-            [nnangpress.utils :as u]
-            [clojure.zip :as z]
-            [clojure.spec :as s]
-            [clojure.walk :as wlk]
-            [cljs.core.async :refer [put! chan <!]]))
-(defn update-site-data 
-  "Update a user's site data by site name" 
-  [uid site-name data]
-  (let [c (chan)
-        _ (user-site-index uid site-name c)]
-    (go
-      (->
-        (js/firebase.database)
-        (.ref (str "users/" uid "/sites/" "3"))
-        (.set (clj->js data)) 
-        ))))
-(ns nnangpress.repl
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [nnangpress.monolith :as mn]
-            [nnangpress.utils :as u]
-            [nnangpress.widgets :as wgts]
-            [cljs.reader :as rdr]
-            [cljs.spec :as s]
-            [cljs.spec.test :as ts :include-macros true]
-            [cljs.core.async :refer [put! chan <!]]))
-  (mn/update-site-data "eKWcekJm6GMc4klsRG7CNvteCQN2" "site2" {:test "hi"})
-(ns nnangpress.repl
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [nnangpress.monolith :as mn]
-            [nnangpress.utils :as u]
-            [nnangpress.widgets :as wgts]
-            [cljs.reader :as rdr]
-            [cljs.spec :as s]
-            [cljs.spec.test :as ts :include-macros true]
-            [cljs.core.async :refer [put! chan <!]]))
-  (mn/update-site-data "eKWcekJm6GMc4klsRG7CNvteCQN2" "site2" {:test "hi"})
-(int? 2)
-  (u/uid)
-  (subs 0 4 (u/uid))
-  (subs (u/uid) 0 4 )
-  (subs (u/uid) 0 5 )
-(ns nnangpress.repl
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [nnangpress.monolith :as mn]
-            [nnangpress.utils :as u]
-            [nnangpress.widgets :as wgts]
-            [cljs.reader :as rdr]
-            [cljs.spec :as s]
-            [cljs.spec.test :as ts :include-macros true]
-            [cljs.core.async :refer [put! chan <!]]))
-(new-site)
-(mn/new-site)
-  (mn/uid)
-  (all-data)
-  (mn/all-data)
-  (mn/uid)
-  (type (chan))
-(= 
-    cljs.core.async.impl.channels/ManyToManyChannel
-    (chan)
-    )
-(= 
-    cljs.core.async.impl.channels/ManyToManyChannel
-  (type (chan))
-    )
-(s/def ::channel #(= 
-                    (type %)
-                    cljs.core.async.impl.channels/ManyToManyChannel))
- (s/valid? ::channel (chan))
-(ns nnangpress.repl
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [nnangpress.monolith :as mn]
-            [nnangpress.utils :as u]
-            [nnangpress.widgets :as wgts]
-            [nnangpress.firebase :as fb]
-            [cljs.reader :as rdr]
-            [cljs.spec :as s]
-            [cljs.spec.test :as ts :include-macros true]
-            [cljs.core.async :refer [put! chan <!]]))
-(let [c (chan)]
-  (go 
-    (fb/firebase-get c)
-    (println "rtn" (<! c))))
-(let [c (chan)]
-  (go 
-    (fb/firebase-get "nangpress-data/" c)
-    (println "rtn" (<! c))))
-(ns nnangpress.repl
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [nnangpress.monolith :as mn]
-            [nnangpress.utils :as u]
-            [nnangpress.widgets :as wgts]
-            [nnangpress.firebase :as fb]
-            [cljs.reader :as rdr]
-            [cljs.spec :as s]
-            [cljs.spec.test :as ts :include-macros true]
-            [cljs.core.async :refer [put! chan <!]]))
-(let [c (chan)]
-  (go 
-    (fb/firebase-get "nangpress-data/" c)
-    (println "rtn" (<! c))))
-(ns nnangpress.firebase
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs.core.async :refer [put! chan <!]]
             [nnangpress.monolith :as mn]))
@@ -498,3 +251,250 @@ l
 )
 (fb-copy "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/5" 
         "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1")
+(start-repl)
+(ns nnangpress.firebase
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require 
+    [clojure.walk :as wlk]
+    [cljs.core.async :refer [put! chan <!]]))
+fb-copy
+  (fb-copy "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/description" 
+           "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1/description")
+  (fb-copy "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/description" 
+           "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/2/description")
+l
+(start-repl)
+(ns nnangpress.firebase
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require 
+    [clojure.walk :as wlk]
+    [cljs.core.async :refer [put! chan <!]]))
+(->
+    (js/firebase.database)
+    (.ref "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites")
+    (.equalTo "site1-a0c4-35dc-50cf-c825")
+    )
+(->
+    (js/firebase.database)
+    (.ref "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites")
+    (.equalTo "site1-a0c4-35dc-50cf-c825")
+    (.once "value")
+    (.then (fn [snapshot] (println "snapshot: " snapshot)))
+    )
+(->
+    (js/firebase.database)
+    (.ref "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites")
+    (.equalTo "site1-a0c4-35dc-50cf-c825")
+    (.once "value")
+    (.then (fn [snapshot] (println "snapshot: " (.val snapshot))))
+    )
+(->
+    (js/firebase.database)
+    (.ref "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites")
+    (.once "value")
+    (.then (fn [snapshot] (println "snapshot: " (.val snapshot))))
+    )
+(->
+    (js/firebase.database)
+    (.ref "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites")
+    (.orderByValue)
+    (.equalTo "site1-a0c4-35dc-50cf-c825")
+    (.once "value")
+    (.then (fn [snapshot] (println "snapshot: " (.val snapshot))))
+    )
+(->
+    (js/firebase.database)
+    (.ref "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites")
+    (.orderByValue)
+    (.equalTo "site1-a0c4-35dc-50cf-c825")
+    (.once "value")
+    (.then (fn [snapshot] (println "snapshot: " (.val snapshot))))
+    )
+(->
+    (js/firebase.database)
+    (.ref "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites")
+    (.orderByValue)
+    (.once "value")
+    (.then (fn [snapshot] (println "snapshot: " (.val snapshot))))
+    )
+(->
+    (js/firebase.database)
+    (.ref "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites")
+    (.orderByValue)
+    (.once "value")
+    (.then (fn [snapshot] (println "snapshot: " (.val snapshot))))
+    )
+(->
+    (js/firebase.database)
+    (.ref "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites")
+    (.once "value")
+    (.then (fn [snapshot] 
+             (let [val (.val snapshot)]
+               (println "snapshot" (filter #(= (:name %) "site1-a0c4-35dc-50cf-c825") (.val snapshot)))
+               )
+             )))
+(->
+    (js/firebase.database)
+    (.ref "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites")
+    (.once "value")
+    (.then (fn [snapshot] 
+             (let [val (.val snapshot)]
+               (println "snapshot" (filter #(= (:name %) "site1-a0c4-35dc-50cf-c825") (.val snapshot)))
+               )
+             )))
+(let [c (chan)
+        _ (firebase-get "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites" c ) 
+        sites (<! c)
+        _ (filter #(= (:name %) "site1-a0c4-35dc-50cf-c825") sites)
+        ]
+    sites
+    )
+(go 
+   (let [c (chan)
+        _ (firebase-get "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites" c ) 
+        sites (<! c)
+        _ (filter #(= (:name %) "site1-a0c4-35dc-50cf-c825") sites)
+        ]
+    sites
+    ) 
+    )
+(go 
+    (let [c (chan)
+          _ (firebase-get "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites" c ) 
+          sites (<! c)
+          _ (filter #(= (:name %) "site1-a0c4-35dc-50cf-c825") sites)
+          ]
+      (println "sites: " sites)
+      ) 
+    )
+(defn firebase-get
+  "Get data from firebase database by route"  
+  [route out] 
+  (->
+    (.ref (js/firebase.database) route)
+    (.once "value")
+    (.then (fn [snapshot]
+             (put! out (firebase-empty->clj-empty
+                         (js->clj (.val snapshot) :keywordize-keys true)))))))
+(defn firebase-empty->clj-empty 
+  "Goiing from firebase representation of empty vector to a clj empty vector" 
+  [data]
+  (wlk/postwalk 
+    (fn [x]   
+      (if 
+        (and 
+          (vector? x) 
+          (= 1 (count x)) 
+          (= "" (first x))) 
+        [] 
+        x)) 
+    data))
+(defn firebase-get
+  "Get data from firebase database by route"  
+  [route out] 
+  (->
+    (.ref (js/firebase.database) route)
+    (.once "value")
+    (.then (fn [snapshot]
+             (put! out (firebase-empty->clj-empty
+                         (js->clj (.val snapshot) :keywordize-keys true)))))))
+(go 
+    (let [c (chan)
+          _ (firebase-get "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites" c ) 
+          sites (<! c)
+          _ (filter #(= (:name %) "site1-a0c4-35dc-50cf-c825") sites)
+          ]
+      (println "sites: " sites)
+      ) 
+    )
+(go 
+    (let [c (chan)
+          _ (firebase-get "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites" c ) 
+          sites (<! c)
+          _ (filter #(= (:name %) "site1-a0c4-35dc-50cf-c825") sites)
+          ]
+      (reset! cache sites)
+      (println "sites: " sites)
+      ) 
+    )
+  (def cache (atom []))
+(go 
+    (let [c (chan)
+          _ (firebase-get "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites" c ) 
+          sites (<! c)
+          _ (filter #(= (:name %) "site1-a0c4-35dc-50cf-c825") sites)
+          ]
+      (reset! cache sites)
+      (println "sites: " sites)
+      ) 
+    )
+  @cache
+  (type @cache)
+(start-repl)
+(ns nnangpress.firebase
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require 
+    [clojure.walk :as wlk]
+    [cljs.core.async :refer [put! chan <!]]))
+  (def cache (atom []))
+(go 
+    (let [c (chan)
+          _ (firebase-get "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites" c ) 
+          sites (<! c)
+          _ (filter #(= (:name %) "site1-a0c4-35dc-50cf-c825") sites)
+          ]
+      (reset! cache sites)
+      (println "sites: " sites)
+      ) 
+    )
+  (type @cache)
+  (count @cache)
+  (keep-indexed #(= (:name %) "site1-a0c4-35dc-50cf-c825") @cache)
+  (keep-indexed #(do 
+                   (println (:name %)) 
+                   (= (:name %) "site1-a0c4-35dc-50cf-c825")) 
+                @cache)
+  (keys (first @cache))
+  (keep-indexed #(do 
+                   (println %) 
+                   (= (:name %) "site1-a0c4-35dc-50cf-c825")) 
+                @cache)
+  (map-indexed #(do 
+                   (println %) 
+                   ) 
+                @cache)
+  (keep-indexed #(do 
+                   (println %) 
+                   (= (:name %2) "site1-a0c4-35dc-50cf-c825")) 
+                @cache)
+  (keep-indexed #(do 
+                   (println %) 
+                   (= (:name %2) "site1-a0c4-35dc-50cf-c825")) 
+                @cache)
+  (keep-indexed #(do 
+                   (println %) 
+                   (= (:name %2) "site1-a0c4-35dc-50cf-c825-bf6b-1a26")) 
+                @cache)
+(keep-indexed #(do 
+                   (println %) 
+                   (= (:name %2) "site1-a0c4-35dc-50cf-c825-bf6b-1a26")
+                   (keys %2)) 
+                @cache)
+(keep-indexed #(do 
+                   (println %) 
+                   (if 
+                     (= (:name %2) "site1-a0c4-35dc-50cf-c825-bf6b-1a26")  
+                     (keys %2)
+                     nil
+                     )
+                   ) 
+                @cache)
+(keep-indexed #(do 
+                   (println %) 
+                   (if 
+                     (= (:name %2) "site1-a0c4-35dc-50cf-c825-bf6b-1a26")  
+                    %1 
+                     nil
+                     )
+                   ) 
+                @cache)

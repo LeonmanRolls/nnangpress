@@ -448,3 +448,7 @@
         (raw-nnangpress->renderable (<! c) current-user))
       (om/root root-component monolith {:target (. js/document (getElementById root-node-id))}))))
 
+(defn save-site-name "" [])
+
+(defn save-site-description "" [])
+

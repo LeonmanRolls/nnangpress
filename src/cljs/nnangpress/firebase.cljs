@@ -102,3 +102,62 @@
     (<! fb-copy)
     (fb-delete source)))
 
+(comment 
+
+  (def cache (atom []))
+
+  (go 
+    (let [c (chan)
+          _ (firebase-get "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites" c ) 
+          sites (<! c)
+          _ (filter #(= (:name %) "site1-a0c4-35dc-50cf-c825") sites)
+          ]
+      (reset! cache sites)
+      (println "sites: " sites)
+      ) 
+    )
+     
+  (type @cache)
+  (count @cache)
+  (keys (first @cache))
+
+  (keep-indexed #(do 
+                   (println %) 
+                   (if 
+                     (= (:name %2) "site1-a0c4-35dc-50cf-c825-bf6b-1a26")  
+                    %1 
+                     nil
+                     )
+                   ) 
+                @cache)
+
+
+  (map-indexed #(do 
+                   (println %) 
+                   ) 
+                @cache)
+
+  (.equalTo "site1-a0c4-35dc-50cf-c825")
+
+  (->
+    (js/firebase.database)
+    (.ref "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites")
+    (.once "value")
+    (.then (fn [snapshot] 
+             (let [val (.val snapshot)]
+
+               (println "snapshot" (filter #(= (:name %) "site1-a0c4-35dc-50cf-c825") (.val snapshot)))
+
+               )
+             )))
+
+  (->
+    (js/firebase.database)
+    (.ref "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites")
+    (.orderByValue)
+    (.once "value")
+    (.then (fn [snapshot] (println "snapshot: " (.val snapshot))))
+    )
+
+  )
+
