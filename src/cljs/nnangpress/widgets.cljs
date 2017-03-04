@@ -608,7 +608,7 @@
   [{:keys [name description data screenshot] :as all-data} owner]
   (reify
     om/IRenderState
-    (render-state [_ {:keys [save-chan]}]
+    (render-state [_ {:keys [delete]}]
       (dom/div #js {:style #js {:position "relative", :height "200px", :margin "10px", 
                                 :fontWeight "900" :border "2px solid white" :padding "10px",
                                 :background "rgba(0,0,0,0.7)"}} 
@@ -631,9 +631,9 @@
                (dom/button
                  #js {:style #js {:background "transparent" :color "white" :marginLeft "10px"}
                       :onClick (fn [_] 
-                                 (put! save-chan "hi there")
+                                 (put! delete name)
                                  )}
-                 "Save changes")))))
+                 "Delete site")))))
 
 ;The user's sites as seen when on the user homepage. Not meant to be a user selectable widget. This widget 
 ;is somewhat removed from the general monolith architecture. It loads its own data into the monolith 
@@ -644,37 +644,36 @@
     om/IInitState
     (init-state [_]
       {:advertise? false
-       :save-chan (chan)})
+       :delete (chan)})
 
     om/IWillMount
     (will-mount [_]
       (let [uid-obs (om/observe owner (mn/uid))
-            advertise? (om/get-state owner :advertise?)
+            {:keys [advertise? delete]} (om/get-state owner)
             c (chan)]
         (when (not advertise?)
           (go 
             (fb/firebase-get (str "users/" (first @uid-obs)  "/sites") c)
-            (om/update! user-sites (vec (filter #(not (nil? %)) (<! c))))))))
+            (om/update! user-sites (vec (filter #(not (nil? %)) (<! c))))))
+        (go (loop []
+              (let [site-name (<! delete)]
+                (om/transact! user-sites (fn [xs] (vec (remove #(= site-name (:name %)) xs)))))
+              (recur)))))
 
-    om/IDidUpdate 
-    (did-update [_ _ _]
-      (go 
-        (let [{:keys [save-chan]} (om/get-state owner)]
-          (while true
-            (<! save-chan)
-            (fb/fb-write 
-              (str "users/" (first (om/observe owner (mn/uid)))  "/sites")
-              user-sites)))))
+    om/IWillUpdate 
+    (will-update [_ next-props _]
+      (fb/fb-write 
+        (str "users/" (first (om/observe owner (mn/uid)))  "/sites")
+        (:user-sites next-props)))
 
     om/IRenderState
-    (render-state [_ {:keys [save-chan]}]
+    (render-state [_ {:keys [delete]}]
       (dom/div {:style #js {:fontWeight "900"}}
                (dom/div #js {:style #js {:fontWeight "900", :fontSize "2em", :textAlign "center", 
                                          :textDecoration "underline"}} 
                         "Your Sites")
-               (println "render user-sites: " (count user-sites))
                (apply dom/div nil
-                      (om/build-all display-site user-sites {:state {:save-chan save-chan}}))))))
+                      (om/build-all display-site user-sites {:init-state {:delete delete}}))))))
 
 (defmethod widget-data-type 11 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::inner-html]))
