@@ -1,6 +1,3 @@
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [cljs.core.async :refer [put! chan <!]]
-            [nnangpress.monolith :as mn]))
 (defn firebase-get
   "Get data from firebase database by route"  
   [route out] 
@@ -498,3 +495,6 @@ l
                      )
                    ) 
                 @cache)
+(fb-copy 
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1/description"
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/2/description")

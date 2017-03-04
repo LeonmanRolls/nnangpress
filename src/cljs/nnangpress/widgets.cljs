@@ -105,24 +105,6 @@
                           (dom/input #js {:id link-input-id})
                           (dom/button #js{:id link-btn-id} "Link")))))))
 
-(defn rich-text-edit-cursor 
-  "Directly updates the cursor on contentEditable changes. As opposed to rich-text-edit which uses mediumjs and 
-  DOM methods." 
-  [data owner]
-  (let []
-    (reify
-      om/IRenderState
-      (render-state [_ state]
-        (let []
-          (dom/div nil 
-                   (dom/div #js {:id uid
-                                 :style #js {:marginTop "-10px"}
-                                 :dangerouslySetInnerHTML #js {:__html (first data)}})
-
-                   (dom/div #js {:style #js {:display (cc/edit-mode-display edit-mode-obs)}}
-                            (dom/input #js {:id link-input-id})
-                            (dom/button #js{:id link-btn-id} "Link"))))))))
-
 ;##Wdigets 
 ;The main widget multimethods. 
 
@@ -621,34 +603,48 @@
                  :description (widget-data 1)
                  :data {:a "placeholder"}}]})
 
-;The user's sites as seen when on the user homepage. Not meant to be a user selectable widget.  
+(defn display-site
+  "" 
+  [{:keys [name description data screenshot] :as all-data} owner]
+  (reify
+    om/IRenderState
+    (render-state [_ {:keys [save-chan]}]
+      (dom/div #js {:style #js {:position "relative", :height "200px", :margin "10px", 
+                                :fontWeight "900" :border "2px solid white" :padding "10px",
+                                :background "rgba(0,0,0,0.7)"}} 
+
+               (dom/div nil (str "Site name: " name))
+               (dom/u nil (str "Site description: "))
+               (om/build widget description)
+
+               (dom/img #js {:style #js {:float "right", :position "absolute", :top "10px", 
+                                         :right "10px"} 
+                             :alt "Loading..." :src screenshot :width "300" :height "200"})
+               (dom/button
+                 #js {:style #js {:background "transparent" :color "white"}
+                      :onClick (fn [_] 
+                                 (go 
+                                   (mn/change-site 
+                                     (<! (mn/renderable-site->full-monolith @data)))))}
+                 "Go to site")
+
+               (dom/button
+                 #js {:style #js {:background "transparent" :color "white" :marginLeft "10px"}
+                      :onClick (fn [_] 
+                                 (put! save-chan "hi there")
+                                 )}
+                 "Save changes")))))
+
+;The user's sites as seen when on the user homepage. Not meant to be a user selectable widget. This widget 
+;is somewhat removed from the general monolith architecture. It loads its own data into the monolith 
+;based on the current user, and provides a channel for sub components to communicate back to it for saving 
+;updates to the user's site data. So this component and it's sub components are their own mini ecosystem. 
 (defmethod widget 10 [{:keys [user-sites] :as data} owner]
   (reify
     om/IInitState
     (init-state [_]
       {:advertise? false
-       :display-site (fn [{:keys [name description data screenshot] :as all-data} owner]
-                       (reify
-                         om/IRender
-                         (render [_]
-                           (dom/div #js {:style #js {:position "relative", :height "200px", :margin "10px", 
-                                                     :fontWeight "900" :border "2px solid white" :padding "10px",
-                                                     :background "rgba(0,0,0,0.7)"}} 
-                                    
-                                    (dom/div nil (str "Site name: " name))
-                                    (dom/u nil (str "Site description: "))
-                                    (om/build widget description)
-
-                                    (dom/img #js {:style #js {:float "right", :position "absolute", :top "10px", 
-                                                              :right "10px"} 
-                                                  :alt "Loading..." :src screenshot :width "300" :height "200"})
-                                    (dom/button
-                                      #js {:style #js {:background "transparent" :color "white"}
-                                           :onClick (fn [_] 
-                                                      (go 
-                                                        (mn/change-site 
-                                                          (<! (mn/renderable-site->full-monolith @data)))))}
-                                      "Go to site")))))})
+       :save-chan (chan)})
 
     om/IWillMount
     (will-mount [_]
@@ -660,14 +656,25 @@
             (fb/firebase-get (str "users/" (first @uid-obs)  "/sites") c)
             (om/update! user-sites (vec (filter #(not (nil? %)) (<! c))))))))
 
+    om/IDidUpdate 
+    (did-update [_ _ _]
+      (go 
+        (let [{:keys [save-chan]} (om/get-state owner)]
+          (while true
+            (<! save-chan)
+            (fb/fb-write 
+              (str "users/" (first (om/observe owner (mn/uid)))  "/sites")
+              user-sites)))))
+
     om/IRenderState
-    (render-state [_ {:keys [display-site] :as state}]
+    (render-state [_ {:keys [save-chan]}]
       (dom/div {:style #js {:fontWeight "900"}}
                (dom/div #js {:style #js {:fontWeight "900", :fontSize "2em", :textAlign "center", 
                                          :textDecoration "underline"}} 
                         "Your Sites")
+               (println "render user-sites: " (count user-sites))
                (apply dom/div nil
-                      (om/build-all display-site user-sites))))))
+                      (om/build-all display-site user-sites {:state {:save-chan save-chan}}))))))
 
 (defmethod widget-data-type 11 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::inner-html]))

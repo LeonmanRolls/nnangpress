@@ -74,23 +74,16 @@
       :else (current-route-map xs (get (:children routes-map) idx)))))
 
 (defn monolith-watcher-init [monolith]
-    (add-watch monolith :watcher
-               (fn  [key atom old-state new-state]
-                 (let [uid "SGXvf26OEpeVDQ79XIH2V71fVnT2"
-                       user-data-ref (->
-                                       (js/firebase.database)
-                                       (.ref (str "users/" uid)))]
-                   (prn "-- Atom Changed --")
-                   (prn (keys new-state))
-
-                   #_(->
-                       user-data-ref
-                       (.set #js {:username "wellwell"
-                                  :email "leon.talbert@gmail.com"
-                                  :data  (pr-str @monolith)}))))))
+  (add-watch monolith :watcher
+             (fn  [key atom old-state new-state]
+               (let []
+                 (prn "-- Atom Changed --")
+                 (prn (keys new-state))
+                 (prn "-- Site state --")
+                 (prn (:site-state new-state))))))
 
 (defn ref-cursor-init 
-  "Defines our monolith API" 
+  "Defines our monolith API for convenient access to data further down the tree." 
   [monolith]
 
   (defn sidebar-data []
@@ -437,6 +430,23 @@
   [owner key val]
  (om/update-state! owner :local-style (fn [x] (update x key (fn [_] val)))) )
 
+(defn site-state-decider 
+  "Site state is important as it modifies various functions of nangpress." 
+  [query-param login-state]
+  (let [site? (get query-param "site")]
+    (cond 
+      site? "site"
+      (and (not site?) (empty? login-state)) "splash"
+      (and (not site?) login-state) "user")))
+
+(defn update-site-state! 
+  "Utility for keeping site state up to date. Should be called on every major change to the monolith." 
+  []
+  (om/update! 
+    (all-data) 
+    :site-state 
+    (site-state-decider (ndom/get-query-params<<) (user-email))))
+
 (defn auth-state-load-site!
   "Load site based on the auth state and/or the particular user. Also initializes the root component." 
   [root-component root-node-id]
@@ -446,9 +456,6 @@
       (fb/firebase-get "nangpress-data/" c)
       (reset-monolith-atom! 
         (raw-nnangpress->renderable (<! c) current-user))
+      (update-site-state!)
       (om/root root-component monolith {:target (. js/document (getElementById root-node-id))}))))
-
-(defn save-site-name "" [])
-
-(defn save-site-description "" [])
 
