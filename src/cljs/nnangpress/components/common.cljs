@@ -29,3 +29,14 @@
   [edit-mode]
   (if edit-mode "inherit" "none"))
 
+(def standard-button-style
+  "Style for admin toolbar button." 
+  {:background "transparent", :color "white", :letterSpacing "1px", :marginRight "5px"})
+
+(defn standard-button
+  "Button for admin toolbar. Calls callback when clicked" 
+  [cb button-title]
+  (dom/button #js {:style (clj->js standard-button-style)
+                   :onClick (fn [_] (cb))} 
+              button-title))
+

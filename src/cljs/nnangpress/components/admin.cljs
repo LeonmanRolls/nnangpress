@@ -12,17 +12,6 @@
     [om.dom :as dom :include-macros true]
     [om.core :as om :include-macros true :refer [set-state! update-state!]]))
 
-(def admin-toolbar-button-style
-  "Style for admin toolbar button." 
-  {:background "transparent", :color "white", :letterSpacing "1px", :marginRight "5px"})
-
-(defn admin-toolbar-button
-  "Button for admin toolbar. Calls callback when clicked" 
-  [cb button-title]
-  (dom/button #js {:style (clj->js admin-toolbar-button-style)
-                   :onClick (fn [_] (cb))} 
-              button-title))
-
 (defn admin-toolbar 
   "Toolbar to aid in editing the site and provide information. Should not be visible when ordinarily visting the site." 
   [{:keys [sidebar-data]} owner]
@@ -35,11 +24,11 @@
                  (dom/b nil "Welcome to Nnangpress alpha | ")
                  (dom/b nil (str " Username:  " (first @user-email-obs)))
                  (dom/b nil (str " | Site name:  " (first @site-name-obs) " | " ))
-                 (admin-toolbar-button #(om/transact! sidebar-data :sidebar-visible u/toggle) "Menu")
-                 (admin-toolbar-button mn/toggle-edit-mode "Toggle edit mode")
-                 (admin-toolbar-button mn/new-site "Save new site")
-                 (admin-toolbar-button mn/save-site-data "Update current site")
-                 (admin-toolbar-button (fn [_] (fb/firebase-signout identity)) "Sign Out"))))))
+                 (cc/standard-button #(om/transact! sidebar-data :sidebar-visible u/toggle) "Menu")
+                 (cc/standard-button mn/toggle-edit-mode "Toggle edit mode")
+                 (cc/standard-button mn/new-site "Save new site")
+                 (cc/standard-button mn/save-site-data "Update current site")
+                 (cc/standard-button (fn [_] (fb/firebase-signout identity)) "Sign Out"))))))
 
 (defn select-widget-wrapper 
   "Primarily for edit mode. Allows the widget this wraps to be added to the current route." 

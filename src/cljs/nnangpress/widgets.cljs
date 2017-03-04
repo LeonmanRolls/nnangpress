@@ -620,19 +620,15 @@
                (dom/img #js {:style #js {:float "right", :position "absolute", :top "10px", 
                                          :right "10px"} 
                              :alt "Loading..." :src screenshot :width "300" :height "200"})
-               (dom/button
-                 #js {:style #js {:background "transparent" :color "white"}
-                      :onClick (fn [_] 
-                                 (go 
-                                   (mn/change-site 
-                                     (<! (mn/renderable-site->full-monolith @data)))))}
+
+               (cc/standard-button 
+                 #(go 
+                    (mn/change-site 
+                      (<! (mn/renderable-site->full-monolith @data))))  
                  "Go to site")
 
-               (dom/button
-                 #js {:style #js {:background "transparent" :color "white" :marginLeft "10px"}
-                      :onClick (fn [_] 
-                                 (put! delete name)
-                                 )}
+               (cc/standard-button 
+                 #(put! delete name)  
                  "Delete site")))))
 
 ;The user's sites as seen when on the user homepage. Not meant to be a user selectable widget. This widget 
