@@ -35,8 +35,8 @@
 
 (defn standard-button
   "Button for admin toolbar. Calls callback when clicked" 
-  [cb button-title]
-  (dom/button #js {:style (clj->js standard-button-style)
+  [cb button-title & extra-style]
+  (dom/button #js {:style (clj->js (merge (first extra-style) standard-button-style))
                    :onClick (fn [_] (cb))} 
               button-title))
 

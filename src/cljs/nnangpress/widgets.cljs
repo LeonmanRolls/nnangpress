@@ -631,6 +631,14 @@
                  #(put! delete name)  
                  "Delete site")))))
 
+(defn new-site-template
+  []
+  "Data for displaying on the userhome screen and rendering fully."
+  {:name (u/uid) 
+   :description (widget-data 1)
+   :screenshot "http://placekitten.com/500/400" 
+   :data {:a "placeholder"}})
+
 ;The user's sites as seen when on the user homepage. Not meant to be a user selectable widget. This widget 
 ;is somewhat removed from the general monolith architecture. It loads its own data into the monolith 
 ;based on the current user, and provides a channel for sub components to communicate back to it for saving 
@@ -665,9 +673,14 @@
     om/IRenderState
     (render-state [_ {:keys [delete]}]
       (dom/div {:style #js {:fontWeight "900"}}
-               (dom/div #js {:style #js {:fontWeight "900", :fontSize "2em", :textAlign "center", 
-                                         :textDecoration "underline"}} 
+               (dom/div #js {:style #js {:fontWeight "900", :fontSize "2em", :textDecoration "underline"}} 
                         "Your Sites")
+               (cc/standard-button 
+                 (fn [] (om/transact! user-sites #(conj % (new-site-template))))
+                 "+ Add New Site" 
+                 {:position "absolute", :top "0", :right "0", 
+                  :fontSize "1.5em" :marginTop "20px", :cursor "pointer"})
+
                (apply dom/div nil
                       (om/build-all display-site user-sites {:init-state {:delete delete}}))))))
 
