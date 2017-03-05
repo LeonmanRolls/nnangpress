@@ -32,7 +32,7 @@
     (render [this]
       (let [edit-mode-obs (om/observe owner (mn/edit-mode))]
         (dom/div #js {:id "the-nav" :className "main-nav"}
-                 (when (first @edit-mode-obs) "Default navbar"))))))
+                 (when (first @edit-mode-obs) "Choose a navbar to add routing."))))))
 
 (defmethod navbar-data 1 [_]
   {:route-widget-id 1
@@ -143,10 +143,11 @@
   (reify
     om/IInitState
     (init-state  [_]
-      {:depth 1})
+      {:depth 1
+       :advertise? false})
 
     om/IRenderState
-    (render-state [_ {:keys [depth prev-children] :as state}]
+    (render-state [_ {:keys [depth advertise?] :as state}]
       (let [curr-route (first (om/observe owner (mn/current-route)))
             active? (u/string-contains? curr-route route-name)
             routes-map-obs (om/observe owner (mn/routes-map))
@@ -169,19 +170,13 @@
           (and (not (empty? children)) (> depth (if (first @edit-mode-obs) 2 2)))
           (dom/div #js {:style #js {:position "relative"}}
 
-                   #_(println (:route-name (first prev-children)))
-                   #_(println "route-name: " route-name)
-                   #_(println (positions (fn [x] (do (println "x: " (:route-name x) " - " (= (:route-name x) "/LoL-comedy")) 
-                                                 (= (:route-name x) "/LoL-comedy"))) 
-                                       prev-children))
                    (cc/delete-button prev-children :route-name route-name)
 
                    (dom/li #js {:className (str "sub-nav-li ")
                                 :onClick (partial rt/js-link @routes-map-obs route-name)}
 
                            (dom/div #js {:className (str (when active? "active-text"))}
-                                    (str-beautify route-name)))
-                   )
+                                    (str-beautify route-name))))
 
           (not (empty? children))
           (dom/div #js {:style #js {:position "relative"}}
@@ -211,15 +206,15 @@
 ;A margin navbar
 (defmethod navbar 1 [{:keys [routes-map logo-data nav-style] :as data} owner]
   (reify
-    om/IRender
-    (render [this]
+    om/IRenderState
+    (render-state [_ {:keys [advertise?]}]
       (dom/div #js {:id "the-nav" :className "main-nav"}
 
                #_(dom/div #js {:className "nav-aux"}
                         (om/build nav-hint {}))
 
                (dom/div #js {:className "nav-menu"
-                             :style (clj->js nav-style)}
+                             :style (clj->js (merge (when advertise? {:position "relative"}) nav-style))}
                         (om/build nav-menu-logo logo-data)
                         (om/build nav-menu routes-map))))))
 

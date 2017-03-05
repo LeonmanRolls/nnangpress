@@ -86,6 +86,12 @@
   "Defines our monolith API for convenient access to data further down the tree." 
   [monolith]
 
+  (defn route-widget-data []
+    (om/ref-cursor (:route-widget (om/root-cursor monolith))))
+
+  (defn all-navs-data []
+    (om/ref-cursor (:all-navs-data (om/root-cursor monolith))))
+
   (defn sidebar-data []
     (om/ref-cursor (:sidebar-data (om/root-cursor monolith))))
 
@@ -174,7 +180,8 @@
     site-data 
     add-current-user-email 
     add-current-uid
-    update-all))
+    update-all)
+  (update-site-state!))
 
 (defn toggle-edit-mode 
   "Toggle edit mode" 
@@ -254,7 +261,7 @@
         :args (s/or 
                 :empty empty? 
                 :three-args (s/cat :uid ::authed-uid-raw 
-                                   :data ::user-site-data 
+                                   :data ny? 
                                    :idx-or-name (s/or :idx int? :site-name string?))))
 
 (defn screenshot-data-uri 
@@ -275,9 +282,7 @@
            {:keys [site-name] :as all-data} @(all-data)]
        (save-site-data 
          (first @(uid)) 
-         {:name (first site-name) 
-          :description "A description"
-          :screenshot (<! c) 
+         {:screenshot (<! c) 
           :data all-data}
          (first site-name)))))
 
@@ -365,7 +370,9 @@
        (renderable-site->full-monolith renderable-site (<! c)))))
 
   ([renderable-site nangpress-system-data] 
-   (merge nangpress-system-data renderable-site)))
+   (merge nangpress-system-data renderable-site)
+   ))
+      
 
 (defn set-bg-img! 
   "Set background colour or image." 
@@ -441,11 +448,14 @@
 
 (defn update-site-state! 
   "Utility for keeping site state up to date. Should be called on every major change to the monolith." 
-  []
-  (om/update! 
-    (all-data) 
-    :site-state 
-    (site-state-decider (ndom/get-query-params<<) (user-email))))
+  ([]
+   (om/update! 
+     (all-data) 
+     :site-state 
+     (site-state-decider (ndom/get-query-params<<) (user-email))))
+
+  ([site-state]
+   (om/update! (all-data) :site-state site-state)))
 
 (defn auth-state-load-site!
   "Load site based on the auth state and/or the particular user. Also initializes the root component." 

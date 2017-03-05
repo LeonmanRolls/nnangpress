@@ -19,15 +19,18 @@
     om/IRenderState
     (render-state [_ {:keys [local-style]}]
       (let [user-email-obs (om/observe owner (mn/user-email))
-            site-name-obs (om/observe owner (mn/site-name))]
+            site-name-obs (om/observe owner (mn/site-name))
+            all-data-obs (om/observe owner (mn/all-data))
+            site? (= "site" (:site-state @all-data-obs))]
+        (println "site: " (:site-state @all-data-obs))
         (dom/div #js {:className "admin-toolbar"}
                  (dom/b nil "Welcome to Nnangpress alpha | ")
                  (dom/b nil (str " Username:  " (first @user-email-obs)))
                  (dom/b nil (str " | Site name:  " (first @site-name-obs) " | " ))
-                 (cc/standard-button #(om/transact! sidebar-data :sidebar-visible u/toggle) "Menu")
-                 (cc/standard-button mn/toggle-edit-mode "Toggle edit mode")
-                 (cc/standard-button mn/new-site "Save new site")
-                 (cc/standard-button mn/save-site-data "Update current site")
+                 (when site? (cc/standard-button #(om/transact! sidebar-data :sidebar-visible u/toggle) "Menu"))
+                 (when site? (cc/standard-button mn/toggle-edit-mode "Toggle edit mode"))
+                 (when site? (cc/standard-button mn/new-site "Save new site"))
+                 (when site? (cc/standard-button mn/save-site-data "Save"))
                  (cc/standard-button (fn [_] (fb/firebase-signout identity)) "Sign Out"))))))
 
 (defn select-widget-wrapper 
@@ -115,7 +118,8 @@
   [data owner] 
   (dom/ul #js {:style #js {:fontWeight "600", :cursor "pointer", :marginTop "0px"}} 
           (sidebar-li "route settings" #(update-sidebar-page! "route-settings"))
-          (sidebar-li "add a widget" #(update-sidebar-page! "widget-select"))))
+          (sidebar-li "add a widget" #(update-sidebar-page! "widget-select"))
+          (sidebar-li "Select a navbar" #(update-sidebar-page! "navbar-select"))))
 
 (defn current-route-map-ref-cur 
   "" 
@@ -159,6 +163,33 @@
                     (om/build-all
                       select-widget-wrapper
                       all-widgets-data-obs)))))
+
+(defn select-navbar-wrapper 
+  "Primarily for edit mode. Allows the widget this wraps to be added to the current route." 
+  [{:keys [route-widget-id] :as data} owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/div #js {:className "selectWidget"}
+               (dom/div #js {:style #js {:borderBottom "1px solid white" :marginBottom "10px"}} 
+                        (dom/span nil "Title of navbar")
+
+                        (dom/button #js {:style #js {:float "right", :background "transparent", :color "white", 
+                                                     :cursor "pointer"}
+                                         :onClick (fn [_] 
+                                                    (om/update! (mn/route-widget-data) :route-widget-id route-widget-id))}
+                                    "Add navigation"))
+
+               (om/build nv/navbar data {:state {:advertise? true}})))))
+
+(defmethod sidebar-content "navbar-select"
+  [data owner] 
+  (let [all-navs-data-obs (om/observe owner (mn/all-navs-data))]
+    (dom/div nil 
+             (dom/u nil "Select a widget")
+             (dom/br nil "")
+             (apply dom/div nil 
+                    (om/build-all select-navbar-wrapper @all-navs-data-obs)))))
 
 (defmethod sidebar-content :default
   [data owner] 

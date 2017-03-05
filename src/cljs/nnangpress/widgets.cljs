@@ -623,8 +623,8 @@
 
                (cc/standard-button 
                  #(go 
-                    (mn/change-site 
-                      (<! (mn/renderable-site->full-monolith @data))))  
+                    (mn/change-site (<! (mn/renderable-site->full-monolith @data)))
+                    (mn/update-site-state! "site"))  
                  "Go to site")
 
                (cc/standard-button 
@@ -675,6 +675,7 @@
       (dom/div {:style #js {:fontWeight "900"}}
                (dom/div #js {:style #js {:fontWeight "900", :fontSize "2em", :textDecoration "underline"}} 
                         "Your Sites")
+
                (cc/standard-button 
                  (fn [] (om/transact! user-sites #(conj % (new-site-template))))
                  "+ Add New Site" 
@@ -894,4 +895,19 @@
                (cc/edit-mode-sense 
                  owner 
                  (cre/simple-input-cursor! youtube-video-id data :youtube-video-id))))))
+
+(defmethod widget-data 15 [_]
+  {:widget-uid 15
+   :object-id (u/uid)
+   :widget-name "Standard text widget"})
+
+;Welcome widget, the first widget the user will see on their new site. Should have basic instructions 
+;on what to do next.  
+(defmethod widget 15 [{:keys [youtube-video-id] :as data} owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/div nil 
+               "Welcome"         
+               ))))
 

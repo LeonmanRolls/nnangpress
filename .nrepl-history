@@ -1,28 +1,3 @@
-(defn firebase-get
-  "Get data from firebase database by route"  
-  [route out] 
-  (->
-    (.ref (js/firebase.database) route)
-    (.once "value")
-    (.then (fn [snapshot]
-             (put! 
-               out 
-               (mn/firebase-empty->clj-empty
-                 (js->clj (.val snapshot) :keywordize-keys true)))))))
-(ns nnangpress.repl
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [nnangpress.monolith :as mn]
-            [nnangpress.utils :as u]
-            [nnangpress.widgets :as wgts]
-            [nnangpress.firebase :as fb]
-            [cljs.reader :as rdr]
-            [cljs.spec :as s]
-            [cljs.spec.test :as ts :include-macros true]
-            [cljs.core.async :refer [put! chan <!]]))
-(let [c (chan)]
-  (go 
-    (fb/firebase-get "nangpress-data/" c)
-    (println "rtn" (<! c))))
 (let [c (chan)]
   (go 
     (fb/firebase-get "nangpress-data/site-name" c)
@@ -498,3 +473,28 @@ l
 (fb-copy 
     "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1/description"
     "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/2/description")
+l
+(start-repl)
+(ns nnangpress.firebase
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require 
+    [clojure.walk :as wlk]
+    [cljs.core.async :refer [put! chan <!]]))
+ (fb-copy "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1/description" "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/2/description") 
+l
+(nnangpress.navbars/navbar-data 0) 
+  (fb-write "/nangpress-data/all-navs-data/0/" (nnangpress.navbars/navbar-data 0))
+  (fb-write "/nangpress-data/all-navs-data/1/" (nnangpress.navbars/navbar-data 1))
+l
+  (fb-copy 
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1/data/route-widget/routes-map/children/0/" 
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/2/data/route-widget/routes-map/children/0/ ") 
+  (fb-copy 
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1/data/route-widget/routes-map/children/0/" 
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/2/data/route-widget/routes-map/children/0 ") 
+  (fb-copy 
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1/data/route-widget/routes-map/children" 
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/2/data/route-widget/routes-map/children") 
+  (fb-copy 
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1/description" 
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/2/description") 
