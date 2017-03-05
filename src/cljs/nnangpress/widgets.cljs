@@ -79,24 +79,23 @@
 
     om/IDidMount
     (did-mount [_]
-      (let [{:keys [uid advertise? link-btn-id link-input-id]} (om/get-state owner)
+      (let [{:keys [uid advertise? link-btn-id link-input-id edit]} (om/get-state owner)
             edit-mode-obs (first (om/observe owner (mn/edit-mode)))]
         (medium-init uid data link-btn-id link-input-id)
-        (ndom/set-attr-by-id uid "contenteditable" (str edit-mode-obs))))
+        (ndom/set-attr-by-id uid "contenteditable" (str (or edit-mode-obs edit)))))
 
     om/IDidUpdate
     (did-update [_ _ _]
-      (let [{:keys [uid advertise? link-btn-id link-input-id]} (om/get-state owner)
+      (let [{:keys [uid advertise? link-btn-id link-input-id edit]} (om/get-state owner)
             edit-mode-obs (first (mn/edit-mode))
             medium-destroy (medium-init uid data link-btn-id link-input-id)]
         (medium-destroy)
         (medium-init uid data link-btn-id link-input-id)
-        (ndom/set-attr-by-id uid "contenteditable" (str edit-mode-obs))))
+        (ndom/set-attr-by-id uid "contenteditable" (str (or edit-mode-obs edit)))))
 
     om/IRenderState
-    (render-state [_ state]
-      (let [{:keys [uid advertise? link-btn-id link-input-id]} (om/get-state owner)
-            edit-mode-obs (first (om/observe owner (mn/edit-mode)))]
+    (render-state [_ {:keys [uid advertise? link-btn-id link-input-id]}]
+      (let [edit-mode-obs (first (om/observe owner (mn/edit-mode)))]
         (dom/div nil 
                  (dom/div #js {:id uid
                                :style #js {:marginTop "-10px"}
@@ -108,7 +107,6 @@
 
 ;##Wdigets 
 ;The main widget multimethods. 
-
 (defmulti widget-data-type 
   "Spec multimethod." 
   :widget-uid)
@@ -124,10 +122,10 @@
 (defmethod widget 001  
   [data owner]
   (reify
-    om/IRender
-    (render [_ ]
+    om/IRenderState
+    (render-state [_ {:keys [edit]}]
       (dom/div nil 
-               (om/build rich-text-edit (:inner-html data))))))
+               (om/build rich-text-edit (:inner-html data) {:state {:edit edit}})))))
 
 (defmethod widget-data-type 2 [_]
   (s/keys :req-un [::widget-uid ::object-id ::imgs]))
@@ -514,7 +512,7 @@
 
                (dom/div nil (str "Site name: " name))
                (dom/u nil (str "Site description: "))
-               (om/build widget description)
+               (om/build widget description {:state {:edit true}})
 
                (dom/img #js {:style #js {:float "right", :position "absolute", :top "10px", 
                                          :right "10px"} 
