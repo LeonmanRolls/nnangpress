@@ -319,13 +319,16 @@
   (go 
     (let [uid (uid)
           c (chan)
+          c2 (chan)
           _ (user-site-count (first @uid) c)
+          _ (screenshot-data-uri c2)
           data (all-data)
           site-name (str (first (:site-name @data)) "-" (u/uid 4)) ]
       (save-site-data 
         (first @uid) 
         {:name site-name
-         :description "Change me"
+         :description "change me" 
+         :screenshot (<! c2)
          :data (update @data :site-name (fn [x] [site-name]))}
         (<! c)))))
 
