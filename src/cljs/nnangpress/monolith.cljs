@@ -5,11 +5,14 @@
             [om.dom :as dom :include-macros true]
             [nnangpress.utils :as u]
             [nnangpress.dom :as ndom]
+            [nnangpress.widgetdata :as wd]
             [clojure.zip :as z]
             [clojure.spec :as s]
             [clojure.walk :as wlk]
             [cljs.core.async :refer [put! chan <!]]
             [nnangpress.firebase :as fb]))
+
+(declare update-site-state!)
 
 (s/def ::all-widgets-data vector?)
 (s/def ::current-route vector?)
@@ -261,7 +264,7 @@
         :args (s/or 
                 :empty empty? 
                 :three-args (s/cat :uid ::authed-uid-raw 
-                                   :data ny? 
+                                   :data any? 
                                    :idx-or-name (s/or :idx int? :site-name string?))))
 
 (defn screenshot-data-uri 
@@ -327,7 +330,7 @@
       (save-site-data 
         (first @uid) 
         {:name site-name
-         :description "change me" 
+         :description (wd/widget-data 1) 
          :screenshot (<! c2)
          :data (update @data :site-name (fn [x] [site-name]))}
         (<! c)))))

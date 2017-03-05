@@ -9,6 +9,7 @@
     [om.dom :as dom :include-macros true]
     [cljs.reader :as rdr]
     [nnangpress.utils :as u]
+    [nnangpress.widgetdata :as wd]
     [nnangpress.monolith :as mn]
     [nnangpress.core :as cre]
     [nnangpress.routing :as rt]
@@ -112,27 +113,12 @@
   "Spec multimethod." 
   :widget-uid)
 
-(defmulti widget-data 
-  "Data for widget components." 
-  (fn [x] x))
-
 (defmulti widget 
   "Components for displaying widgets." 
   (fn [data owner] (:widget-uid data)))
 
-(defmethod widget-data :default
-  [data owner]
-  (dom/div nil "Widget multimethod default"))
-
 (defmethod widget-data-type 1 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::inner-html]))
-
-(defmethod widget-data 001  
-  [_]
-  {:widget-uid 001
-   :object-id (u/uid)
-   :widget-name "Standard text widget"
-   :inner-html [(str "<p>" (u/uid) "</p>" )]})
 
 ;Basic mediumjs widget
 (defmethod widget 001  
@@ -145,14 +131,6 @@
 
 (defmethod widget-data-type 2 [_]
   (s/keys :req-un [::widget-uid ::object-id ::imgs]))
-
-(defmethod widget-data 2 [_]
-  {:widget-uid 2
-   :object-id (u/uid)
-   :imgs [{:object-id (u/uid)
-           :url "http://placekitten.com/900/600"}
-          {:object-id (u/uid)
-           :url "http://placekitten.com/900/600"}]})
 
 ;Image slider widget.
 (defmethod widget 002 [{:keys [imgs] :as data} owner]
@@ -232,12 +210,6 @@
 (defmethod widget-data-type 3 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::inner-html]))
 
-(defmethod widget-data 003 [_]
-  {:widget-uid 003
-   :object-id (u/uid)
-   :widget-name "Standard text widget"
-   :inner-html ["<p> Hi there </p>"]})
-
 ;Boxed mediumjs text widget
 (defmethod widget 003 [data owner]
   (reify
@@ -248,17 +220,6 @@
 
 (defmethod widget-data-type 4 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::text]))
-
-(defmethod widget-data 004 [_]
-  {:widget-uid 004
-   :object-id (u/uid)
-   :widget-name "Accordion"
-   :text [{:title {:widget-uid 001
-                   :widget-name "Standard text widget"
-                   :inner-html ["<p> Hi there </p>"]}
-           :sub {:widget-uid 001
-                 :widget-name "Standard text widget"
-                 :inner-html ["<p> Hi there </p>"]}}]})
 
 ;Accordion
 (defmethod widget 004 [{:keys [text] :as data} owner]
@@ -307,20 +268,14 @@
                               #js{:onClick (fn [_] (om/transact!
                                                      text
                                                      (fn [text]
-                                                       (conj text {:title (widget-data 001)
-                                                                   :sub (widget-data 001)}))))}
+                                                       (conj text {:title (wd/widget-data 001)
+                                                                   :sub (wd/widget-data 001)}))))}
                               "Add Section")
                             (om/build cre/remove-element text
                                       {:state {:label "remove accordion section"}}))))))))
 
 (defmethod widget-data-type 5 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::inner-html]))
-
-(defmethod widget-data 005 [_]
-  {:widget-uid 005
-   :object-id (u/uid)
-   :widget-name "Standard text widget"
-   :inner-html ["<p> Hi there </p>"]})
 
 ;Clear box red border
 (defmethod widget 005 [data owner]
@@ -332,13 +287,6 @@
 
 (defmethod widget-data-type 6 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::img]))
-
-(defmethod widget-data 006 [_]
-  {:widget-uid 006
-   :object-id (u/uid)
-   :widget-name "Standard image widget"
-   :img "http://solariarchitects.com/img/leaderboards/group_photo_everyday_zoomed.jpg"
-   :style {:width "60%"}})
 
 ;Simple Image
 (defmethod widget 006 [{:keys [style img object-id] :as data} owner]
@@ -364,22 +312,6 @@
 
 (defmethod widget-data-type 7 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::imgs]))
-
-(defmethod widget-data 007 [_]
-  {:widget-uid 007
-   :object-id (u/uid)
-   :widget-name "Grid"
-   :imgs [{:id "entry-1"
-           :className "mega-entry"
-           :data-src "http://solariarchitects.com/img/teampics/jsolari_everyday.jpg"
-           :data-width "320"
-           :data-height "400"}
-          {:id "entry-1-1"
-           :className "mega-entry"
-           :title "WE HAVE A LAUGH"
-           :text "Cue James in a bald cap, need I say more?"
-           :data-width "320"
-           :data-height "400"}]})
 
 ;Image and text grid  
 (defmethod widget 007 [{:keys [imgs] :as data} owner]
@@ -518,12 +450,6 @@
 (defmethod widget-data-type 8 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::imgs]))
 
-(defmethod widget-data 8 [_]
-  {:widget-uid 8
-   :object-id (u/uid)
-   :widget-name "Right Nav"
-   :imgs []})
-
 ;Small right nav
 (defmethod widget 8 [{:keys [lis] :as data} owner]
   (reify
@@ -547,22 +473,6 @@
 
 (defmethod widget-data-type 9 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name]))
-
-(defmethod widget-data 9 [_]
-  {:widget-uid 9
-   :object-id (u/uid)
-   :widget-name "Sign in widget"
-   :style {:fontSize "20px"
-           :outline "none"
-           :height "80px"
-           :width "300px"
-           :borderRadius "40px"
-           :background "black"
-           :border "5px solid #3498db"
-           :color "#3498db" 
-           :letterSpacing "1px"
-           :cursor "pointer"
-           :display "inherit"}})
 
 ;Sign in
 (defmethod widget 9 [{:keys [style]} owner]
@@ -591,17 +501,6 @@
 
 (defmethod widget-data-type 10 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::user-sites]))
-
-(defmethod widget-data 10 [_]
-  {:widget-uid 10
-   :object-id (u/uid)
-   :widget-name "Show your sites"
-   :user-sites [{:name (widget-data 1)
-                 :description (widget-data 1)
-                 :data {:a "placeholder"}}
-                {:name (widget-data 1)
-                 :description (widget-data 1)
-                 :data {:a "placeholder"}}]})
 
 (defn display-site
   "" 
@@ -635,7 +534,7 @@
   []
   "Data for displaying on the userhome screen and rendering fully."
   {:name (u/uid) 
-   :description (widget-data 1)
+   :description (wd/widget-data 1)
    :screenshot "http://placekitten.com/500/400" 
    :data {:a "placeholder"}})
 
@@ -687,15 +586,6 @@
 
 (defmethod widget-data-type 11 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::inner-html]))
-
-(defmethod widget-data 11 [_]
-  {:widget-uid 11 
-   :object-id (u/uid)
-   :widget-name "Standard text widget"
-   :inner-html ["<p> Hi there </p>"]
-   :visible? true
-   :tags [{:edit true} {:tag "Entrepreneurship"} {:tag "Open Source"} {:tag "Collaboration"} 
-          {:tag "PHP"} {:tag "Javascript"} {:tag "Clojure(script)"} ]})
 
 (defmulti tag 
   "Project tags"
@@ -770,16 +660,6 @@
 (defmethod widget-data-type 12 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::img]))
 
-(defmethod widget-data 12 [_]
-  {:widget-uid 12   
-   :object-id (u/uid)
-   :widget-name "Standard image widget"
-   :tags [{:addtag true} {:clicked true :tagz "Entrepreneurship"}
-          {:clicked true :tagz "Open Source"} {:clicked true :tagz "Clojurescript"}
-          {:clicked true :tagz "Collaboration"} {:clicked true :tagz "PHP"}
-          {:clicked true :tagz "Javascript"} {:clicked true :tagz "Clojure(script)"}
-          {:clicked true :tagz "Clojure"}]})
-
 (def default-tag {:clicked true :tagz "Change me"})
 
 (defmulti select-tag 
@@ -844,12 +724,6 @@
                  (apply dom/ul #js {:style #js {:display "inline-block" :margin "0px"}}
                         (om/build-all select-tag tags {:state {:tags tags}})))))))
 
-(defmethod widget-data 13 [_]
-  {:widget-uid 13
-   :object-id (u/uid)
-   :widget-name "Standard text widget"
-   :like-box-string "<div class=\"fb-page\" data-href=\"https://www.facebook.com/U1stGamesOfficial/\"  data-width=\"500\" data-height=\"300\" data-small-header=\"true\" data-adapt-container-width=\"true\" data-show-posts=\"false\" data-hide-cover=\"false\" data-show-facepile=\"false\"><div class=\"fb-xfbml-parse-ignore\"><blockquote cite=\"https://www.facebook.com/U1stGamesOfficial/\"><a href=\"https://www.facebook.com/U1stGamesOfficial/\">U1st Games</a></blockquote></div></div>"})
-
 ;Facebook like box
 (defmethod widget 13 [{:keys [like-box-string] :as data} owner]
   (reify
@@ -870,12 +744,6 @@
                  owner 
                  (cre/simple-input-cursor! like-box-string data :like-box-string))))))
 
-(defmethod widget-data 14 [_]
-  {:widget-uid 14
-   :object-id (u/uid)
-   :widget-name "Standard text widget"
-   :youtube-video-id "S-0MmK73OdY"})
-
 (defn youtube-string-gen 
   "Given a youtube video url, return embedable string" 
   [youtube-video-id]
@@ -895,11 +763,6 @@
                (cc/edit-mode-sense 
                  owner 
                  (cre/simple-input-cursor! youtube-video-id data :youtube-video-id))))))
-
-(defmethod widget-data 15 [_]
-  {:widget-uid 15
-   :object-id (u/uid)
-   :widget-name "Standard text widget"})
 
 ;Welcome widget, the first widget the user will see on their new site. Should have basic instructions 
 ;on what to do next.  

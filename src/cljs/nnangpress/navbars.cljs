@@ -170,7 +170,7 @@
           (and (not (empty? children)) (> depth (if (first @edit-mode-obs) 2 2)))
           (dom/div #js {:style #js {:position "relative"}}
 
-                   (cc/delete-button prev-children :route-name route-name)
+                   #_(cc/delete-button prev-children :route-name route-name)
 
                    (dom/li #js {:className (str "sub-nav-li ")
                                 :onClick (partial rt/js-link @routes-map-obs route-name)}

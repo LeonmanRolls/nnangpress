@@ -5,6 +5,7 @@
     [nnangpress.utils :as u]
     [nnangpress.components.common :as cc]
     [nnangpress.widgets :as wgt]
+    [nnangpress.widgetdata :as wd]
     [nnangpress.monolith :as mn]
     [nnangpress.firebase :as fb]
     [nnangpress.dom :as ndom]
@@ -47,7 +48,7 @@
                                          :onClick (fn [_] 
                                                     (mn/ref-conj! 
                                                       (mn/current-widgets-builder<< owner) 
-                                                      (wgt/widget-data widget-uid)))}
+                                                      (wd/widget-data widget-uid)))}
                                     "Add widget"))
                (om/build wgt/widget data {:init-state {:advertise? true}})))))
 
