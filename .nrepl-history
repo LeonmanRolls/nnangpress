@@ -1,26 +1,3 @@
-            [nnangpress.core :as cre]
-            [nnangpress.utils :as u]
-            [nnangpress.routing :as rt]
-            [nnangpress.firebase :as fb]
-            [cljs.reader :as rdr]
-            [goog.events :as ev]
-            [goog.dom :as gdom]
-            [ajax.core :refer [GET POST]]
-            [cljs.spec :as s :include-macros true]
-            [cljs.spec.test :as ts :include-macros true]
-            [cljs.core.async :refer [put! chan <!]]
-            [cemerick.url :as url]))
-(get-query-params<)
-    (get (get-query-params<) "dev")
-(doc defmulti)
-(start-repl)
-(doc defmulti)
-(doc defmethod)
-(+ 2 3)
-(start-repl)
-(+ 2 3)
-(in-ns 'nnangpress.firebase)
-(fb-delete "/nnangpress/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0")
 (ns nnangpress.firebase
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require 
@@ -498,3 +475,26 @@ l
     (js/firebase.database)
     (.ref path)
     (.update (clj->js data))))
+(nnangpress.widgetdata/widget-data 1)
+(fb-write 
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/3/data/route-widget/logo-data/logo-text/" 
+    (nnangpress.widgetdata/widget-data 1))
+(fb-write 
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/3/data/route-widget/routes-map/children/0/route-name-editable" 
+    (nnangpress.widgetdata/widget-data 1))
+  (fb-write 
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/3/data/route-widget/routes-map/children/0/children/0/route-name-editable" 
+    (nnangpress.widgetdata/widget-data 1))
+l
+(start-repl)
+(ns nnangpress.routing
+  "Routing for a single page application. The bridge between the route in the browser bar and the application's 
+  route state."
+  (:import [goog.history Html5History EventType])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [goog.events :as ev]
+            [goog.dom :as gdom]
+            [nnangpress.utils :as utls]
+            [nnangpress.monolith :as mn]))
+  (get-token )

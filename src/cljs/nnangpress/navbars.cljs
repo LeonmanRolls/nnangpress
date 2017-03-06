@@ -5,6 +5,7 @@
             [om.dom :as dom :include-macros true]
             [nnangpress.monolith :as mn]
             [nnangpress.utils :as u]
+            [nnangpress.widgets :as wgt]
             [nnangpress.components.common :as cc]
             [nnangpress.core :as cre]
             [nnangpress.routing :as rt]))
@@ -114,22 +115,15 @@
         (dom/h1 #js {:style (clj->js logo-style)
                      :className "logo"
                      :onClick (partial rt/js-link @routes-map-obs "/")}
-                logo-text)))))
+                (om/build wgt/widget logo-text))))))
 
-(defn str-beautify 
-  "Remove hyphens from a string" 
-  [s]
-  (->
-    (subs s 1)
-    (clojure.string/replace #"-" " ")))
-
-(defn list-item [active? routes-map route-name]
+(defn list-item [active? routes-map {:keys [route-name route-name-editable] :as all}]
   (dom/li #js {:className (str "nav-li " (when active? "active-li"))
-               :onClick (partial rt/js-link routes-map route-name)}
+               :onClick (partial rt/js-link @routes-map route-name)}
 
           (dom/div #js {:className (str (when active? "active-text"))}
-                   (str-beautify route-name))))
-
+                   (om/build wgt/widget route-name-editable {:state {:parent-cursor all
+                                                                     :routes-map routes-map}}))))
 (defn positions
   [pred coll]
   (keep-indexed (fn [idx x]
@@ -138,7 +132,7 @@
                 coll))
 
 (defn nav-menu
-  [{:keys [:route-name :background :widgets :children] :as all} owner]
+  [{:keys [:route-name :background :widgets :children :route-name-editable] :as all} owner]
 
   (reify
     om/IInitState
@@ -176,12 +170,13 @@
                                 :onClick (partial rt/js-link @routes-map-obs route-name)}
 
                            (dom/div #js {:className (str (when active? "active-text"))}
-                                    (str-beautify route-name))))
+                                    (om/build wgt/widget route-name-editable {:state {:parent-cursor all 
+                                                                                      :routes-map routes-map-obs}}))))
 
           (not (empty? children))
           (dom/div #js {:style #js {:position "relative"}}
 
-                   (list-item active? @routes-map-obs route-name)
+                   (list-item active? routes-map-obs all)
 
                    (when active?
                      (apply dom/ul #js {:className "nav-ul"}
@@ -201,7 +196,8 @@
           (dom/li #js {:className (str "sub-nav-li " (when active? "active-text"))
                        :onClick (partial rt/js-link @routes-map-obs route-name)}
 
-                  (str-beautify route-name)))))))
+                  (om/build wgt/widget route-name-editable {:state {:parent-cursor all
+                                                                    :routes-map routes-map-obs}})))))))
 
 ;A margin navbar
 (defmethod navbar 1 [{:keys [routes-map logo-data nav-style] :as data} owner]
@@ -212,8 +208,6 @@
 
                #_(dom/div #js {:className "nav-aux"}
                         (om/build nav-hint {}))
-
-               (println "logo-data: " logo-data)
 
                (dom/div #js {:className "nav-menu"
                              :style (clj->js (merge (when advertise? {:position "relative"}) nav-style))}

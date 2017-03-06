@@ -20,13 +20,19 @@
     (.setUseFragment false)))
 
 ;This is probably why state is not responsing to url change anymore
-(defn handle-url-change [e])
+(defn handle-url-change [e]
+  (println "url chagne: ")
+  (.dir js/console e))
 
 (defonce history (doto (make-history)
                    (goog.events/listen EventType.NAVIGATE #(handle-url-change %))
                    (.setEnabled true)))
 
-(defn nav! [token routes-map]
+(defn nav! 
+  "Extracts all possible paths from the routes-map, and then sees which one ends with the given token. This is the 
+  currently active route and the html5 history is then updated accordingly. Is done this way because the routes-map 
+  could change at any time so we always need to check it when changing navigation location." 
+  [token routes-map]
   (let [paths (utls/tree-seq-path
                 #(contains? % :children)
                 #(:children %)
@@ -49,3 +55,9 @@
   (do
     (.preventDefault e)
     (nav! route-name routes-map)))
+
+(comment 
+  
+  (get-token )
+  
+  )

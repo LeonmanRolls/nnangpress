@@ -50,3 +50,15 @@
   [bool] 
   (not bool))
 
+(defn str-beautify 
+  "Remove hyphens from a string, used in going from a route name to something displayable in navbar." 
+  [s]
+  (->
+    (subs s 1)
+    (clojure.string/replace #"-" " ")))
+
+(defn str-uglify 
+  "Mainly for making a string storable as a route name."
+  [s]
+  (str "/" (clojure.string/replace s #" " "-")))
+

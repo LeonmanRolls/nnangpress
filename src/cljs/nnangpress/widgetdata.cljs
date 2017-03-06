@@ -1,5 +1,7 @@
 (ns nnangpress.widgetdata
-  (:require [nnangpress.utils :as u]))
+  (:require 
+    [om.dom :as dom :include-macros true]
+    [nnangpress.utils :as u]))
 
 (defmulti widget-data 
   "Data for widget components." 
@@ -138,4 +140,11 @@
   {:widget-uid 15
    :object-id (u/uid)
    :widget-name "Standard text widget"})
+
+(defmethod widget-data 16  
+  [_]
+  {:widget-uid 001
+   :object-id (u/uid)
+   :widget-name "Standard text widget"
+   :inner-html [(str "<p>Route Name</p>" )]})
 

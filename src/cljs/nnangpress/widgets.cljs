@@ -42,7 +42,7 @@
                                 :placeholder "Your Text here"
                                 :attributes nil
                                 :tags nil
-                                :pasteAsTExt false
+                                :pasteAsText false
                                 :modifiers #js {:q (fn [event element]
                                                      (om/update!
                                                        data
@@ -773,4 +773,94 @@
       (dom/div nil 
                "Welcome"         
                ))))
+
+(defn medium-init-rt
+  "Helper for mediumjs components. Initializes a medium instance. Returns a function that can be used to destroy 
+  instance and related listeners" 
+  [uuid data link-btn-id link-input-id parent-cursor routes-map]
+  (let [medium (js/Medium. #js {:element (.getElementById js/document uuid)
+                                :mode js/Medium.richMode
+                                :placeholder "Your Text here"
+                                :attributes nil
+                                :tags nil
+                                :pasteAsText false
+                                :modifiers #js {:q (fn [event element]
+                                                     (do 
+                                                       (om/update!
+                                                         parent-cursor 
+                                                         :route-name
+                                                         (u/str-uglify (.-innerHTML (gdom/getElement uuid))))  
+                                                       (rt/nav! (u/str-uglify (.-innerHTML (gdom/getElement uuid))) @routes-map)
+                                                       )
+                                                     (om/update! data [(.-innerHTML (gdom/getElement uuid))])
+                                                     )}})
+
+        cb (ndom/attach-click-listener-by-id 
+             link-btn-id 
+             (fn []
+               (do 
+                 (.focus medium)
+                 (.invokeElement 
+                   medium 
+                   "a" 
+                   #js {:title "I am a link"
+                        :style "color: #66d9ef"
+                        :target "_blank"
+                        :href (.-value 
+                                (ndom/get-node-by-id link-input-id))}))))]
+
+    (fn []
+      (.destroy medium)
+      (ndom/remove-listener link-btn-id cb))))
+
+(defn rich-text-edit-rt
+  "Mediumjs rich text editor for routing. The main difference between this and the ordinary mediumjs widget is the
+  way we want the cursor to be updated" 
+  [data owner]
+  (reify
+    om/IInitState
+    (init-state [_]
+      {:uid (u/uid)
+       :advertise? false
+       :link-btn-id (u/uid)
+       :link-input-id (u/uid)})
+
+    om/IDidMount
+    (did-mount [_]
+      (let [{:keys [uid advertise? link-btn-id link-input-id edit parent-cursor routes-map]} (om/get-state owner)
+            edit-mode-obs (first (om/observe owner (mn/edit-mode)))]
+        (medium-init-rt uid data link-btn-id link-input-id parent-cursor routes-map)
+        (ndom/set-attr-by-id uid "contenteditable" (str (or edit-mode-obs edit)))))
+
+    om/IDidUpdate
+    (did-update [_ _ _]
+      (let [{:keys [uid advertise? link-btn-id link-input-id edit parent-cursor routes-map]} (om/get-state owner)
+            edit-mode-obs (first (mn/edit-mode))
+            medium-destroy (medium-init-rt uid data link-btn-id link-input-id parent-cursor routes-map)]
+        (medium-destroy)
+        (medium-init-rt uid data link-btn-id link-input-id parent-cursor routes-map)
+        (ndom/set-attr-by-id uid "contenteditable" (str (or edit-mode-obs edit)))))
+
+    om/IRenderState
+    (render-state [_ {:keys [uid advertise? link-btn-id link-input-id]}]
+      (let [edit-mode-obs (first (om/observe owner (mn/edit-mode)))]
+        (dom/div nil 
+                 (dom/div #js {:id uid
+                               :style #js {:marginTop "-10px"}
+                               :dangerouslySetInnerHTML #js {:__html (first data)}})
+
+                 (dom/div #js {:style #js {:display (cc/edit-mode-display edit-mode-obs)}}
+                          (dom/input #js {:id link-input-id})
+                          (dom/button #js{:id link-btn-id} "Link")))))))
+
+;Editing route names requires special treatment as the routing system relies on the route names.
+(defmethod widget 16  
+  [data owner]
+  (reify
+    om/IRenderState
+    (render-state [_ {:keys [edit parent-cursor routes-map]}]
+      (dom/div nil 
+               (om/build rich-text-edit-rt (:inner-html data) {:state {:edit edit 
+                                                                       :parent-cursor parent-cursor 
+                                                                       :routes-map routes-map}})))))
 
