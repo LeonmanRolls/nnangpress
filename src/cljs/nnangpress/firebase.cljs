@@ -87,6 +87,14 @@
     (.ref path)
     (.set (clj->js data))))
 
+(defn fb-update 
+  "Update certain items at path without overwriting nodes that aren't referenced."
+  [path data]
+  (->
+    (js/firebase.database)
+    (.ref path)
+    (.update (clj->js data))))
+
 (defn fb-copy 
   "Copy data from one path to another"
   [source dest]

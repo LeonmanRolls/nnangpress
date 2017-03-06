@@ -114,7 +114,7 @@
         (dom/h1 #js {:style (clj->js logo-style)
                      :className "logo"
                      :onClick (partial rt/js-link @routes-map-obs "/")}
-                "Leon Talbert")))))
+                logo-text)))))
 
 (defn str-beautify 
   "Remove hyphens from a string" 
@@ -212,6 +212,8 @@
 
                #_(dom/div #js {:className "nav-aux"}
                         (om/build nav-hint {}))
+
+               (println "logo-data: " logo-data)
 
                (dom/div #js {:className "nav-menu"
                              :style (clj->js (merge (when advertise? {:position "relative"}) nav-style))}
