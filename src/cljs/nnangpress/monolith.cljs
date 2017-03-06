@@ -258,14 +258,7 @@
   (let [c (chan)]
     (go 
       (get-user-sites uid c) 
-      (put! out (u/index-of-key-val (<! c) :name site-name)))))
-
-(s/fdef save-site-data 
-        :args (s/or 
-                :empty empty? 
-                :three-args (s/cat :uid ::authed-uid-raw 
-                                   :data any? 
-                                   :idx-or-name (s/or :idx int? :site-name string?))))
+      (put! out (u/index-of-key-val (<! c) :site-id site-name)))))
 
 (defn screenshot-data-uri 
   "Take a screenshot using html2canvas and returns a data uri string." 
@@ -275,6 +268,13 @@
     #js{:background "#95a5a6"
         :onrendered (fn [canvas] 
                       (put! out (.toDataURL canvas)))}))
+
+(s/fdef save-site-data 
+        :args (s/or 
+                :empty empty? 
+                :three-args (s/cat :uid ::authed-uid-raw 
+                                   :data any? 
+                                   :idx-or-name (s/or :idx int? :site-name string?))))
 
 (defn save-site-data 
   "Save a user's site data by site name or index" 
@@ -295,14 +295,14 @@
      (->
        (js/firebase.database)
        (.ref (str "users/" uid "/sites/" idx-or-site-name))
-       (.set (clj->js data)))
+       (.update (clj->js data)))
      (let [c (chan)
            _ (user-site-index uid idx-or-site-name c)]
        (go
          (->
            (js/firebase.database)
            (.ref (str "users/" uid "/sites/" (<! c)))
-           (.set (clj->js data))))))))
+           (.update (clj->js data))))))))
 
 (s/fdef user-site-count 
   :args (s/cat :uid ::authed-uid-raw :chan ::channel)
@@ -329,7 +329,8 @@
           site-name (str (first (:site-name @data)) "-" (u/uid 4)) ]
       (save-site-data 
         (first @uid) 
-        {:name site-name
+        {:name (wd/widget-data 1)
+         :site-id site-name
          :description (wd/widget-data 1) 
          :screenshot (<! c2)
          :data (update @data :site-name (fn [x] [site-name]))}

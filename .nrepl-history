@@ -1,54 +1,3 @@
-(let [c (chan)]
-  (go 
-    (fb/firebase-get "nangpress-data/site-name" c)
-    (println "rtn" (<! c))))
-(start-repl)
-(ns nnangpress.repl
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [nnangpress.monolith :as mn]
-            [nnangpress.utils :as u]
-            [nnangpress.widgets :as wgts]
-            [nnangpress.firebase :as fb]
-            [cljs.reader :as rdr]
-            [cljs.spec :as s]
-            [cljs.spec.test :as ts :include-macros true]
-            [cljs.core.async :refer [put! chan <!]]))
-(mn/site-name)
-(all-data_
-)
-(all-data)
-(mn/all-data)
-(= false #{})
-(tag)
-tag
-(while true
-    (let [imax (first (apply max-key second (map-indexed vector '(1 2 3 4 5 6 7 8))))]
-      max))
-(+ 2 3)
-(while true
-    (let [imax (first (apply max-key second (map-indexed vector '(1 2 3 4 5 6 7 8))))]
-      max))
-(let [imax (first (apply max-key second (map-indexed vector '(1 2 3 4 5 6 7 8))))]
-      max)
-(println "hi there")
-(let [imax (first (apply max-key second (map-indexed vector '(1 2 3 4 5 6 7 8))))]
-      max)
-(let [imax (first (apply max-key second (map-indexed vector '(1 2 3 4 5 6 7 8))))]
-      imax)
-(apply max-key second (map-indexed vector '(1 2 3 4 5 6 7 8)))
-(boot (marginalia))
-(docs (marginalia))
-(doc (marginalia))
-(start-repl)
-(ns nnangpress.app
-  "Start here"
-  (:import [goog.history Html5History EventType])
-  (:require-macros [cljs.core.async.macros :refer  [go go-loop]])
-  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
-            [om.dom :as dom :include-macros true]
-            [nnangpress.monolith :as mn]
-            [nnangpress.navbars :as nv]
-            [nnangpress.widgets :as wgt]
             [nnangpress.core :as cre]
             [nnangpress.utils :as u]
             [nnangpress.routing :as rt]
@@ -498,3 +447,54 @@ l
   (fb-copy 
     "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1/description" 
     "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/2/description") 
+l
+(start-repl)
+  (nnangpress.widgetdata/widget-data 1)
+  (fb-copy 
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/name" 
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/site-id")
+(ns nnangpress.firebase
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require 
+    [clojure.walk :as wlk]
+    [cljs.core.async :refer [put! chan <!]]))
+  (fb-copy 
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/name" 
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/site-id")
+  (fb-copy 
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1/name" 
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1/site-id")
+  (fb-copy 
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/2/name" 
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/2/site-id")
+  (fb-copy 
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/3/name" 
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/3/site-id")
+(nnangpress.widgetdata/widget-data 1)
+  (fb-write 
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/name" 
+    (nnangpress.widgetdata/widget-data 1))
+  (fb-write 
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1/name" 
+    (nnangpress.widgetdata/widget-data 1))
+  (fb-write 
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/2/name" 
+    (nnangpress.widgetdata/widget-data 1))
+  (fb-write 
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/3/name" 
+    (nnangpress.widgetdata/widget-data 1))
+  (fb-write 
+    "/nangpress-data/route-widgets/userhome/routes-map/widgets/1/user-sites/0/name" 
+    (nnangpress.widgetdata/widget-data 1))
+(u/uid)
+(nnangpress.utils/uid)
+  (fb-write 
+    "/nangpress-data/route-widgets/userhome/routes-map/widgets/1/user-sites/0/site-id" 
+    (nnangpress.utils/uid))
+(defn fb-update 
+  "Update certain items at path without overwriting nodes that aren't referenced."
+  [path data]
+  (->
+    (js/firebase.database)
+    (.ref path)
+    (.update (clj->js data))))

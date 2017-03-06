@@ -13,6 +13,8 @@
     [om.dom :as dom :include-macros true]
     [om.core :as om :include-macros true :refer [set-state! update-state!]]))
 
+(declare master)
+
 (defn admin-toolbar 
   "Toolbar to aid in editing the site and provide information. Should not be visible when ordinarily visting the site." 
   [{:keys [sidebar-data]} owner]
@@ -23,12 +25,12 @@
             site-name-obs (om/observe owner (mn/site-name))
             all-data-obs (om/observe owner (mn/all-data))
             site? (= "site" (:site-state @all-data-obs))]
-        (println "site: " (:site-state @all-data-obs))
         (dom/div #js {:className "admin-toolbar"}
                  (dom/b nil "Welcome to Nnangpress alpha | ")
                  (dom/b nil (str " Username:  " (first @user-email-obs)))
                  (dom/b nil (str " | Site name:  " (first @site-name-obs) " | " ))
                  (when site? (cc/standard-button #(om/transact! sidebar-data :sidebar-visible u/toggle) "Menu"))
+                 (when site? (cc/standard-button #(mn/auth-state-load-site! master "super-container") "Home"))
                  (when site? (cc/standard-button mn/toggle-edit-mode "Toggle edit mode"))
                  (when site? (cc/standard-button mn/new-site "Save new site"))
                  (when site? (cc/standard-button mn/save-site-data "Save"))

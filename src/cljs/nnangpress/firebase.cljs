@@ -102,3 +102,19 @@
     (<! fb-copy)
     (fb-delete source)))
 
+(comment 
+
+  (fb-write 
+    "/nangpress-data/route-widgets/userhome/routes-map/widgets/1/user-sites/0/site-id" 
+    (nnangpress.utils/uid))
+
+  (fb-write 
+    "/nangpress-data/route-widgets/userhome/routes-map/widgets/1/user-sites/0/name" 
+    (nnangpress.widgetdata/widget-data 1))
+
+  (fb-copy 
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/3/name" 
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/3/site-id")
+
+  )
+

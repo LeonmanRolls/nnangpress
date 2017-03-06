@@ -510,7 +510,8 @@
                                 :fontWeight "900" :border "2px solid white" :padding "10px",
                                 :background "rgba(0,0,0,0.7)"}} 
 
-               (dom/div nil (str "Site name: " name))
+               (dom/u nil (str "Site name: "))
+               (om/build widget name {:state {:edit true}})
                (dom/u nil (str "Site description: "))
                (om/build widget description {:state {:edit true}})
 
@@ -531,8 +532,9 @@
 (defn new-site-template
   []
   "Data for displaying on the userhome screen and rendering fully."
-  {:name (u/uid) 
+  {:name (wd/widget-data 1)
    :description (wd/widget-data 1)
+   :site-id (u/uid)
    :screenshot "http://placekitten.com/500/400" 
    :data {:a "placeholder"}})
 
