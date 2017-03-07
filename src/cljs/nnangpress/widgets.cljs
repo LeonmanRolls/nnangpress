@@ -774,6 +774,20 @@
                "Welcome"         
                ))))
 
+(defn route-modifier 
+  ""
+  [data parent-cursor routes-map]
+  (fn [event element]
+    (let [uuid (-> event .-srcElement .-id)]
+      (.dir js/console event)
+      (do 
+        (om/update!
+          parent-cursor 
+          :route-name
+          (u/str-uglify (.-innerHTML (gdom/getElement uuid))))  
+        (rt/nav! (u/str-uglify (.-innerHTML (gdom/getElement uuid))) @routes-map)
+        (om/update! data [(.-innerHTML (gdom/getElement uuid))])))))
+
 (defn medium-init-rt
   "Helper for mediumjs components. Initializes a medium instance. Returns a function that can be used to destroy 
   instance and related listeners" 
@@ -784,16 +798,7 @@
                                 :attributes nil
                                 :tags nil
                                 :pasteAsText false
-                                :modifiers #js {:q (fn [event element]
-                                                     (do 
-                                                       (om/update!
-                                                         parent-cursor 
-                                                         :route-name
-                                                         (u/str-uglify (.-innerHTML (gdom/getElement uuid))))  
-                                                       (rt/nav! (u/str-uglify (.-innerHTML (gdom/getElement uuid))) @routes-map)
-                                                       )
-                                                     (om/update! data [(.-innerHTML (gdom/getElement uuid))])
-                                                     )}})
+                                :modifiers #js {:q (route-modifier data parent-cursor routes-map)}})
 
         cb (ndom/attach-click-listener-by-id 
              link-btn-id 
@@ -860,7 +865,7 @@
     om/IRenderState
     (render-state [_ {:keys [edit parent-cursor routes-map]}]
       (dom/div nil 
-               (om/build rich-text-edit-rt (:inner-html data) {:state {:edit edit 
+               (om/build rich-text-edit-rt (:inner-html data) {:state {:edit false 
                                                                        :parent-cursor parent-cursor 
                                                                        :routes-map routes-map}})))))
 

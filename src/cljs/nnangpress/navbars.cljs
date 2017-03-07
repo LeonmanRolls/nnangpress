@@ -115,7 +115,7 @@
         (dom/h1 #js {:style (clj->js logo-style)
                      :className "logo"
                      :onClick (partial rt/js-link @routes-map-obs "/")}
-                (om/build wgt/widget logo-text))))))
+                (om/build wgt/widget logo-text {:state {:edit false}}))))))
 
 (defn list-item [active? routes-map {:keys [route-name route-name-editable] :as all}]
   (dom/li #js {:className (str "nav-li " (when active? "active-li"))
