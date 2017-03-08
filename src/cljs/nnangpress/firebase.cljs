@@ -103,6 +103,14 @@
       (firebase-get source c)
       (fb-write dest (<! c)))))
 
+(defn fb-copy-update 
+  "For when you don't want to overwirte the destination's data"
+  [source dest]
+  (let [c (chan)]
+    (go 
+      (firebase-get source c)
+      (fb-update dest (<! c)))))
+
 (defn fb-move
   "Copy data from one path to another and delete data at original place."
   [source dest]
@@ -112,17 +120,18 @@
 
 (comment 
 
-  (fb-write 
-    "/nangpress-data/route-widgets/userhome/routes-map/widgets/1/user-sites/0/site-id" 
-    (nnangpress.utils/uid))
-
-  (fb-write 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/3/data/route-widget/routes-map/children/0/children/0/route-name-editable" 
-    (nnangpress.widgetdata/widget-data 1))
+  (fb-copy-update 
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/data/route-widget/nav-style" 
+    "/nangpress-data/all-navs-data/0/nav-style")
 
   (fb-copy 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/3/name" 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/3/site-id")
+    "/nangpress-data/all-navs-data/0/"
+    "/nangpress-data/all-navs-data/1/"
+    )
+
+  (fb-write 
+    "/nangpress-data/all-navs-data/1/routes-map/children/0/route-name-editable" 
+    (nnangpress.widgetdata/widget-data 16))
 
   )
 

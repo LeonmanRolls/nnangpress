@@ -199,7 +199,7 @@
                   (om/build wgt/widget route-name-editable {:state {:parent-cursor all
                                                                     :routes-map routes-map-obs}})))))))
 
-;A margin navbar
+;A margin navbar. Css styling can be overwritten with local data.
 (defmethod navbar 1 [{:keys [routes-map logo-data nav-style] :as data} owner]
   (reify
     om/IRenderState
@@ -210,7 +210,11 @@
                         (om/build nav-hint {}))
 
                (dom/div #js {:className "nav-menu"
-                             :style (clj->js (merge (when advertise? {:position "relative"}) nav-style))}
+                             :style (clj->js (merge (when advertise? {:position "relative"}) nav-style))
+                             }
+
+                        (prn "logo-data: " logo-data)
+
                         (om/build nav-menu-logo logo-data)
                         (om/build nav-menu routes-map))))))
 

@@ -174,6 +174,7 @@
     om/IRender
     (render [_]
       (dom/div #js {:className "selectWidget"}
+
                (dom/div #js {:style #js {:borderBottom "1px solid white" :marginBottom "10px"}} 
                         (dom/span nil "Title of navbar")
 

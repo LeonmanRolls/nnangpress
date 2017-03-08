@@ -851,10 +851,9 @@
       (let [edit-mode-obs (first (om/observe owner (mn/edit-mode)))]
         (dom/div nil 
                  (dom/div #js {:id uid
-                               :style #js {:marginTop "-10px"}
                                :dangerouslySetInnerHTML #js {:__html (first data)}})
 
-                 (dom/div #js {:style #js {:display (cc/edit-mode-display edit-mode-obs)}}
+                 (dom/div #js {:style #js {:display "none"}}
                           (dom/input #js {:id link-input-id})
                           (dom/button #js{:id link-btn-id} "Link")))))))
 
