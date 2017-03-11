@@ -4,10 +4,6 @@
     [clojure.walk :as wlk]
     [cljs.core.async :refer [put! chan <!]]))
 
-(defn load-user-home-site 
-  "" 
-  [])
-
 (defn sign-in-ui-config-gen 
   "Configuration for firebase login flow. Callback will have access to user data."
   [cb]
@@ -120,14 +116,14 @@
 
 (comment 
 
-  (fb-copy-update 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/data/route-widget/nav-style" 
-    "/nangpress-data/all-navs-data/0/nav-style")
+  (go 
+    (let [c (chan)]
+      (firebase-get "/nangpress-data" c)  
+      (println (<! c))))
 
-  (fb-copy 
-    "/nangpress-data/all-navs-data/0/"
-    "/nangpress-data/all-navs-data/1/"
-    )
+  (fb-copy
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1/data/route-widget/logo-data" 
+    "/nangpress-data/all-navs-data/1/logo-data")
 
   (fb-write 
     "/nangpress-data/all-navs-data/1/routes-map/children/0/route-name-editable" 

@@ -143,7 +143,7 @@
 
 (defmethod widget-data 16  
   [_]
-  {:widget-uid 001
+  {:widget-uid 16
    :object-id (u/uid)
    :widget-name "Standard text widget"
    :inner-html [(str "<p>Route Name</p>" )]})

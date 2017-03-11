@@ -62,3 +62,8 @@
   [s]
   (str "/" (clojure.string/replace s #" " "-")))
 
+(defn atom? 
+  ""
+  [x]
+  (instance? cljs.core/Atom x))
+

@@ -5,6 +5,7 @@
             [om.dom :as dom :include-macros true]
             [nnangpress.utils :as u]
             [nnangpress.dom :as ndom]
+            [nnangpress.specs :as spcs]
             [nnangpress.widgetdata :as wd]
             [clojure.zip :as z]
             [clojure.spec :as s]
@@ -14,54 +15,60 @@
 
 (declare update-site-state!)
 
+;#Primitives
+
 (s/def ::all-widgets-data vector?)
 (s/def ::current-route vector?)
 (s/def ::edit-mode vector?)
 (s/def ::logo-text vector?)
 (s/def ::route-widget map?)
-(s/def ::route-widgets map?)
+(s/def ::admin-route-widgets map?)
 (s/def ::email vector?)
 (s/def ::site-name vector?)
+(s/def ::site-state string?)
+(s/def ::uid vector?)
 
 (s/def ::uid vector?)
 (s/def ::authed-uid-raw (s/and #(not (empty? %)) string?))
 
-(s/def ::channel #(= 
-                    (type %)
-                    cljs.core.async.impl.channels/ManyToManyChannel))
+(s/def ::channel #(= (type %) cljs.core.async.impl.channels/ManyToManyChannel))
 
-(s/def ::name string?)
-(s/def ::description string?)
-(s/def ::data map?)
+;Cursors
+(s/def ::map-cursor om/MapCursor)
+(s/def ::indexed-cursor om/IndexedCursor)
 
-(s/def ::all-data (s/keys :req-un [::all-widgets-data
-                                   ::uid
-                                   ::current-route
-                                   ::edit-mode
-                                   ::logo-text
-                                   ::route-widget]))
+;Site meta-data, primarily for displaying a user's sites to the user.
+(s/def ::name ::spcs/basic-mediumjs-wgt)
+(s/def ::description ::spcs/basic-mediumjs-wgt)
+(s/def ::site-id string?)
+(s/def ::screenshot string?)
 
-(s/def ::site-data (s/keys :req-un [::all-widgets-data
-                                    ::uid
-                                    ::site-name
-                                    ::current-route
-                                    ::edit-mode
-                                    ::logo-text
+;#Compounds
+
+;Unfortunately simple name. Data for a renderable site. Should be merged with system data to make a fully renderable 
+;data structure.
+(s/def ::data (s/keys :req-un [::email ::logo-text ::route-widget ::site-name ::site-state ::uid]))
+
+(s/def ::all-data (s/keys :req-un [::all-widgets-data ::uid ::current-route ::edit-mode ::logo-text ::route-widget]))
+
+(s/def ::site-data (s/keys :req-un [::all-widgets-data ::uid ::site-name ::current-route ::edit-mode ::logo-text
                                     ::route-widget]))
 
-(s/def ::nangpress-data (s/keys :req-un [::all-widgets-data
-                                         ::uid
-                                         ::current-route
-                                         ::edit-mode
-                                         ::logo-text
-                                         ::route-widgets
-                                         ::route-widget]))
+;For the sake of not overcomplicating initializing reference cursors, nangpress-data should be renderable and have 
+;the shape that reference cursor initialization requires
+(s/def ::nangpress-data (s/keys :req-un [::admin-route-widgets ::all-navs-data ::all-widgets-data ::current-route 
+                                         ::edit-mode ::sidebar-data ::site-name ::site-state ::uid]))
 
-(s/def ::user-site-data (s/keys :req-un [::name ::description ::data]))
+;Primarily for displaying site on a user's homepage.
+(s/def ::site-with-meta (s/keys :req-un [::site-id ::screenshot ::name ::description ::route-widget]))
+
+;Minimum data required for a site to render
+(s/def ::renderable (s/keys :req-un [::route-widget ::all-navs-data ::sidebar-data ::site-name ::uid ::email ::edit-mode
+                                     ::all-widgets-data ::current-route]))
 
 (def monolith (atom {}))
 
-(set-validator! 
+#_(set-validator! 
   monolith
   (fn [new-data]
     (s/valid? ::site-data new-data)))
@@ -84,6 +91,9 @@
                  (prn (keys new-state))
                  (prn "-- Site state --")
                  (prn (:site-state new-state))))))
+
+(s/fdef ref-cursor-init 
+        :args (s/cat :monolith u/atom?))
 
 (defn ref-cursor-init 
   "Defines our monolith API for convenient access to data further down the tree." 
@@ -124,9 +134,6 @@
 
   (defn current-route []
     (om/ref-cursor (:current-route (om/root-cursor monolith))))
-
-  (defn logo-text []
-    (om/ref-cursor (:logo-text (om/root-cursor monolith))))
 
   (defn logo-hint []
     (om/ref-cursor (-> (om/root-cursor monolith) :route-widget :routes-map :nav-hint))))
@@ -210,25 +217,10 @@
     data))
 
 (s/fdef reset-monolith-atom! 
-        :args (s/cat :data ::site-data))
+        :args (s/cat :data ::renderable))
 
 (defn reset-monolith-atom! [data]
   (reset! monolith data))
-
-(s/fdef nnangpress-data->monolith 
-        :args (s/cat :nangpress-data ::nangpress-data :current-user any?))
-
-(defn nnangpress-data->monolith
-  "Going from system data to system + user data and setting monolith atom" 
-  [nnangpress-data current-user]
-  (reset-monolith-atom! 
-    (assoc 
-      (dissoc nnangpress-data :route-widgets)  
-      :uid [(if current-user (.-uid current-user) "")] 
-      :email [(if current-user (.-email current-user) "")]
-      :route-widget (if current-user
-                      (-> nnangpress-data :route-widgets :userhome)
-                      (-> nnangpress-data :route-widgets :homepage)))))
 
 (s/fdef get-user-sites 
   :args (s/cat :uid ::authed-uid-raw :chan ::channel))
@@ -341,6 +333,15 @@
   [cursor idx1 idx2]
   (om/transact! cursor (fn [xs] (u/vec-swap xs idx1 idx2))))
 
+(s/fdef site-meta->renderable
+        :args (s/cat :site-meta ::site-with-meta))
+
+(defn site-meta->renderable 
+  "Primarily for going from userhome to and end user site." 
+  [site-meta]
+  
+  )
+
 (defn update-monolith-user-data 
   "Update monolith with current user data" 
 
@@ -353,19 +354,25 @@
      :uid [(if current-user (.-uid current-user) "")] 
      :email [(if current-user (.-email current-user) "")])))
 
-(defn raw-nnangpress->renderable 
+(s/fdef nangpress-data->renderable
+        :args (s/cat :nangpess-data ::nangpress-data :current-user any?))
+
+(defn nangpress-data->renderable 
   "Raw nnangpress to renderable based on user auth status"  
 
-  ([raw-nnangpress]
-   (raw-nnangpress->renderable raw-nnangpress (fb/current-user)))
+  ([nangpress-data]
+   (nangpress-data->renderable nangpress-data (fb/current-user)))
 
-  ([raw-nnangpress current-user]
+  ([nangpress-data current-user]
    (-> 
-     (assoc raw-nnangpress :route-widget (if current-user
-                                           (-> raw-nnangpress :route-widgets :userhome)
-                                           (-> raw-nnangpress :route-widgets :homepage)))
+     (assoc nangpress-data :route-widget (if current-user
+                                           (-> nangpress-data :route-widgets :userhome)
+                                           (-> nangpress-data :route-widgets :homepage)))
      (update-monolith-user-data current-user)
      (dissoc :route-widgets))))
+
+(s/fdef renderable-site->full-monolith
+        :args (s/cat :renderable-stie any? :nangpress-system-data any?))
 
 (defn renderable-site->full-monolith
   "Combines a renderable site with system data to form full monolith" 
@@ -377,9 +384,7 @@
        (renderable-site->full-monolith renderable-site (<! c)))))
 
   ([renderable-site nangpress-system-data] 
-   (merge nangpress-system-data renderable-site)
-   ))
-      
+   (merge nangpress-system-data renderable-site)))
 
 (defn set-bg-img! 
   "Set background colour or image." 
@@ -464,15 +469,20 @@
   ([site-state]
    (om/update! (all-data) :site-state site-state)))
 
+(s/fdef auth-state-load-site! 
+        :args (s/cat :root-component fn? :root-node-id string?))
+
 (defn auth-state-load-site!
   "Load site based on the auth state and/or the particular user. Also initializes the root component." 
   [root-component root-node-id]
   (go 
     (let [current-user (-> js/firebase .auth .-currentUser)
-          c (chan)]
-      (fb/firebase-get "nangpress-data/" c)
+          c (chan)
+          _ (fb/firebase-get "nangpress-data/" c)
+          nangpress-data (<! c)]
+      
       (reset-monolith-atom! 
-        (raw-nnangpress->renderable (<! c) current-user))
-      (update-site-state!)
-      (om/root root-component monolith {:target (. js/document (getElementById root-node-id))}))))
+        (nangpress-data->renderable nangpress-data current-user))
+      #_(update-site-state!)
+      #_(om/root root-component monolith {:target (. js/document (getElementById root-node-id))}))))
 

@@ -4,6 +4,7 @@
   (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
             [om.dom :as dom :include-macros true]
             [nnangpress.monolith :as mn]
+            [nnangpress.widgetdata :as wd]
             [nnangpress.utils :as u]
             [nnangpress.widgets :as wgt]
             [nnangpress.components.common :as cc]
@@ -27,8 +28,13 @@
                :children []}})
 
 ;A simple navbar. 
-(defmethod navbar 0 [data owner]
+(defmethod navbar 0 [{:keys [main-view-style] :as data} owner]
   (reify
+    om/IWillMount 
+    (will-mount [_]
+      (when (= (type main-view-style) om.core/MapCursor)
+        (om/update! main-view-style [:style :paddingLeft] "180px")))
+
     om/IRender
     (render [this]
       (let [edit-mode-obs (om/observe owner (mn/edit-mode))]
@@ -82,6 +88,7 @@
    :grey-bg? true
    :nav-hint ["nav hint"]
    :nav-hint-style {:color "white"}
+   :route-name-editable (wd/widget-data 16) 
    :widgets [{:widget-uid 001
               :object-id (u/uid)
               :widget-name "Standard text widget"
@@ -91,6 +98,7 @@
                :grey-bg? true
                :nav-hint ["nav hint"]
                :nav-hint-style {:color "white"}
+               :route-name-editable (wd/widget-data 16) 
                :widgets [{:widget-uid 001
                           :object-id (u/uid)
                           :widget-name "Standard text widget"
@@ -200,18 +208,22 @@
                                                                     :routes-map routes-map-obs}})))))))
 
 ;A margin navbar. Css styling can be overwritten with local data.
-(defmethod navbar 1 [{:keys [routes-map logo-data nav-style] :as data} owner]
+(defmethod navbar 1 [{:keys [routes-map logo-data nav-style main-view-style] :as data} owner]
   (reify
+    om/IWillMount
+    (will-mount [_]
+      (when (= (type main-view-style) om.core/MapCursor)
+        (om/update! main-view-style [:style :paddingLeft] "320px")))
+
     om/IRenderState
     (render-state [_ {:keys [advertise?]}]
       (dom/div #js {:id "the-nav" :className "main-nav"}
 
                #_(dom/div #js {:className "nav-aux"}
-                        (om/build nav-hint {}))
+                          (om/build nav-hint {}))
 
                (dom/div #js {:className "nav-menu"
-                             :style (clj->js (merge (when advertise? {:position "relative"}) nav-style))
-                             }
+                             :style (clj->js (merge (when advertise? {:position "relative"}) nav-style))}
 
                         (prn "logo-data: " logo-data)
 

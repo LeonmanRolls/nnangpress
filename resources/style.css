@@ -496,3 +496,7 @@ color: white !important;
 }
 /*Side menu End --------------------------------------------------------------------------------*/
 
+.welcome-widget > p {
+    margin: 10px;
+}
+

@@ -7,8 +7,8 @@
   (:require
     [om.core :as om :include-macros true :refer [set-state! update-state!]]
     [om.dom :as dom :include-macros true]
-    [cljs.reader :as rdr]
     [nnangpress.utils :as u]
+    [nnangpress.specs :as spcs]
     [nnangpress.widgetdata :as wd]
     [nnangpress.monolith :as mn]
     [nnangpress.core :as cre]
@@ -23,10 +23,6 @@
 
 (declare widget-data-type master admin-sidebar main-view)
 
-(s/def ::widget-uid int?)
-(s/def ::object-id string?)
-(s/def ::widget-name string?)
-(s/def ::inner-html vector?)
 (s/def ::imgs vector?)
 (s/def ::text vector?)
 (s/def ::img string?)
@@ -115,8 +111,7 @@
   "Components for displaying widgets." 
   (fn [data owner] (:widget-uid data)))
 
-(defmethod widget-data-type 1 [_]
-  (s/keys :req-un [::widget-uid ::object-id ::widget-name ::inner-html]))
+(defmethod widget-data-type 1 [_] ::basic-medium-js-widget)
 
 ;Basic mediumjs widget
 (defmethod widget 001  
@@ -130,8 +125,9 @@
 (defmethod widget-data-type 2 [_]
   (s/keys :req-un [::widget-uid ::object-id ::imgs]))
 
+
 ;Image slider widget.
-(defmethod widget 002 [{:keys [imgs] :as data} owner]
+(defmethod widget 002 [{:keys [imgs] :as data} owner] 
   (reify
     om/IInitState
     (init-state [_]
@@ -530,13 +526,17 @@
                  "Delete site")))))
 
 (defn new-site-template
-  []
-  "Data for displaying on the userhome screen and rendering fully."
-  {:name (wd/widget-data 1)
-   :description (wd/widget-data 1)
-   :site-id (u/uid)
-   :screenshot "http://placekitten.com/500/400" 
-   :data {:a "placeholder"}})
+    []
+    "Data for displaying on the userhome screen and rendering fully."
+
+    {:name (wd/widget-data 1)
+     :description (wd/widget-data 1)
+     :site-id (u/uid)
+     :screenshot "http://placekitten.com/500/400" 
+     :data {:email ["email@email.com"]
+            :logo-text (wd/widget-data 16)
+            }}
+  )
 
 ;The user's sites as seen when on the user homepage. Not meant to be a user selectable widget. This widget 
 ;is somewhat removed from the general monolith architecture. It loads its own data into the monolith 
@@ -576,13 +576,24 @@
                         "Your Sites")
 
                (cc/standard-button 
-                 (fn [] (om/transact! user-sites #(conj % (new-site-template))))
+                 (fn [] (om/transact! user-sites #(conj % (new-site-data))))
                  "+ Add New Site" 
                  {:position "absolute", :top "0", :right "0", 
                   :fontSize "1.5em" :marginTop "20px", :cursor "pointer"})
 
                (apply dom/div nil
                       (om/build-all display-site user-sites {:init-state {:delete delete}}))))))
+
+(comment 
+  ::mn/data
+  (s/valid? ::mn/data (new-site-template))
+  (ts/instrument)
+  (s/cat :empty-input (s/* empty?))
+  (s/gen ::mn/data)
+
+
+
+  )
 
 (defmethod widget-data-type 11 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::inner-html]))
@@ -764,15 +775,36 @@
                  owner 
                  (cre/simple-input-cursor! youtube-video-id data :youtube-video-id))))))
 
+(def welcome-widget-style {:fontWeight "900", :textAlign "center", :background "rgba(0,0,0,0.95)", 
+                           :padding "20px", :border "2px solid white"})
+
 ;Welcome widget, the first widget the user will see on their new site. Should have basic instructions 
 ;on what to do next.  
 (defmethod widget 15 [{:keys [youtube-video-id] :as data} owner]
   (reify
     om/IRender
     (render [_]
-      (dom/div nil 
-               "Welcome"         
-               ))))
+      (dom/div #js {:style (clj->js welcome-widget-style)
+                    :className "welcome-widget"} 
+               (dom/p #js {:style #js {:fontSize "1.5em"}} "Welcome to Nangpress! Here's how to get started.")         
+               (dom/p nil "1. Choose a navbar. 
+                          This is optional but without it your site won't have any pages other than the homepage.
+                          You can do this by clicking 'Menu' in the admin navbar above and then 'Select a navbar' 
+                          from the menu that appears on the left.")         
+               (dom/img #js {:src "https://media.giphy.com/media/l0Iy9RHuSPfER4NEs/source.gif"})
+               (dom/p nil "2. Add some routes to your site. 
+                          Hit 'Toggle edit mode' at the top. This will make the navbar editable. If you click on 
+                          the links on the navbar they will go to the corresponding page.")         
+               (dom/img #js {:src "https://media.giphy.com/media/l0Iy7jckAeUOgt5Bu/source.gif"})
+               (dom/p nil "3. Add widgets to a page. 
+                          In the side menu click on the 'add a widget' section. Here you will see a selction of 
+                          widgets that you can add to the current page you are on by clicking 'Add widget'. You 
+                          can play around with the widgets in the side menu as they have been loaded with some 
+                          default data.")
+               (dom/img #js {:src "https://media.giphy.com/media/3o7btTKSqMxrMW3G2k/source.gif"})
+               (dom/p nil "4. Edit the widgets you have just added. 
+                          Hit 'Toggle edit mode' at the top to edit the widgets you just added.")
+               (dom/p nil "5. Happy site building! Delete this widget when you're finished with it.")))))
 
 (defn route-modifier 
   ""

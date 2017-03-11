@@ -1,191 +1,3 @@
-    (fb-delete source)))
-(defn fb-delete
-  "Delete data at path. Use with care! Check for at least two /s to prevent deleting something at the root level." 
-  [path]
-  {:pre [(< 2 (count (clojure.string/split path #"/")))]}
-  (->
-    (js/firebase.database)
-    (.ref path)
-    (.remove)))
-(fb-move "/nangpress-data/route-widgets/userhome/routes-map/widgets/3" 
- "/nangpress-data/route-widgets/userhome/routes-map/widgets/4")
-(fb-copy "/nangpress-data/route-widgets/userhome/routes-map/widgets/1" 
- "/nangpress-data/route-widgets/userhome/routes-map/widgets/2")
-(fb-copy "/nangpress-data/route-widgets/userhome/routes-map/widgets/3" 
- "/nangpress-data/route-widgets/userhome/routes-map/widgets/5")
-(fb-copy "/nangpress-data/route-widgets/userhome/routes-map/widgets/2" 
- "/nangpress-data/route-widgets/userhome/routes-map/widgets/1")
-(start-repl)
-(ns nnangpress.firebase
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require 
-    [clojure.walk :as wlk]
-    [cljs.core.async :refer [put! chan <!]]))
-(defn fb-copy 
-  "Copy data from one path to another"
-  [source dest]
-  (let [c (chan)]
-    (go 
-      (firebase-get source c)
-      (fb-write dest (<! c)))))
-(defn firebase-get
-  "Get data from firebase database by route"  
-  [route out] 
-  (->
-    (.ref (js/firebase.database) route)
-    (.once "value")
-    (.then (fn [snapshot]
-             (put! out (firebase-empty->clj-empty
-                         (js->clj (.val snapshot) :keywordize-keys true)))))))
-(defn firebase-empty->clj-empty 
-  "Goiing from firebase representation of empty vector to a clj empty vector" 
-  [data]
-  (wlk/postwalk 
-    (fn [x]   
-      (if 
-        (and 
-          (vector? x) 
-          (= 1 (count x)) 
-          (= "" (first x))) 
-        [] 
-        x)) 
-    data))
-(defn fb-copy 
-  "Copy data from one path to another"
-  [source dest]
-  (let [c (chan)]
-    (go 
-      (firebase-get source c)
-      (fb-write dest (<! c)))))
-(defn fb-write 
-  "Wite data to firebase path"
-  [path data]
-  (->
-    (js/firebase.database)
-    (.ref path)
-    (.set (clj->js data))))
-(defn fb-copy 
-  "Copy data from one path to another"
-  [source dest]
-  (let [c (chan)]
-    (go 
-      (firebase-get source c)
-      (fb-write dest (<! c)))))
-(fb-copy "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/4" 
-        "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0"
-)
-(fb-copy "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/5" 
-        "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1")
-(start-repl)
-(ns nnangpress.firebase
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require 
-    [clojure.walk :as wlk]
-    [cljs.core.async :refer [put! chan <!]]))
-fb-copy
-  (fb-copy "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/description" 
-           "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1/description")
-  (fb-copy "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/description" 
-           "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/2/description")
-l
-(start-repl)
-(ns nnangpress.firebase
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require 
-    [clojure.walk :as wlk]
-    [cljs.core.async :refer [put! chan <!]]))
-(->
-    (js/firebase.database)
-    (.ref "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites")
-    (.equalTo "site1-a0c4-35dc-50cf-c825")
-    )
-(->
-    (js/firebase.database)
-    (.ref "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites")
-    (.equalTo "site1-a0c4-35dc-50cf-c825")
-    (.once "value")
-    (.then (fn [snapshot] (println "snapshot: " snapshot)))
-    )
-(->
-    (js/firebase.database)
-    (.ref "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites")
-    (.equalTo "site1-a0c4-35dc-50cf-c825")
-    (.once "value")
-    (.then (fn [snapshot] (println "snapshot: " (.val snapshot))))
-    )
-(->
-    (js/firebase.database)
-    (.ref "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites")
-    (.once "value")
-    (.then (fn [snapshot] (println "snapshot: " (.val snapshot))))
-    )
-(->
-    (js/firebase.database)
-    (.ref "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites")
-    (.orderByValue)
-    (.equalTo "site1-a0c4-35dc-50cf-c825")
-    (.once "value")
-    (.then (fn [snapshot] (println "snapshot: " (.val snapshot))))
-    )
-(->
-    (js/firebase.database)
-    (.ref "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites")
-    (.orderByValue)
-    (.equalTo "site1-a0c4-35dc-50cf-c825")
-    (.once "value")
-    (.then (fn [snapshot] (println "snapshot: " (.val snapshot))))
-    )
-(->
-    (js/firebase.database)
-    (.ref "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites")
-    (.orderByValue)
-    (.once "value")
-    (.then (fn [snapshot] (println "snapshot: " (.val snapshot))))
-    )
-(->
-    (js/firebase.database)
-    (.ref "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites")
-    (.orderByValue)
-    (.once "value")
-    (.then (fn [snapshot] (println "snapshot: " (.val snapshot))))
-    )
-(->
-    (js/firebase.database)
-    (.ref "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites")
-    (.once "value")
-    (.then (fn [snapshot] 
-             (let [val (.val snapshot)]
-               (println "snapshot" (filter #(= (:name %) "site1-a0c4-35dc-50cf-c825") (.val snapshot)))
-               )
-             )))
-(->
-    (js/firebase.database)
-    (.ref "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites")
-    (.once "value")
-    (.then (fn [snapshot] 
-             (let [val (.val snapshot)]
-               (println "snapshot" (filter #(= (:name %) "site1-a0c4-35dc-50cf-c825") (.val snapshot)))
-               )
-             )))
-(let [c (chan)
-        _ (firebase-get "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites" c ) 
-        sites (<! c)
-        _ (filter #(= (:name %) "site1-a0c4-35dc-50cf-c825") sites)
-        ]
-    sites
-    )
-(go 
-   (let [c (chan)
-        _ (firebase-get "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites" c ) 
-        sites (<! c)
-        _ (filter #(= (:name %) "site1-a0c4-35dc-50cf-c825") sites)
-        ]
-    sites
-    ) 
-    )
-(go 
-    (let [c (chan)
-          _ (firebase-get "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites" c ) 
           sites (<! c)
           _ (filter #(= (:name %) "site1-a0c4-35dc-50cf-c825") sites)
           ]
@@ -498,3 +310,191 @@ l
 (fb-copy
     "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1/data/route-widget/logo-data" 
     "/nangpress-data/all-navs-data/1/logo-data")
+l
+(start-repl)
+ (use 'nnangpress.monolith :reload) 
+l
+  (in-ns 'nnangpress.monolith)
+  (in-ns 'nnangpress.app)
+cadmin/master
+(ns nnangpress.monolith
+  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [nnangpress.utils :as u]
+            [nnangpress.dom :as ndom]
+            [nnangpress.widgetdata :as wd]
+            [clojure.zip :as z]
+            [clojure.spec :as s]
+            [clojure.walk :as wlk]
+            [cljs.core.async :refer [put! chan <!]]
+            [nnangpress.firebase :as fb]))
+(ns nnangpress.app
+  "App initializaiton takes place here. ![Diagram](http://i.imgur.com/3lxmHdT.jpg). Everything after the proxy 
+  server is handled by the single page application itself.
+  To help with this flow, we can identify three main states that the app can be in, splash, user and site. Everytime 
+  a site is loaded the global app state should be updated. Some functions such as saving site data and editable text 
+  will behave differently based on the state of the site.
+  
+  **Splash:** Nangpress homepage 
+  **User:** Show the user's sites and other settings, and allow the creation of new sites.
+  **Site:** A specific site created with nangpress.
+  "
+  (:require 
+    [cljs.spec.test :as ts :include-macros true]
+    [nnangpress.monolith :as mn]
+    [nnangpress.dom :as ndom]
+    [nnangpress.widgets :as wgt]
+    [nnangpress.components.admin :as cadmin]))
+cadmin/master
+  (cadmin/master)
+  (cadmin/master {} {})
+  (type (cadmin/master {} {}))
+(ns nnangpress.monolith
+  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [nnangpress.utils :as u]
+            [nnangpress.dom :as ndom]
+            [nnangpress.widgetdata :as wd]
+            [clojure.zip :as z]
+            [clojure.spec :as s]
+            [clojure.walk :as wlk]
+            [cljs.core.async :refer [put! chan <!]]
+            [nnangpress.firebase :as fb]))
+::nnangpress.widgets/inner-html
+(s/valid? ::nnangpress.widgets/inner-html 1) 
+(s/valid? ::nnangpress.widgets/inner-html []) 
+(s/valid? :nnangpress.widgets/inner-html []) 
+(s/valid? :nnangpress.widgets/inner-html 1) 
+l
+(start-repl)
+(ns nnangpress.widgets
+  "Widgets are the main 'unit' of display in nnangpress. Widgets can be added and deleted by the user. A widget 
+  comprises a react component and its supporting data. These are both implemented as multimethods. So if the user 
+  selects a new widget, the widget's id is passed to a multimethod that returns the data for that widget. When a 
+  widget is rendered, the multimethod returns the corresponding react component."
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require
+    [om.core :as om :include-macros true :refer [set-state! update-state!]]
+    [om.dom :as dom :include-macros true]
+    [cljs.reader :as rdr]
+    [nnangpress.utils :as u]
+    [nnangpress.specs :as spcs]
+    [nnangpress.widgetdata :as wd]
+    [nnangpress.monolith :as mn]
+    [nnangpress.core :as cre]
+    [nnangpress.routing :as rt]
+    [nnangpress.firebase :as fb]
+    [nnangpress.dom :as ndom]
+    [nnangpress.components.common :as cc]
+    [goog.dom :as gdom]
+    [cljs.core.async :refer [put! chan <!]]
+    [cljs.spec :as s]
+    [clojure.set :as st]))
+(s/valid? mn/data (new-site-template))
+mn/data
+(s/valid? ::mn/data (new-site-template))
+  (ts/instrument)
+  (s/gen ::mn/data)
+l
+(ns nnangpress.widgets
+  "Widgets are the main 'unit' of display in nnangpress. Widgets can be added and deleted by the user. A widget 
+  comprises a react component and its supporting data. These are both implemented as multimethods. So if the user 
+  selects a new widget, the widget's id is passed to a multimethod that returns the data for that widget. When a 
+  widget is rendered, the multimethod returns the corresponding react component."
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require
+    [om.core :as om :include-macros true :refer [set-state! update-state!]]
+    [om.dom :as dom :include-macros true]
+    [nnangpress.utils :as u]
+    [nnangpress.specs :as spcs]
+    [nnangpress.widgetdata :as wd]
+    [nnangpress.monolith :as mn]
+    [nnangpress.core :as cre]
+    [nnangpress.routing :as rt]
+    [nnangpress.firebase :as fb]
+    [nnangpress.dom :as ndom]
+    [nnangpress.components.common :as cc]
+    [goog.dom :as gdom]
+    [cljs.core.async :refer [put! chan <!]]
+    [cljs.spec :as s]
+    [clojure.set :as st]
+    [cljs.test :refer-macros [is with-test run-tests]]))
+l
+(start-repl)
+(ns nnangpress.firebase
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require 
+    [clojure.walk :as wlk]
+    [cljs.core.async :refer [put! chan <!]]))
+(fb-copy 
+    "/nangpress-data"
+    "/nangpress-data-backup")
+(fb-copy 
+    "/nangpress-data/route-widgets"
+    "/route-widgets-backup"
+    )
+(fb-copy 
+    "/nangpress-data/route-widgets"
+    "/nangpress-data/admin-route-widgets"
+    )
+(fb-copy 
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/5/data/route-widget"
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/5/route-widget"
+    )
+(type (atom []))
+(ns nnangpress.monolith-test
+  (:require [cljs.test :refer-macros [deftest is testing run-tests]]
+            [cljs.spec :as s]
+            [nnangpress.monolith :as mn]
+            [nnangpress.widgets :as wgt]))
+(firebase-get "/nangpress-data")
+(ns nnangpress.firebase
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require 
+    [clojure.walk :as wlk]
+    [cljs.core.async :refer [put! chan <!]]))
+(firebase-get "/nangpress-data")
+(go 
+    (let [c (chan)]
+      (firebase-get "/nangpress-data" c)  
+      (println (<! c))))
+l
+(ns nnangpress.test-data
+  (:require [nnangpress.widgetdata :as wd]))
+(range 0 16)
+(range 1 16)
+(range 1 17)
+(map 
+  wgt/widget  
+(range 1 17)
+    )
+(ns nnangpress.test-data
+  (:require 
+    [nnangpress.widgets :as wgt]
+    [nnangpress.widgetdata :as wd]))
+(map 
+  wgt/widget  
+(range 1 17)
+    )
+(range 1 17)
+(map 
+    wgt/widget  
+    (range 1 17)
+    )
+(map 
+    wd/widget-data 
+    (range 1 17)
+    )
+(range 0 1)
+(range 0 2)
+(def all-navs-data [(map wd/widget-data (range 0 2))])
+[(map nvs/navbar-data (range 0 2))]
+(ns nnangpress.test-data
+  (:require 
+    [nnangpress.navbars :as nvs]
+    [nnangpress.widgetdata :as wd]))
+[(map nvs/navbar-data (range 0 2))]
