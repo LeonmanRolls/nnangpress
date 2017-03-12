@@ -525,19 +525,6 @@
                  #(put! delete name)  
                  "Delete site")))))
 
-(defn new-site-template
-    []
-    "Data for displaying on the userhome screen and rendering fully."
-
-    {:name (wd/widget-data 1)
-     :description (wd/widget-data 1)
-     :site-id (u/uid)
-     :screenshot "http://placekitten.com/500/400" 
-     :data {:email ["email@email.com"]
-            :logo-text (wd/widget-data 16)
-            }}
-  )
-
 ;The user's sites as seen when on the user homepage. Not meant to be a user selectable widget. This widget 
 ;is somewhat removed from the general monolith architecture. It loads its own data into the monolith 
 ;based on the current user, and provides a channel for sub components to communicate back to it for saving 
@@ -576,7 +563,7 @@
                         "Your Sites")
 
                (cc/standard-button 
-                 (fn [] (om/transact! user-sites #(conj % (new-site-data))))
+                 (fn [] (om/transact! user-sites #(conj % (mn/new-site-data))))
                  "+ Add New Site" 
                  {:position "absolute", :top "0", :right "0", 
                   :fontSize "1.5em" :marginTop "20px", :cursor "pointer"})

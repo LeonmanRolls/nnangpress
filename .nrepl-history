@@ -1,322 +1,7 @@
-          sites (<! c)
-          _ (filter #(= (:name %) "site1-a0c4-35dc-50cf-c825") sites)
-          ]
-      (println "sites: " sites)
-      ) 
-    )
-(defn firebase-get
-  "Get data from firebase database by route"  
-  [route out] 
-  (->
-    (.ref (js/firebase.database) route)
-    (.once "value")
-    (.then (fn [snapshot]
-             (put! out (firebase-empty->clj-empty
-                         (js->clj (.val snapshot) :keywordize-keys true)))))))
-(defn firebase-empty->clj-empty 
-  "Goiing from firebase representation of empty vector to a clj empty vector" 
-  [data]
-  (wlk/postwalk 
-    (fn [x]   
-      (if 
-        (and 
-          (vector? x) 
-          (= 1 (count x)) 
-          (= "" (first x))) 
-        [] 
-        x)) 
-    data))
-(defn firebase-get
-  "Get data from firebase database by route"  
-  [route out] 
-  (->
-    (.ref (js/firebase.database) route)
-    (.once "value")
-    (.then (fn [snapshot]
-             (put! out (firebase-empty->clj-empty
-                         (js->clj (.val snapshot) :keywordize-keys true)))))))
-(go 
-    (let [c (chan)
-          _ (firebase-get "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites" c ) 
-          sites (<! c)
-          _ (filter #(= (:name %) "site1-a0c4-35dc-50cf-c825") sites)
-          ]
-      (println "sites: " sites)
-      ) 
-    )
-(go 
-    (let [c (chan)
-          _ (firebase-get "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites" c ) 
-          sites (<! c)
-          _ (filter #(= (:name %) "site1-a0c4-35dc-50cf-c825") sites)
-          ]
-      (reset! cache sites)
-      (println "sites: " sites)
-      ) 
-    )
-  (def cache (atom []))
-(go 
-    (let [c (chan)
-          _ (firebase-get "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites" c ) 
-          sites (<! c)
-          _ (filter #(= (:name %) "site1-a0c4-35dc-50cf-c825") sites)
-          ]
-      (reset! cache sites)
-      (println "sites: " sites)
-      ) 
-    )
-  @cache
-  (type @cache)
-(start-repl)
-(ns nnangpress.firebase
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require 
-    [clojure.walk :as wlk]
-    [cljs.core.async :refer [put! chan <!]]))
-  (def cache (atom []))
-(go 
-    (let [c (chan)
-          _ (firebase-get "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites" c ) 
-          sites (<! c)
-          _ (filter #(= (:name %) "site1-a0c4-35dc-50cf-c825") sites)
-          ]
-      (reset! cache sites)
-      (println "sites: " sites)
-      ) 
-    )
-  (type @cache)
-  (count @cache)
-  (keep-indexed #(= (:name %) "site1-a0c4-35dc-50cf-c825") @cache)
-  (keep-indexed #(do 
-                   (println (:name %)) 
-                   (= (:name %) "site1-a0c4-35dc-50cf-c825")) 
-                @cache)
-  (keys (first @cache))
-  (keep-indexed #(do 
-                   (println %) 
-                   (= (:name %) "site1-a0c4-35dc-50cf-c825")) 
-                @cache)
-  (map-indexed #(do 
-                   (println %) 
-                   ) 
-                @cache)
-  (keep-indexed #(do 
-                   (println %) 
-                   (= (:name %2) "site1-a0c4-35dc-50cf-c825")) 
-                @cache)
-  (keep-indexed #(do 
-                   (println %) 
-                   (= (:name %2) "site1-a0c4-35dc-50cf-c825")) 
-                @cache)
-  (keep-indexed #(do 
-                   (println %) 
-                   (= (:name %2) "site1-a0c4-35dc-50cf-c825-bf6b-1a26")) 
-                @cache)
-(keep-indexed #(do 
-                   (println %) 
-                   (= (:name %2) "site1-a0c4-35dc-50cf-c825-bf6b-1a26")
-                   (keys %2)) 
-                @cache)
-(keep-indexed #(do 
-                   (println %) 
-                   (if 
-                     (= (:name %2) "site1-a0c4-35dc-50cf-c825-bf6b-1a26")  
-                     (keys %2)
-                     nil
-                     )
-                   ) 
-                @cache)
-(keep-indexed #(do 
-                   (println %) 
-                   (if 
-                     (= (:name %2) "site1-a0c4-35dc-50cf-c825-bf6b-1a26")  
-                    %1 
-                     nil
-                     )
-                   ) 
-                @cache)
-(fb-copy 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1/description"
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/2/description")
-l
-(start-repl)
-(ns nnangpress.firebase
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require 
-    [clojure.walk :as wlk]
-    [cljs.core.async :refer [put! chan <!]]))
- (fb-copy "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1/description" "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/2/description") 
-l
-(nnangpress.navbars/navbar-data 0) 
-  (fb-write "/nangpress-data/all-navs-data/0/" (nnangpress.navbars/navbar-data 0))
-  (fb-write "/nangpress-data/all-navs-data/1/" (nnangpress.navbars/navbar-data 1))
-l
-  (fb-copy 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1/data/route-widget/routes-map/children/0/" 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/2/data/route-widget/routes-map/children/0/ ") 
-  (fb-copy 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1/data/route-widget/routes-map/children/0/" 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/2/data/route-widget/routes-map/children/0 ") 
-  (fb-copy 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1/data/route-widget/routes-map/children" 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/2/data/route-widget/routes-map/children") 
-  (fb-copy 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1/description" 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/2/description") 
-l
-(start-repl)
-  (nnangpress.widgetdata/widget-data 1)
-  (fb-copy 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/name" 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/site-id")
-(ns nnangpress.firebase
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require 
-    [clojure.walk :as wlk]
-    [cljs.core.async :refer [put! chan <!]]))
-  (fb-copy 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/name" 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/site-id")
-  (fb-copy 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1/name" 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1/site-id")
-  (fb-copy 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/2/name" 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/2/site-id")
-  (fb-copy 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/3/name" 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/3/site-id")
-(nnangpress.widgetdata/widget-data 1)
-  (fb-write 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/name" 
-    (nnangpress.widgetdata/widget-data 1))
-  (fb-write 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1/name" 
-    (nnangpress.widgetdata/widget-data 1))
-  (fb-write 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/2/name" 
-    (nnangpress.widgetdata/widget-data 1))
-  (fb-write 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/3/name" 
-    (nnangpress.widgetdata/widget-data 1))
-  (fb-write 
-    "/nangpress-data/route-widgets/userhome/routes-map/widgets/1/user-sites/0/name" 
-    (nnangpress.widgetdata/widget-data 1))
-(u/uid)
-(nnangpress.utils/uid)
-  (fb-write 
-    "/nangpress-data/route-widgets/userhome/routes-map/widgets/1/user-sites/0/site-id" 
-    (nnangpress.utils/uid))
-(defn fb-update 
-  "Update certain items at path without overwriting nodes that aren't referenced."
-  [path data]
-  (->
-    (js/firebase.database)
-    (.ref path)
-    (.update (clj->js data))))
-(nnangpress.widgetdata/widget-data 1)
-(fb-write 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/3/data/route-widget/logo-data/logo-text/" 
-    (nnangpress.widgetdata/widget-data 1))
-(fb-write 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/3/data/route-widget/routes-map/children/0/route-name-editable" 
-    (nnangpress.widgetdata/widget-data 1))
-  (fb-write 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/3/data/route-widget/routes-map/children/0/children/0/route-name-editable" 
-    (nnangpress.widgetdata/widget-data 1))
-l
-(start-repl)
-(ns nnangpress.routing
-  "Routing for a single page application. The bridge between the route in the browser bar and the application's 
-  route state."
-  (:import [goog.history Html5History EventType])
-  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
-            [om.dom :as dom :include-macros true]
-            [goog.events :as ev]
-            [goog.dom :as gdom]
-            [nnangpress.utils :as utls]
-            [nnangpress.monolith :as mn]))
-  (get-token )
-  (fb-copy 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/3/data/route-widget/routes-map" 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/3/data/all-navs-data/0/routes-map")
-l
-(use 'nnangperss.firebase)
-l
-(ns nnangpress.firebase
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require 
-    [clojure.walk :as wlk]
-    [cljs.core.async :refer [put! chan <!]]))
-  (fb-copy 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/3/data/route-widget/routes-map" 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/3/data/all-navs-data/0/routes-map")
-  (fb-copy 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/3/data/route-widget/routes-map" 
-    "/nnangpress/nangpress-data/all-navs-data/0/routes-map")
-  (fb-copy 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/3/data/route-widget/routes-map" 
-    "/nnangpress/nangpress-data/all-navs-data/0/routes-map")
-  (fb-copy 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/3/data/route-widget/routes-map" 
-    "/nangpress-data/all-navs-data/0/routes-map")
-(fb-write 
-    "/nangpress-data/all-navs-data/1/routes-map/children/0/route-name-editable" 
-    (nnangpress.widgetdata/widget-data 16))
-(fb-copy 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1/data/route-widget/logo-data" 
-    "/nangpress-data/all-navs-data/1/")
-(fb-copy 
-    "/nangpress-data/all-navs-data/0/"
-    "/nangpress-data/all-navs-data/1/"
-    )
-  (fb-update 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1/data/route-widget/logo-data" 
-    "/nangpress-data/all-navs-data/1/")
-(defn fb-copy-update 
-  "For when you don't want to overwirte the destination's data"
-  [source dest]
-  (let [c (chan)]
-    (go 
-      (firebase-get source c)
-      (fb-update dest (<! c)))))
-(fb-copy-update 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1/data/route-widget/logo-data" 
-    "/nangpress-data/all-navs-data/1/")
-(fb-copy-update 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/data/route-widget/logo-data" 
-    "/nangpress-data/all-navs-data/1/")
-(fb-copy-update 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/data/route-widget/logo-data" 
-    "/nangpress-data/all-navs-data/1/logo-data")
-(fb-copy-update 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/data/route-widget/logo-data" 
-    "/nangpress-data/all-navs-data/0/logo-data")
-(fb-copy-update 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/data/route-widget/nav-style" 
-    "/nangpress-data/all-navs-data/0/nav-style")
-(fb-copy-update 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/data/route-widget/nav-style" 
-    "/nangpress-data/all-navs-data/1/nav-style")
-(fb-copy
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/data/route-widget/logo-data" 
-    "/nangpress-data/all-navs-data/1/logo-dasta")
-(fb-copy
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/data/route-widget/logo-data" 
-    "/nangpress-data/all-navs-data/1/logo-data")
-(fb-copy
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/data/route-widget/logo-data" 
-    "/nangpress-data/all-navs-data/1/logo-data")
-(fb-copy
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1/data/route-widget/logo-data" 
-    "/nangpress-data/all-navs-data/1/logo-data")
-l
-(start-repl)
- (use 'nnangpress.monolith :reload) 
-l
-  (in-ns 'nnangpress.monolith)
-  (in-ns 'nnangpress.app)
-cadmin/master
+    [nnangpress.widgets :as wgt]))
+(mn/nangpress-data->renderable td/nangpess-data)
+  (keys td/nangpress-data)
+  (:admin-route-widgets td/nangpress-data)
 (ns nnangpress.monolith
   "Functions for reading and updating the monlith. Most side-effecting functions should go here."
   (:require-macros [cljs.core.async.macros :refer [go]])
@@ -324,177 +9,492 @@ cadmin/master
             [om.dom :as dom :include-macros true]
             [nnangpress.utils :as u]
             [nnangpress.dom :as ndom]
+            [nnangpress.specs :as spcs]
             [nnangpress.widgetdata :as wd]
             [clojure.zip :as z]
             [clojure.spec :as s]
             [clojure.walk :as wlk]
             [cljs.core.async :refer [put! chan <!]]
             [nnangpress.firebase :as fb]))
-(ns nnangpress.app
-  "App initializaiton takes place here. ![Diagram](http://i.imgur.com/3lxmHdT.jpg). Everything after the proxy 
-  server is handled by the single page application itself.
-  To help with this flow, we can identify three main states that the app can be in, splash, user and site. Everytime 
-  a site is loaded the global app state should be updated. Some functions such as saving site data and editable text 
-  will behave differently based on the state of the site.
-  
-  **Splash:** Nangpress homepage 
-  **User:** Show the user's sites and other settings, and allow the creation of new sites.
-  **Site:** A specific site created with nangpress.
-  "
+(defn nangpress-data->renderable 
+  "Raw nnangpress to renderable based on user auth status"  
+  ([nangpress-data]
+   (nangpress-data->renderable nangpress-data (fb/current-user)))
+  ([nangpress-data current-user]
+   (-> 
+     (assoc nangpress-data :route-widget (if current-user
+                                           (-> nangpress-data :admin-route-widgets :userhome)
+                                           (-> nangpress-data :admin-route-widgets :homepage)))
+     #_(update-monolith-user-data current-user)
+     #_(dissoc :route-widgets))))
+  (mn/nangpress-data->renderable td/nangpess-data)  
+(ns nnangpress.monolith-test
   (:require 
     [cljs.spec.test :as ts :include-macros true]
-    [nnangpress.monolith :as mn]
-    [nnangpress.dom :as ndom]
-    [nnangpress.widgets :as wgt]
-    [nnangpress.components.admin :as cadmin]))
-cadmin/master
-  (cadmin/master)
-  (cadmin/master {} {})
-  (type (cadmin/master {} {}))
-(ns nnangpress.monolith
-  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
-            [om.dom :as dom :include-macros true]
-            [nnangpress.utils :as u]
-            [nnangpress.dom :as ndom]
-            [nnangpress.widgetdata :as wd]
-            [clojure.zip :as z]
-            [clojure.spec :as s]
-            [clojure.walk :as wlk]
-            [cljs.core.async :refer [put! chan <!]]
-            [nnangpress.firebase :as fb]))
-::nnangpress.widgets/inner-html
-(s/valid? ::nnangpress.widgets/inner-html 1) 
-(s/valid? ::nnangpress.widgets/inner-html []) 
-(s/valid? :nnangpress.widgets/inner-html []) 
-(s/valid? :nnangpress.widgets/inner-html 1) 
-l
-(start-repl)
-(ns nnangpress.widgets
-  "Widgets are the main 'unit' of display in nnangpress. Widgets can be added and deleted by the user. A widget 
-  comprises a react component and its supporting data. These are both implemented as multimethods. So if the user 
-  selects a new widget, the widget's id is passed to a multimethod that returns the data for that widget. When a 
-  widget is rendered, the multimethod returns the corresponding react component."
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require
-    [om.core :as om :include-macros true :refer [set-state! update-state!]]
-    [om.dom :as dom :include-macros true]
-    [cljs.reader :as rdr]
-    [nnangpress.utils :as u]
-    [nnangpress.specs :as spcs]
-    [nnangpress.widgetdata :as wd]
-    [nnangpress.monolith :as mn]
-    [nnangpress.core :as cre]
-    [nnangpress.routing :as rt]
-    [nnangpress.firebase :as fb]
-    [nnangpress.dom :as ndom]
-    [nnangpress.components.common :as cc]
-    [goog.dom :as gdom]
-    [cljs.core.async :refer [put! chan <!]]
+    [cljs.test :refer-macros [deftest is testing run-tests]]
     [cljs.spec :as s]
-    [clojure.set :as st]))
-(s/valid? mn/data (new-site-template))
-mn/data
-(s/valid? ::mn/data (new-site-template))
-  (ts/instrument)
-  (s/gen ::mn/data)
-l
-(ns nnangpress.widgets
-  "Widgets are the main 'unit' of display in nnangpress. Widgets can be added and deleted by the user. A widget 
-  comprises a react component and its supporting data. These are both implemented as multimethods. So if the user 
-  selects a new widget, the widget's id is passed to a multimethod that returns the data for that widget. When a 
-  widget is rendered, the multimethod returns the corresponding react component."
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require
-    [om.core :as om :include-macros true :refer [set-state! update-state!]]
-    [om.dom :as dom :include-macros true]
-    [nnangpress.utils :as u]
-    [nnangpress.specs :as spcs]
-    [nnangpress.widgetdata :as wd]
+    [nnangpress.testdata :as td]
     [nnangpress.monolith :as mn]
-    [nnangpress.core :as cre]
-    [nnangpress.routing :as rt]
-    [nnangpress.firebase :as fb]
-    [nnangpress.dom :as ndom]
-    [nnangpress.components.common :as cc]
-    [goog.dom :as gdom]
-    [cljs.core.async :refer [put! chan <!]]
-    [cljs.spec :as s]
-    [clojure.set :as st]
-    [cljs.test :refer-macros [is with-test run-tests]]))
-l
-(start-repl)
-(ns nnangpress.firebase
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require 
-    [clojure.walk :as wlk]
-    [cljs.core.async :refer [put! chan <!]]))
-(fb-copy 
-    "/nangpress-data"
-    "/nangpress-data-backup")
-(fb-copy 
-    "/nangpress-data/route-widgets"
-    "/route-widgets-backup"
-    )
-(fb-copy 
-    "/nangpress-data/route-widgets"
-    "/nangpress-data/admin-route-widgets"
-    )
-(fb-copy 
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/5/data/route-widget"
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/5/route-widget"
-    )
-(type (atom []))
-(ns nnangpress.monolith-test
-  (:require [cljs.test :refer-macros [deftest is testing run-tests]]
-            [cljs.spec :as s]
-            [nnangpress.monolith :as mn]
-            [nnangpress.widgets :as wgt]))
-(firebase-get "/nangpress-data")
-(ns nnangpress.firebase
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require 
-    [clojure.walk :as wlk]
-    [cljs.core.async :refer [put! chan <!]]))
-(firebase-get "/nangpress-data")
-(go 
-    (let [c (chan)]
-      (firebase-get "/nangpress-data" c)  
-      (println (<! c))))
-l
-(ns nnangpress.test-data
-  (:require [nnangpress.widgetdata :as wd]))
-(range 0 16)
-(range 1 16)
-(range 1 17)
-(map 
-  wgt/widget  
-(range 1 17)
-    )
-(ns nnangpress.test-data
-  (:require 
-    [nnangpress.widgets :as wgt]
-    [nnangpress.widgetdata :as wd]))
-(map 
-  wgt/widget  
-(range 1 17)
-    )
-(range 1 17)
-(map 
-    wgt/widget  
-    (range 1 17)
-    )
-(map 
-    wd/widget-data 
-    (range 1 17)
-    )
-(range 0 1)
-(range 0 2)
-(def all-navs-data [(map wd/widget-data (range 0 2))])
-[(map nvs/navbar-data (range 0 2))]
-(ns nnangpress.test-data
+    [nnangpress.widgets :as wgt]))
+  (mn/nangpress-data->renderable td/nangpess-data)  
+td/nangpess-data
+  (mn/nangpress-data->renderable td/nangpress-data)  
+  (keys (mn/nangpress-data->renderable td/nangpress-data))  
+  (:admin-route-widgets td/nangpress-data)
+  (s/valid? ::mn/renderable (mn/nangpress-data->renderable td/nangpress-data))  
+  (s/explain ::mn/renderable (mn/nangpress-data->renderable td/nangpress-data))  
+  (keys (mn/nangpress-data->renderable td/nangpress-data))  
+  (s/explain ::mn/renderable (mn/nangpress-data->renderable td/nangpress-data))  
+(ns nnangpress.testdata
+  "Data primarily for testing. Causes less problems if placed here instead of test namespace."
   (:require 
     [nnangpress.navbars :as nvs]
     [nnangpress.widgetdata :as wd]))
-[(map nvs/navbar-data (range 0 2))]
+(def admin-route-widgets {:homepage {} 
+                          :userhome {}})
+(ns nnangpress.monolith-test
+  (:require 
+    [cljs.spec.test :as ts :include-macros true]
+    [cljs.test :refer-macros [deftest is testing run-tests]]
+    [cljs.spec :as s]
+    [nnangpress.testdata :as td]
+    [nnangpress.monolith :as mn]
+    [nnangpress.widgets :as wgt]))
+  (s/valid? ::mn/renderable (mn/nangpress-data->renderable td/nangpress-data))  
+  (:admin-route-widgets td/nangpress-data)
+(ns nnangpress.testdata
+  "Data primarily for testing. Causes less problems if placed here instead of test namespace."
+  (:require 
+    [nnangpress.navbars :as nvs]
+    [nnangpress.widgetdata :as wd]))
+(def admin-route-widgets {:homepage {} 
+                          :userhome {}})
+(def nangpress-data {:admin-route-widgets admin-route-widgets
+                     :all-navs-data all-navs-data
+                     :all-widgets-data all-widgets-data
+                     :current-route current-route
+                     :edit-mode edit-mode
+                     :sidebar-data sidebar-data
+                     :site-name site-name 
+                     :site-state site-state 
+                     :uid uid})
+nangpress-data
+(:admin-route-widgets nangpress-dasta)
+(:admin-route-widgets nangpress-data)
+(ns nnangpress.monolith-test
+  (:require 
+    [cljs.spec.test :as ts :include-macros true]
+    [cljs.test :refer-macros [deftest is testing run-tests]]
+    [cljs.spec :as s]
+    [nnangpress.testdata :as td]
+    [nnangpress.monolith :as mn]
+    [nnangpress.widgets :as wgt]))
+  (:admin-route-widgets td/nangpress-data)
+  (s/valid? ::mn/renderable (mn/nangpress-data->renderable td/nangpress-data))  
+  (s/explain ::mn/renderable (mn/nangpress-data->renderable td/nangpress-data))  
+(ns nnangpress.monolith
+  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [nnangpress.utils :as u]
+            [nnangpress.dom :as ndom]
+            [nnangpress.specs :as spcs]
+            [nnangpress.widgetdata :as wd]
+            [clojure.zip :as z]
+            [clojure.spec :as s]
+            [clojure.walk :as wlk]
+            [cljs.core.async :refer [put! chan <!]]
+            [nnangpress.firebase :as fb]))
+(defn nangpress-data->renderable 
+  "Raw nnangpress to renderable based on user auth status"  
+  ([nangpress-data]
+   (nangpress-data->renderable nangpress-data (fb/current-user)))
+  ([nangpress-data current-user]
+   (-> 
+     (assoc nangpress-data :route-widget (if current-user
+                                           (-> nangpress-data :admin-route-widgets :userhome)
+                                           (-> nangpress-data :admin-route-widgets :homepage)))
+     (update-monolith-user-data current-user)
+     (dissoc :admin-route-widgets))))
+(ns nnangpress.monolith-test
+  (:require 
+    [cljs.spec.test :as ts :include-macros true]
+    [cljs.test :refer-macros [deftest is testing run-tests]]
+    [cljs.spec :as s]
+    [nnangpress.testdata :as td]
+    [nnangpress.monolith :as mn]
+    [nnangpress.widgets :as wgt]))
+  (keys td/nangpress-data)
+  (keys (mn/nangpress-data->renderable td/nangpress-data))  
+  (s/valid? ::mn/renderable (mn/nangpress-data->renderable td/nangpress-data))  
+(ns nnangpress.firebase
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require 
+    [clojure.walk :as wlk]
+    [cljs.core.async :refer [put! chan <!]]))
+ (current-user) 
+(-> js/firebase .auth .-currentUser)
+(ns nnangpress.monolith-test
+  (:require 
+    [cljs.spec.test :as ts :include-macros true]
+    [cljs.test :refer-macros [deftest is testing run-tests]]
+    [cljs.spec :as s]
+    [nnangpress.testdata :as td]
+    [nnangpress.monolith :as mn]
+    [nnangpress.widgets :as wgt]))
+(ns nnangpress.monolith
+  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [nnangpress.utils :as u]
+            [nnangpress.dom :as ndom]
+            [nnangpress.specs :as spcs]
+            [nnangpress.widgetdata :as wd]
+            [clojure.zip :as z]
+            [clojure.spec :as s]
+            [clojure.walk :as wlk]
+            [cljs.core.async :refer [put! chan <!]]
+            [nnangpress.firebase :as fb]))
+(defn new-site-template
+  []
+  "Data for displaying on the userhome screen and rendering fully."
+  {:name (wd/widget-data 1)
+   :description (wd/widget-data 1)
+   :site-id (u/uid)
+   :screenshot "http://placekitten.com/500/400" 
+   :data {:email ["email@email.com"]
+          :logo-text (wd/widget-data 16)
+          }}
+  )
+(ns nnangpress.monolith-test
+  (:require 
+    [cljs.spec.test :as ts :include-macros true]
+    [cljs.test :refer-macros [deftest is testing run-tests]]
+    [cljs.spec :as s]
+    [nnangpress.testdata :as td]
+    [nnangpress.monolith :as mn]
+    [nnangpress.widgets :as wgt]))
+(mn/new-site-template)  
+(mn/new-site-template)
+  (s/valid? ::site-with-meta (mn/new-site-template))
+  (s/valid? ::mn/site-with-meta (mn/new-site-template))
+  (s/explain ::mn/site-with-meta (mn/new-site-template))
+(ns nnangpress.monolith
+  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [nnangpress.utils :as u]
+            [nnangpress.dom :as ndom]
+            [nnangpress.specs :as spcs]
+            [nnangpress.widgetdata :as wd]
+            [clojure.zip :as z]
+            [clojure.spec :as s]
+            [clojure.walk :as wlk]
+            [cljs.core.async :refer [put! chan <!]]
+            [nnangpress.firebase :as fb]))
+(ns nnangpress.monolith-test
+  (:require 
+    [cljs.spec.test :as ts :include-macros true]
+    [cljs.test :refer-macros [deftest is testing run-tests]]
+    [cljs.spec :as s]
+    [nnangpress.testdata :as td]
+    [nnangpress.monolith :as mn]
+    [nnangpress.widgets :as wgt]))
+(mn/new-site-template)
+(ns nnangpress.monolith
+  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [nnangpress.utils :as u]
+            [nnangpress.dom :as ndom]
+            [nnangpress.specs :as spcs]
+            [nnangpress.widgetdata :as wd]
+            [clojure.zip :as z]
+            [clojure.spec :as s]
+            [clojure.walk :as wlk]
+            [cljs.core.async :refer [put! chan <!]]
+            [nnangpress.firebase :as fb]))
+(defn new-route-widget 
+  "Essentially the simplest nangpress site possible, with a tutorial widget on the homepage." 
+  []
+  {:logo-data {:logo-style {:fontSize "200%"
+                            :textTransform "inherit"}
+               :logo-text (wd/widget-data 16)}
+   :main-view-style {:style {:dispaly "inherit"
+                             :paddingLeft "170px"
+                             :paddingRight "170px"}} 
+   :nav-style {:backgroundColor "#CE4072"}
+   :route-widget-id 0
+   :routes-map {:bg-img "http://wallpaper-gallery.net/images/minimal-wallpaper/minimal-wallpaper-17.jpg"
+                :children [{:bg-img "http://wallpaper-gallery.net/images/minimal-wallpaper/minimal-wallpaper-17.jpg"
+                            :children [{:bg-img "http://wallpaper-gallery.net/images/minimal-wallpaper/minimal-wallpaper-17.jpg"
+                                        :grey-bg? true
+                                        :nav-hint ["Architects"]
+                                        :nav-hint-style {:color "black"}
+                                        :route-name "/child-ola-ola"
+                                        :widgets []}]
+                            :grey-bg? true
+                            :nav-hint ["Architects"]
+                            :nav-hint-style {:color "black"}
+                            :route-name "/parent-ola-ola"
+                            :widgets []}]
+                :grey-bg? true
+                :nav-hint ["Architects"] 
+                :nav-hint-style {:color "black"}
+                :route-name "/"
+                :widgets [(wd/widget-data 15)]}})
+(defn new-site-template
+  []
+  "Data for displaying on the userhome screen and rendering fully."
+  {:name (wd/widget-data 1)
+   :description (wd/widget-data 1)
+   :site-id (u/uid)
+   :screenshot "http://placekitten.com/500/400" 
+   :route-widget (new-route-widget)})
+(ns nnangpress.monolith
+  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [nnangpress.utils :as u]
+            [nnangpress.dom :as ndom]
+            [nnangpress.specs :as spcs]
+            [nnangpress.widgetdata :as wd]
+            [clojure.zip :as z]
+            [clojure.spec :as s]
+            [clojure.walk :as wlk]
+            [cljs.core.async :refer [put! chan <!]]
+            [nnangpress.firebase :as fb]))
+(ns nnangpress.monolith-test
+  (:require 
+    [cljs.spec.test :as ts :include-macros true]
+    [cljs.test :refer-macros [deftest is testing run-tests]]
+    [cljs.spec :as s]
+    [nnangpress.testdata :as td]
+    [nnangpress.monolith :as mn]
+    [nnangpress.widgets :as wgt]))
+(mn/new-site-template)
+  (s/valid? ::mn/site-with-meta (mn/new-site-template))
+(mn/new-site-template)
+  (:route-widget (mn/new-site-template))
+  (mn/nangpress-data->renderable)
+(ns nnangpress.monolith
+  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [nnangpress.utils :as u]
+            [nnangpress.dom :as ndom]
+            [nnangpress.specs :as spcs]
+            [nnangpress.widgetdata :as wd]
+            [clojure.zip :as z]
+            [clojure.spec :as s]
+            [clojure.walk :as wlk]
+            [cljs.core.async :refer [put! chan <!]]
+            [nnangpress.firebase :as fb]))
+(defn nangpress-data->renderable 
+  "Raw nnangpress to renderable based on user auth status"  
+  ([]
+   (let [current-user (-> js/firebase .auth .-currentUser)
+         c (chan)
+         _ (fb/firebase-get "nangpress-data/" c)
+         nangpress-data (<! c)]
+     (nangpress-data->renderable nangpress-data current-user)))
+  ([nangpress-data]
+   (nangpress-data->renderable nangpress-data (fb/current-user)))
+  ([nangpress-data current-user]
+   (-> 
+     (assoc nangpress-data :route-widget (if current-user
+                                           (-> nangpress-data :admin-route-widgets :userhome)
+                                           (-> nangpress-data :admin-route-widgets :homepage)))
+     (update-monolith-user-data current-user)
+     (dissoc :admin-route-widgets))))
+(ns nnangpress.monolith-test
+  (:require 
+    [cljs.spec.test :as ts :include-macros true]
+    [cljs.test :refer-macros [deftest is testing run-tests]]
+    [cljs.spec :as s]
+    [nnangpress.testdata :as td]
+    [nnangpress.monolith :as mn]
+    [nnangpress.widgets :as wgt]))
+(mn/nangpress-data->renderable)
+(assoc 
+    td/nangpress-data 
+    :route-widget 
+    (:route-widget (mn/new-site-template))
+    )
+(s/valid? 
+    ::mn/renderable 
+    (assoc 
+      td/nangpress-data 
+      :route-widget 
+      (:route-widget (mn/new-site-template)))  
+    )
+(:route-widget (mn/new-site-template))
+(s/explain 
+    ::mn/renderable 
+    (assoc 
+      td/nangpress-data 
+      :route-widget 
+      (:route-widget (mn/new-site-template))))
+(s/explain 
+    ::mn/renderable 
+    (assoc 
+      (mn/nangpress-data->renderable td/nangpress-data nil)
+      :route-widget 
+      (:route-widget (mn/new-site-template))))
+(ns nnangpress.monolith
+  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [nnangpress.utils :as u]
+            [nnangpress.dom :as ndom]
+            [nnangpress.specs :as spcs]
+            [nnangpress.widgetdata :as wd]
+            [clojure.zip :as z]
+            [clojure.spec :as s]
+            [clojure.walk :as wlk]
+            [cljs.core.async :refer [put! chan <!]]
+            [nnangpress.firebase :as fb]))
+(defn site-meta->renderable 
+  "Primarily for going from userhome to an end user site." 
+  [nangpress-data site-meta]
+  (assoc 
+    (mn/nangpress-data->renderable nangpress-data)
+    :route-widget 
+    (:route-widget (mn/new-site-template))))
+(defn site-meta->renderable 
+  "Primarily for going from userhome to an end user site." 
+  [nangpress-data site-meta]
+  (assoc 
+    (nangpress-data->renderable nangpress-data)
+    :route-widget 
+    (:route-widget site-meta)))
+(defn site-meta->renderable 
+  "Primarily for going from userhome to an end user site." 
+  [nangpress-data site-meta]
+  (assoc 
+    (nangpress-data->renderable nangpress-data)
+    :route-widget 
+    (:route-widget site-meta)))
+(ns nnangpress.monolith-test
+  (:require 
+    [cljs.spec.test :as ts :include-macros true]
+    [cljs.test :refer-macros [deftest is testing run-tests]]
+    [cljs.spec :as s]
+    [nnangpress.testdata :as td]
+    [nnangpress.monolith :as mn]
+    [nnangpress.widgets :as wgt]))
+(s/valid? 
+    ::mn/renderable 
+    (mn/site-meta->renderable 
+      td/nangpress-data
+      (:route-widget (mn/new-site-template))))
+(mn/site-meta->renderable 
+      td/nangpress-data
+      (:route-widget (mn/new-site-template)))
+(s/explain 
+    ::mn/renderable 
+    (mn/site-meta->renderable 
+      td/nangpress-data
+      (:route-widget (mn/new-site-template))))
+(mn/new-site-template)
+(:route-widget (mn/new-site-template))
+(keys 
+    (mn/site-meta->renderable 
+      td/nangpress-data
+      (:route-widget (mn/new-site-template))))
+(:route-widget 
+(mn/site-meta->renderable 
+      td/nangpress-data
+      (:route-widget (mn/new-site-template)))
+    )
+(:route-widget (mn/new-site-template))
+(s/valid? 
+    ::mn/renderable 
+    (mn/site-meta->renderable 
+      td/nangpress-data
+      (:route-widget (mn/new-site-template))))
+(s/valid? 
+    ::mn/renderable 
+    (assoc 
+      td/nangpress-data 
+      :route-widget 
+      (:route-widget (mn/new-site-template))))
+(s/explain 
+    ::mn/renderable 
+    (assoc 
+      (mn/nangpress-data->renderable td/nangpress-data nil)
+      :route-widget 
+      (:route-widget (mn/new-site-template))))
+(s/explain 
+    ::mn/renderable 
+    (assoc 
+      (mn/nangpress-data->renderable td/nangpress-data)
+      :route-widget 
+      (:route-widget (mn/new-site-template))))
+(mn/site-meta->renderable 
+      td/nangpress-data
+      (:route-widget (mn/new-site-template)))
+(mn/site-meta->renderable 
+      td/nangpress-data
+      (:route-widget (mn/new-site-template)))
+(:route-widget (mn/new-site-template))
+(mn/site-meta->renderable 
+      td/nangpress-data
+      (:route-widget (mn/new-site-template)))
+  (cljs.pprint/pprint "hi there")
+(cljs.pprint/pprint (mn/site-meta->renderable 
+                        td/nangpress-data
+                        (:route-widget (mn/new-site-template))))
+(ns nnangpress.monolith
+  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [nnangpress.utils :as u]
+            [nnangpress.dom :as ndom]
+            [nnangpress.specs :as spcs]
+            [nnangpress.widgetdata :as wd]
+            [clojure.zip :as z]
+            [clojure.spec :as s]
+            [clojure.walk :as wlk]
+            [cljs.core.async :refer [put! chan <!]]
+            [nnangpress.firebase :as fb]))
+(defn site-meta->renderable 
+  "Primarily for going from userhome to an end user site." 
+  [nangpress-data site-meta]
+  (assoc 
+    (nangpress-data->renderable nangpress-data)
+    :route-widget 
+    (:route-widget site-meta)))
+(ns nnangpress.monolith-test
+  (:require 
+    [cljs.spec.test :as ts :include-macros true]
+    [cljs.test :refer-macros [deftest is testing run-tests]]
+    [cljs.spec :as s]
+    [nnangpress.testdata :as td]
+    [nnangpress.monolith :as mn]
+    [nnangpress.widgets :as wgt]))
+(cljs.pprint/pprint (mn/site-meta->renderable 
+                        td/nangpress-data
+                        (:route-widget (mn/new-site-template))))
+(cljs.pprint/pprint (mn/site-meta->renderable 
+                        td/nangpress-data
+                        (mn/new-site-template)))
+(s/valid? 
+    ::mn/renderable 
+    (mn/site-meta->renderable 
+      td/nangpress-data
+      (mn/new-site-template)))
+(ns nnangpress.firebase
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require 
+    [clojure.walk :as wlk]
+    [cljs.core.async :refer [put! chan <!]]))
+(current-user)

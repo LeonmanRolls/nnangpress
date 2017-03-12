@@ -15,6 +15,7 @@
   (:require 
     [cljs.spec.test :as ts :include-macros true]
     [nnangpress.monolith :as mn]
+    [nnangpress.testdata :as td]
     [nnangpress.dom :as ndom]
     [nnangpress.widgets :as wgt]
     [nnangpress.components.admin :as cadmin]))

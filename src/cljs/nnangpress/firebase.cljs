@@ -116,18 +116,9 @@
 
 (comment 
 
-  (go 
-    (let [c (chan)]
-      (firebase-get "/nangpress-data" c)  
-      (println (<! c))))
-
   (fb-copy
     "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1/data/route-widget/logo-data" 
     "/nangpress-data/all-navs-data/1/logo-data")
-
-  (fb-write 
-    "/nangpress-data/all-navs-data/1/routes-map/children/0/route-name-editable" 
-    (nnangpress.widgetdata/widget-data 16))
 
   )
 

@@ -73,6 +73,45 @@
   (fn [new-data]
     (s/valid? ::site-data new-data)))
 
+(defn new-route-widget 
+  "Essentially the simplest nangpress site possible, with a tutorial widget on the homepage." 
+  []
+  {:logo-data {:logo-style {:fontSize "200%"
+                            :textTransform "inherit"}
+               :logo-text (wd/widget-data 16)}
+   :main-view-style {:style {:dispaly "inherit"
+                             :paddingLeft "170px"
+                             :paddingRight "170px"}} 
+   :nav-style {:backgroundColor "#CE4072"}
+   :route-widget-id 0
+   :routes-map {:bg-img "http://wallpaper-gallery.net/images/minimal-wallpaper/minimal-wallpaper-17.jpg"
+                :children [{:bg-img "http://wallpaper-gallery.net/images/minimal-wallpaper/minimal-wallpaper-17.jpg"
+                            :children [{:bg-img "http://wallpaper-gallery.net/images/minimal-wallpaper/minimal-wallpaper-17.jpg"
+                                        :grey-bg? true
+                                        :nav-hint ["Architects"]
+                                        :nav-hint-style {:color "black"}
+                                        :route-name "/child-ola-ola"
+                                        :widgets []}]
+                            :grey-bg? true
+                            :nav-hint ["Architects"]
+                            :nav-hint-style {:color "black"}
+                            :route-name "/parent-ola-ola"
+                            :widgets []}]
+                :grey-bg? true
+                :nav-hint ["Architects"] 
+                :nav-hint-style {:color "black"}
+                :route-name "/"
+                :widgets [(wd/widget-data 15)]}})
+
+(defn new-site-template
+  []
+  "Data for displaying on the userhome screen and rendering fully."
+  {:name (wd/widget-data 1)
+   :description (wd/widget-data 1)
+   :site-id (u/uid)
+   :screenshot "http://placekitten.com/500/400" 
+   :route-widget (new-route-widget)})
+
 (defn current-route-map 
   "Get the whole data map for the current route, reqires a seq of the route segments."
   [route routes-map]
@@ -333,15 +372,6 @@
   [cursor idx1 idx2]
   (om/transact! cursor (fn [xs] (u/vec-swap xs idx1 idx2))))
 
-(s/fdef site-meta->renderable
-        :args (s/cat :site-meta ::site-with-meta))
-
-(defn site-meta->renderable 
-  "Primarily for going from userhome to and end user site." 
-  [site-meta]
-  
-  )
-
 (defn update-monolith-user-data 
   "Update monolith with current user data" 
 
@@ -358,18 +388,31 @@
         :args (s/cat :nangpess-data ::nangpress-data :current-user any?))
 
 (defn nangpress-data->renderable 
-  "Raw nnangpress to renderable based on user auth status"  
-
+  "Raw nnangpress to renderable based on user auth status. Not getting nangpress-data on its own because 
+  this requires an async call."  
   ([nangpress-data]
    (nangpress-data->renderable nangpress-data (fb/current-user)))
 
   ([nangpress-data current-user]
    (-> 
      (assoc nangpress-data :route-widget (if current-user
-                                           (-> nangpress-data :route-widgets :userhome)
-                                           (-> nangpress-data :route-widgets :homepage)))
+                                           (-> nangpress-data :admin-route-widgets :userhome)
+                                           (-> nangpress-data :admin-route-widgets :homepage)))
      (update-monolith-user-data current-user)
-     (dissoc :route-widgets))))
+     (dissoc :admin-route-widgets))))
+
+(s/fdef site-meta->renderable
+        :args (s/cat :nangpress-data ::nangpress-data :site-meta ::site-with-meta :current-user (s/? any?)))
+
+(defn site-meta->renderable 
+  "Primarily for going from userhome to an end user site." 
+  [nangpress-data site-meta & current-user]
+  (assoc 
+    (if current-user
+      (apply nangpress-data->renderable nangpress-data current-user)
+      (nangpress-data->renderable nangpress-data))
+    :route-widget 
+    (:route-widget site-meta)))
 
 (s/fdef renderable-site->full-monolith
         :args (s/cat :renderable-stie any? :nangpress-system-data any?))
@@ -480,9 +523,9 @@
           c (chan)
           _ (fb/firebase-get "nangpress-data/" c)
           nangpress-data (<! c)]
-      
+
       (reset-monolith-atom! 
         (nangpress-data->renderable nangpress-data current-user))
-      #_(update-site-state!)
-      #_(om/root root-component monolith {:target (. js/document (getElementById root-node-id))}))))
+      (update-site-state!)
+      (om/root root-component monolith {:target (. js/document (getElementById root-node-id))}))))
 
