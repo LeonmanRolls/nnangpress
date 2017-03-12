@@ -17,13 +17,17 @@
 
 ;#Primitives
 
+;Cursors
+(s/def ::map-cursor (= (type %) om/MapCursor))
+(s/def ::indexed-cursor #(= (type %) om/IndexedCursor))
+
 (s/def ::all-widgets-data vector?)
 (s/def ::current-route vector?)
 (s/def ::edit-mode vector?)
 (s/def ::logo-text vector?)
 (s/def ::route-widget map?)
 (s/def ::admin-route-widgets map?)
-(s/def ::email vector?)
+(s/def ::email (s/or :non-cursor vector? :cursor ::indexed-cursor))
 (s/def ::site-name vector?)
 (s/def ::site-state string?)
 (s/def ::uid vector?)
@@ -33,9 +37,6 @@
 
 (s/def ::channel #(= (type %) cljs.core.async.impl.channels/ManyToManyChannel))
 
-;Cursors
-(s/def ::map-cursor om/MapCursor)
-(s/def ::indexed-cursor om/IndexedCursor)
 
 ;Site meta-data, primarily for displaying a user's sites to the user.
 (s/def ::name ::spcs/basic-mediumjs-wgt)
@@ -67,6 +68,9 @@
                                      ::all-widgets-data ::current-route]))
 
 (def monolith (atom {}))
+
+;Caching, use with caution!
+(def nangpress-data-cache (atom {}))
 
 #_(set-validator! 
   monolith
@@ -199,15 +203,13 @@
     current-widgets))
 
 (s/fdef update-all
-        :args (s/cat :data ::all-data))
+        :args (s/cat :data ::renderable))
 
 (defn update-all 
   "Replace the entire monolith with a new monolith" 
   [data]
+  (println "update-all: " (type (:email data)))
   (om/update! (all-data) data))
-
-(s/fdef add-current-user-email
-        :args (s/cat :data ::all-data))
 
 (defn add-current-user-email 
   "Add current user email to data map" 
@@ -220,7 +222,7 @@
   (assoc data :uid @(uid)))
 
 (s/fdef change-site 
-        :args (s/cat :data ::all-data))
+        :args (s/cat :data ::renderable))
 
 (defn change-site 
   "Load a new site" 
@@ -385,7 +387,7 @@
      :email [(if current-user (.-email current-user) "")])))
 
 (s/fdef nangpress-data->renderable
-        :args (s/cat :nangpess-data ::nangpress-data :current-user any?))
+        :args (s/cat :nangpess-data ::nangpress-data :current-user (s/? any?)))
 
 (defn nangpress-data->renderable 
   "Raw nnangpress to renderable based on user auth status. Not getting nangpress-data on its own because 
@@ -415,7 +417,7 @@
     (:route-widget site-meta)))
 
 (s/fdef renderable-site->full-monolith
-        :args (s/cat :renderable-stie any? :nangpress-system-data any?))
+        :args (s/cat :renderable-stie any? :nangpress-system-data (s/? any?)))
 
 (defn renderable-site->full-monolith
   "Combines a renderable site with system data to form full monolith" 

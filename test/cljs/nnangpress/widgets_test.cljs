@@ -4,6 +4,3 @@
             [nnangpress.monolith :as mn]
             [nnangpress.widgets :as wgt]))
 
-(deftest new-site-template []
-  (is (s/valid? ::mn/site-with-meta (wgt/new-site-template))))
-
