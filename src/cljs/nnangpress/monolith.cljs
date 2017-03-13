@@ -216,9 +216,6 @@
         current-widgets (current-widgets
                           (clojure.string/split (first @current-route-obs) #"/")
                           routes-map-obs)]
-    (println "routes-map-obs: " routes-map-obs)
-    (println "current-route-obs: " current-route-obs)
-    (println "current-widgets: " current-widgets)
     current-widgets))
 
 (s/fdef update-all
@@ -548,4 +545,15 @@
         (nangpress-data->renderable nangpress-data current-user))
       (update-site-state!)
       (om/root root-component monolith {:target (. js/document (getElementById root-node-id))}))))
+
+(s/fdef update-sites!!
+        :args (s/cat :user-sites (s/coll-of ::site-with-meta) :uid any?))
+
+(defn update-sites!! 
+  "Takes all of the user's sites and tucks them away safely. Pre condition to somewhat protect user's data." 
+  [user-sites uid]
+  {:pre [(s/valid? (s/coll-of ::site-with-meta) user-sites)]}
+  (fb/fb-write 
+    (str "users/" uid  "/sites")
+    user-sites))
 

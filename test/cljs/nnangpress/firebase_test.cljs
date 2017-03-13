@@ -3,6 +3,7 @@
     [cljs.spec.test :as ts :include-macros true]
     [cljs.test :refer-macros [deftest is testing run-tests]]
     [cljs.spec :as s]
+    [nnangpress.monolith :as mn]
     [nnangpress.testdata :as td]
     [nnangpress.firebase :as fb]))
 
@@ -19,4 +20,8 @@
     (is (= ["empty"] (get-in rslt [:children 0 :children])))
     (is (= ["empty"] (get-in rslt [:children 1 :children 0 :children])))
     (is (= ["empty"] (get-in rslt [:children 1 :children 1 :children])))))
+
+(deftest clj-empty->firebase-empty-new-route-widget
+  (let [rslt (fb/clj-empty->firebase-empty (mn/new-route-widget))]
+    (is (= ["empty"] (get-in rslt [:routes-map :children 0 :widgets])))))
 

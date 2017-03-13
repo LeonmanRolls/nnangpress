@@ -94,7 +94,7 @@
   (->
     (js/firebase.database)
     (.ref path)
-    (.set (clj->js data))))
+    (.set (clj->js (clj-empty->firebase-empty data)))))
 
 (defn fb-update 
   "Update certain items at path without overwriting nodes that aren't referenced."
@@ -102,7 +102,7 @@
   (->
     (js/firebase.database)
     (.ref path)
-    (.update (clj->js data))))
+    (.update (clj->js (clj-empty->firebase-empty data)))))
 
 (defn fb-copy 
   "Copy data from one path to another"

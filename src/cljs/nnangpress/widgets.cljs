@@ -554,9 +554,7 @@
 
     om/IWillUpdate 
     (will-update [_ next-props _]
-      (fb/fb-write 
-        (str "users/" (first (om/observe owner (mn/uid)))  "/sites")
-        (:user-sites next-props)))
+      (mn/update-sites!! @(:user-sites next-props) (first (om/observe owner (mn/uid)))))
 
     om/IRenderState
     (render-state [_ {:keys [delete]}]
