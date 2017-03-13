@@ -18,19 +18,19 @@
 ;#Primitives
 
 ;Cursors
-(s/def ::map-cursor (= (type %) om/MapCursor))
+(s/def ::map-cursor #(= (type %) om/MapCursor))
 (s/def ::indexed-cursor #(= (type %) om/IndexedCursor))
 
 (s/def ::all-widgets-data vector?)
 (s/def ::current-route vector?)
 (s/def ::edit-mode vector?)
 (s/def ::logo-text vector?)
-(s/def ::route-widget map?)
 (s/def ::admin-route-widgets map?)
 (s/def ::email (s/or :non-cursor vector? :cursor ::indexed-cursor))
 (s/def ::site-name vector?)
 (s/def ::site-state string?)
 (s/def ::uid vector?)
+(s/def ::children vector?)
 
 (s/def ::uid vector?)
 (s/def ::authed-uid-raw (s/and #(not (empty? %)) string?))
@@ -60,8 +60,17 @@
 (s/def ::nangpress-data (s/keys :req-un [::admin-route-widgets ::all-navs-data ::all-widgets-data ::current-route 
                                          ::edit-mode ::sidebar-data ::site-name ::site-state ::uid]))
 
-;Primarily for displaying site on a user's homepage.
+;Primarily for displaying site on a user's homepage
 (s/def ::site-with-meta (s/keys :req-un [::site-id ::screenshot ::name ::description ::route-widget]))
+
+(s/def ::route-map (s/keys :req-un [::bg-img ::grey-bg? ::nav-hint ::nav-hint-style ::route-name ::widgets 
+                                    ::route-name-editable]
+                           :opt-un [::children]))
+
+(s/def ::routes-map ::route-map)
+
+;Primarily used by navbars to handle routing and render the navbar itself
+(s/def ::route-widget (s/keys :req-un [::logo-data ::main-view-style ::nav-style ::route-widget-id ::routes-map]))
 
 ;Minimum data required for a site to render
 (s/def ::renderable (s/keys :req-un [::route-widget ::all-navs-data ::sidebar-data ::site-name ::uid ::email ::edit-mode
@@ -95,16 +104,19 @@
                                         :nav-hint ["Architects"]
                                         :nav-hint-style {:color "black"}
                                         :route-name "/child-ola-ola"
+                                        :route-name-editable (wd/widget-data 16)
                                         :widgets []}]
                             :grey-bg? true
                             :nav-hint ["Architects"]
                             :nav-hint-style {:color "black"}
                             :route-name "/parent-ola-ola"
+                            :route-name-editable (wd/widget-data 16)
                             :widgets []}]
                 :grey-bg? true
                 :nav-hint ["Architects"] 
                 :nav-hint-style {:color "black"}
                 :route-name "/"
+                :route-name-editable (wd/widget-data 16)
                 :widgets [(wd/widget-data 15)]}})
 
 (defn new-site-template
@@ -208,7 +220,6 @@
 (defn update-all 
   "Replace the entire monolith with a new monolith" 
   [data]
-  (println "update-all: " (type (:email data)))
   (om/update! (all-data) data))
 
 (defn add-current-user-email 

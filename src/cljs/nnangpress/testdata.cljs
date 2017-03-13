@@ -2,10 +2,11 @@
   "Data primarily for testing. Causes less problems if placed here instead of test namespace."
   (:require 
     [nnangpress.navbars :as nvs]
+    [nnangpress.monolith :as mn]
     [nnangpress.widgetdata :as wd]))
 
-(def admin-route-widgets {:homepage {} 
-                          :userhome {}})
+(def admin-route-widgets {:homepage (mn/new-route-widget) 
+                          :userhome (mn/new-route-widget)})
 
 (def all-navs-data [(map nvs/navbar-data (range 0 2))])
 

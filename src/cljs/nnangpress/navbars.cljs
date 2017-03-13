@@ -3,6 +3,7 @@
   as will as the shape of the data in the route tree."
   (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
             [om.dom :as dom :include-macros true]
+            [cljs.spec :as s]
             [nnangpress.monolith :as mn]
             [nnangpress.widgetdata :as wd]
             [nnangpress.utils :as u]
@@ -125,12 +126,17 @@
                      :onClick (partial rt/js-link @routes-map-obs "/")}
                 (om/build wgt/widget logo-text {:state {:edit false}}))))))
 
+(s/fdef list-item 
+        :args (s/cat :active any? :routes-map any? :all any?))
+
 (defn list-item [active? routes-map {:keys [route-name route-name-editable] :as all}]
   (dom/li #js {:className (str "nav-li " (when active? "active-li"))
                :onClick (partial rt/js-link @routes-map route-name)}
 
+          (println "all all: " (keys all))
+
           (dom/div #js {:className (str (when active? "active-text"))}
-                   (om/build wgt/widget route-name-editable {:state {:parent-cursor all
+                   #_(om/build wgt/widget route-name-editable {:state {:parent-cursor all
                                                                      :routes-map routes-map}}))))
 (defn positions
   [pred coll]

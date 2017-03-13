@@ -501,7 +501,7 @@
   [{:keys [name description route-widget screenshot] :as all-data} owner]
   (reify
     om/IRenderState
-    (render-state [_ {:keys [delete nangpress-data]}]
+    (render-state [_ {:keys [delete]}]
       (dom/div #js {:style #js {:position "relative", :height "200px", :margin "10px", 
                                 :fontWeight "900" :border "2px solid white" :padding "10px",
                                 :background "rgba(0,0,0,0.7)"}} 
@@ -514,8 +514,6 @@
                (dom/img #js {:style #js {:float "right", :position "absolute", :top "10px", 
                                          :right "10px"} 
                              :alt "Loading..." :src screenshot :width "300" :height "200"})
-
-               (println "all-data: " (-> all-data :description :inner-html))
 
                (cc/standard-button 
                  #(go 
@@ -537,8 +535,7 @@
     (init-state [_]
       {:advertise? false
        :delete (chan)
-       :nd-chan (chan)
-       :nangpress-data {}})
+       :nd-chan (chan)})
 
     om/IWillMount
     (will-mount [_]
@@ -546,7 +543,6 @@
             {:keys [advertise? delete nd-chan nangpress-data]} (om/get-state owner)
             _ (fb/firebase-get "nangpress-data" nd-chan)
             c (chan)]
-        (go (om/set-state! owner :nangpress-data (<! nd-chan)))
         (when (not advertise?)
           (go 
             (fb/firebase-get (str "users/" (first @uid-obs)  "/sites") c)
@@ -563,7 +559,7 @@
         (:user-sites next-props)))
 
     om/IRenderState
-    (render-state [_ {:keys [delete nangpress-data]}]
+    (render-state [_ {:keys [delete]}]
       (dom/div {:style #js {:fontWeight "900"}}
                (dom/div #js {:style #js {:fontWeight "900", :fontSize "2em", :textDecoration "underline"}} 
                         "Your Sites")
@@ -575,7 +571,7 @@
                   :fontSize "1.5em" :marginTop "20px", :cursor "pointer"})
 
                (apply dom/div nil
-                      (om/build-all display-site user-sites {:init-state {:delete delete :nangpress-data nangpress-data}}))))))
+                      (om/build-all display-site user-sites {:init-state {:delete delete}}))))))
 
 (defmethod widget-data-type 11 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::inner-html]))

@@ -16,3 +16,5 @@
 (deftest new-site-template
    (is (s/valid? ::mn/site-with-meta (mn/new-site-template))))
 
+(deftest new-route-widget []
+  (is (s/valid? ::mn/route-widget (mn/new-route-widget))))

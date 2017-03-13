@@ -1,89 +1,3 @@
-    [nnangpress.widgets :as wgt]))
-(mn/nangpress-data->renderable td/nangpess-data)
-  (keys td/nangpress-data)
-  (:admin-route-widgets td/nangpress-data)
-(ns nnangpress.monolith
-  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
-            [om.dom :as dom :include-macros true]
-            [nnangpress.utils :as u]
-            [nnangpress.dom :as ndom]
-            [nnangpress.specs :as spcs]
-            [nnangpress.widgetdata :as wd]
-            [clojure.zip :as z]
-            [clojure.spec :as s]
-            [clojure.walk :as wlk]
-            [cljs.core.async :refer [put! chan <!]]
-            [nnangpress.firebase :as fb]))
-(defn nangpress-data->renderable 
-  "Raw nnangpress to renderable based on user auth status"  
-  ([nangpress-data]
-   (nangpress-data->renderable nangpress-data (fb/current-user)))
-  ([nangpress-data current-user]
-   (-> 
-     (assoc nangpress-data :route-widget (if current-user
-                                           (-> nangpress-data :admin-route-widgets :userhome)
-                                           (-> nangpress-data :admin-route-widgets :homepage)))
-     #_(update-monolith-user-data current-user)
-     #_(dissoc :route-widgets))))
-  (mn/nangpress-data->renderable td/nangpess-data)  
-(ns nnangpress.monolith-test
-  (:require 
-    [cljs.spec.test :as ts :include-macros true]
-    [cljs.test :refer-macros [deftest is testing run-tests]]
-    [cljs.spec :as s]
-    [nnangpress.testdata :as td]
-    [nnangpress.monolith :as mn]
-    [nnangpress.widgets :as wgt]))
-  (mn/nangpress-data->renderable td/nangpess-data)  
-td/nangpess-data
-  (mn/nangpress-data->renderable td/nangpress-data)  
-  (keys (mn/nangpress-data->renderable td/nangpress-data))  
-  (:admin-route-widgets td/nangpress-data)
-  (s/valid? ::mn/renderable (mn/nangpress-data->renderable td/nangpress-data))  
-  (s/explain ::mn/renderable (mn/nangpress-data->renderable td/nangpress-data))  
-  (keys (mn/nangpress-data->renderable td/nangpress-data))  
-  (s/explain ::mn/renderable (mn/nangpress-data->renderable td/nangpress-data))  
-(ns nnangpress.testdata
-  "Data primarily for testing. Causes less problems if placed here instead of test namespace."
-  (:require 
-    [nnangpress.navbars :as nvs]
-    [nnangpress.widgetdata :as wd]))
-(def admin-route-widgets {:homepage {} 
-                          :userhome {}})
-(ns nnangpress.monolith-test
-  (:require 
-    [cljs.spec.test :as ts :include-macros true]
-    [cljs.test :refer-macros [deftest is testing run-tests]]
-    [cljs.spec :as s]
-    [nnangpress.testdata :as td]
-    [nnangpress.monolith :as mn]
-    [nnangpress.widgets :as wgt]))
-  (s/valid? ::mn/renderable (mn/nangpress-data->renderable td/nangpress-data))  
-  (:admin-route-widgets td/nangpress-data)
-(ns nnangpress.testdata
-  "Data primarily for testing. Causes less problems if placed here instead of test namespace."
-  (:require 
-    [nnangpress.navbars :as nvs]
-    [nnangpress.widgetdata :as wd]))
-(def admin-route-widgets {:homepage {} 
-                          :userhome {}})
-(def nangpress-data {:admin-route-widgets admin-route-widgets
-                     :all-navs-data all-navs-data
-                     :all-widgets-data all-widgets-data
-                     :current-route current-route
-                     :edit-mode edit-mode
-                     :sidebar-data sidebar-data
-                     :site-name site-name 
-                     :site-state site-state 
-                     :uid uid})
-nangpress-data
-(:admin-route-widgets nangpress-dasta)
-(:admin-route-widgets nangpress-data)
-(ns nnangpress.monolith-test
-  (:require 
-    [cljs.spec.test :as ts :include-macros true]
     [cljs.test :refer-macros [deftest is testing run-tests]]
     [cljs.spec :as s]
     [nnangpress.testdata :as td]
@@ -498,3 +412,89 @@ nangpress-data
     [clojure.walk :as wlk]
     [cljs.core.async :refer [put! chan <!]]))
 (current-user)
+(ns nnangpress.monolith
+  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [nnangpress.utils :as u]
+            [nnangpress.dom :as ndom]
+            [nnangpress.specs :as spcs]
+            [nnangpress.widgetdata :as wd]
+            [clojure.zip :as z]
+            [clojure.spec :as s]
+            [clojure.walk :as wlk]
+            [cljs.core.async :refer [put! chan <!]]
+            [nnangpress.firebase :as fb]))
+(defn new-route-widget 
+  "Essentially the simplest nangpress site possible, with a tutorial widget on the homepage." 
+  []
+  {:logo-data {:logo-style {:fontSize "200%"
+                            :textTransform "inherit"}
+               :logo-text (wd/widget-data 16)}
+   :main-view-style {:style {:dispaly "inherit"
+                             :paddingLeft "170px"
+                             :paddingRight "170px"}} 
+   :nav-style {:backgroundColor "#CE4072"}
+   :route-widget-id 0
+   :routes-map {:bg-img "http://wallpaper-gallery.net/images/minimal-wallpaper/minimal-wallpaper-17.jpg"
+                :children [{:bg-img "http://wallpaper-gallery.net/images/minimal-wallpaper/minimal-wallpaper-17.jpg"
+                            :children [{:bg-img "http://wallpaper-gallery.net/images/minimal-wallpaper/minimal-wallpaper-17.jpg"
+                                        :grey-bg? true
+                                        :nav-hint ["Architects"]
+                                        :nav-hint-style {:color "black"}
+                                        :route-name "/child-ola-ola"
+                                        :route-name-editable (wd/widget-data 16)
+                                        :widgets []}]
+                            :grey-bg? true
+                            :nav-hint ["Architects"]
+                            :nav-hint-style {:color "black"}
+                            :route-name "/parent-ola-ola"
+                            :route-name-editable (wd/widget-data 16)
+                            :widgets []}]
+                :grey-bg? true
+                :nav-hint ["Architects"] 
+                :nav-hint-style {:color "black"}
+                :route-name "/"
+                :route-name-editable (wd/widget-data 16)
+                :widgets [(wd/widget-data 15)]}})
+(s/valid? ::route-widget (new-route-widget))  
+(s/valid? ::route-widget {})  
+(s/def ::route-widget (s/keys :req-un [::logo-data ::main-view-style ::nav-style ::route-widget-id ::routes-map]))
+(s/valid? ::route-widget (new-route-widget))  
+(s/valid? ::route-widget {})  
+(ns nnangpress.firebase
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require 
+    [clojure.walk :as wlk]
+    [cljs.core.async :refer [put! chan <!]]))
+(fb-copy
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/route-widget/logo-data" 
+    "/nangpress-data/admin-route-widgets/homepage/routes-map/logo-data")
+(fb-copy
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/route-widget/logo-data" 
+    "/nangpress-data/admin-route-widgets/userhome/routes-map/logo-data")
+(fb-copy
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/route-widget/nav-style" 
+    "/nangpress-data/admin-route-widgets/homepage/nav-style")
+(fb-copy
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/route-widget/nav-style" 
+    "/nangpress-data/admin-route-widgets/userhome/nav-style")
+(fb-copy
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/route-widget/routes-map/grey-bg?" 
+    "/nangpress-data/admin-route-widgets/userhome/routes-map/grey-bg?")
+(fb-copy
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/route-widget/routes-map/grey-bg?" 
+    "/nangpress-data/admin-route-widgets/homepage/routes-map/grey-bg?")
+(fb-copy
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/route-widget/routes-map/route-name-editable" 
+    "/nangpress-data/admin-route-widgets/homepage/routes-map/route-name-editable")
+(fb-copy
+    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/route-widget/routes-map/route-name-editable" 
+    "/nangpress-data/admin-route-widgets/userhome/routes-map/route-name-editable")
+(fb-copy
+    "/nangpress-data/admin-route-widgets/userhome/routes-map/logo-data"
+    "/nangpress-data/admin-route-widgets/userhome/logo-data")
+(fb-copy
+    "/nangpress-data/admin-route-widgets/homepage/routes-map/logo-data"
+    "/nangpress-data/admin-route-widgets/homepage/logo-data")
