@@ -30,7 +30,6 @@
 (s/def ::site-name vector?)
 (s/def ::site-state string?)
 (s/def ::uid vector?)
-(s/def ::children vector?)
 
 (s/def ::uid vector?)
 (s/def ::authed-uid-raw (s/and #(not (empty? %)) string?))
@@ -63,9 +62,10 @@
 ;Primarily for displaying site on a user's homepage
 (s/def ::site-with-meta (s/keys :req-un [::site-id ::screenshot ::name ::description ::route-widget]))
 
+(s/def ::children (s/cat :route-map (s/* ::route-map)))
+
 (s/def ::route-map (s/keys :req-un [::bg-img ::grey-bg? ::nav-hint ::nav-hint-style ::route-name ::widgets 
-                                    ::route-name-editable]
-                           :opt-un [::children]))
+                                    ::route-name-editable ::children]))
 
 (s/def ::routes-map ::route-map)
 
@@ -100,6 +100,7 @@
    :routes-map {:bg-img "http://wallpaper-gallery.net/images/minimal-wallpaper/minimal-wallpaper-17.jpg"
                 :children [{:bg-img "http://wallpaper-gallery.net/images/minimal-wallpaper/minimal-wallpaper-17.jpg"
                             :children [{:bg-img "http://wallpaper-gallery.net/images/minimal-wallpaper/minimal-wallpaper-17.jpg"
+                                        :children []
                                         :grey-bg? true
                                         :nav-hint ["Architects"]
                                         :nav-hint-style {:color "black"}
@@ -193,6 +194,9 @@
   (defn logo-hint []
     (om/ref-cursor (-> (om/root-cursor monolith) :route-widget :routes-map :nav-hint))))
 
+(s/fdef current-widgets 
+        :args (s/cat :route any? :rotues-map any?))
+
 (defn current-widgets 
   "Get the widget(s) data for the current route" 
   [route routes-map]
@@ -212,6 +216,9 @@
         current-widgets (current-widgets
                           (clojure.string/split (first @current-route-obs) #"/")
                           routes-map-obs)]
+    (println "routes-map-obs: " routes-map-obs)
+    (println "current-route-obs: " current-route-obs)
+    (println "current-widgets: " current-widgets)
     current-widgets))
 
 (s/fdef update-all

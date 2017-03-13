@@ -18,3 +18,6 @@
 
 (deftest new-route-widget []
   (is (s/valid? ::mn/route-widget (mn/new-route-widget))))
+
+(deftest current-widgets 
+  (is false))

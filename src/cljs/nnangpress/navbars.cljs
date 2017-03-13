@@ -133,10 +133,8 @@
   (dom/li #js {:className (str "nav-li " (when active? "active-li"))
                :onClick (partial rt/js-link @routes-map route-name)}
 
-          (println "all all: " (keys all))
-
           (dom/div #js {:className (str (when active? "active-text"))}
-                   #_(om/build wgt/widget route-name-editable {:state {:parent-cursor all
+                   (om/build wgt/widget route-name-editable {:state {:parent-cursor all
                                                                      :routes-map routes-map}}))))
 (defn positions
   [pred coll]
