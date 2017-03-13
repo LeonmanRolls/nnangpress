@@ -29,8 +29,21 @@
         (and 
           (vector? x) 
           (= 1 (count x)) 
-          (= "" (first x))) 
+          (= "empty" (first x))) 
         [] 
+        x)) 
+    data))
+
+(defn clj-empty->firebase-empty 
+  "Goiing from firebase representation of empty vector to a clj empty vector" 
+  [data]
+  (wlk/postwalk 
+    (fn [x]   
+      (if 
+        (and 
+          (vector? x) 
+          (empty? x)) 
+        ["empty"] 
         x)) 
     data))
 
@@ -115,7 +128,6 @@
     (fb-delete source)))
 
 (comment 
-
   (fb-copy
     "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/route-widget/routes-map/route-name-editable" 
     "/nangpress-data/admin-route-widgets/userhome/routes-map/route-name-editable")
@@ -123,6 +135,5 @@
   (fb-copy
     "/nangpress-data/admin-route-widgets/homepage/routes-map/logo-data"
     "/nangpress-data/admin-route-widgets/homepage/logo-data")
-
   )
 

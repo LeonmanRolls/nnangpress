@@ -35,3 +35,33 @@
                      :site-state site-state 
                      :uid uid})
 
+(def firebase->clojure-empty-test
+  {:data "hi"
+   :another "there"
+   :children [{:data "hi"
+               :another "there"
+               :children ["empty"]}
+              {:data "hi"
+               :another "there"
+               :children [{:data "hi"
+                           :another "there"
+                           :children ["empty"]}
+                          {:data "hi"
+                           :another "there"
+                           :children ["empty"]}]}]})
+
+(def clojure->firebase-empty-test
+  {:data "hi"
+   :another "there"
+   :children [{:data "hi"
+               :another "there"
+               :children []}
+              {:data "hi"
+               :another "there"
+               :children [{:data "hi"
+                           :another "there"
+                           :children []}
+                          {:data "hi"
+                           :another "there"
+                           :children []}]}]})
+
