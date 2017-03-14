@@ -516,9 +516,7 @@
                              :alt "Loading..." :src screenshot :width "300" :height "200"})
 
                (cc/standard-button 
-                 #(go 
-                    (mn/change-site (mn/site-meta->renderable @mn/nangpress-data-cache @all-data))
-                    (mn/update-site-state! "site"))  
+                 #(mn/change-site (mn/site-meta->renderable @mn/nangpress-data-cache @all-data))
                  "Go to site")
 
                (cc/standard-button 

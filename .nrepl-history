@@ -1,163 +1,3 @@
-                        (mn/new-site-template)))
-(s/valid? 
-    ::mn/renderable 
-    (mn/site-meta->renderable 
-      td/nangpress-data
-      (mn/new-site-template)))
-(ns nnangpress.firebase
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require 
-    [clojure.walk :as wlk]
-    [cljs.core.async :refer [put! chan <!]]))
-(current-user)
-(ns nnangpress.monolith
-  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
-            [om.dom :as dom :include-macros true]
-            [nnangpress.utils :as u]
-            [nnangpress.dom :as ndom]
-            [nnangpress.specs :as spcs]
-            [nnangpress.widgetdata :as wd]
-            [clojure.zip :as z]
-            [clojure.spec :as s]
-            [clojure.walk :as wlk]
-            [cljs.core.async :refer [put! chan <!]]
-            [nnangpress.firebase :as fb]))
-(defn new-route-widget 
-  "Essentially the simplest nangpress site possible, with a tutorial widget on the homepage." 
-  []
-  {:logo-data {:logo-style {:fontSize "200%"
-                            :textTransform "inherit"}
-               :logo-text (wd/widget-data 16)}
-   :main-view-style {:style {:dispaly "inherit"
-                             :paddingLeft "170px"
-                             :paddingRight "170px"}} 
-   :nav-style {:backgroundColor "#CE4072"}
-   :route-widget-id 0
-   :routes-map {:bg-img "http://wallpaper-gallery.net/images/minimal-wallpaper/minimal-wallpaper-17.jpg"
-                :children [{:bg-img "http://wallpaper-gallery.net/images/minimal-wallpaper/minimal-wallpaper-17.jpg"
-                            :children [{:bg-img "http://wallpaper-gallery.net/images/minimal-wallpaper/minimal-wallpaper-17.jpg"
-                                        :grey-bg? true
-                                        :nav-hint ["Architects"]
-                                        :nav-hint-style {:color "black"}
-                                        :route-name "/child-ola-ola"
-                                        :route-name-editable (wd/widget-data 16)
-                                        :widgets []}]
-                            :grey-bg? true
-                            :nav-hint ["Architects"]
-                            :nav-hint-style {:color "black"}
-                            :route-name "/parent-ola-ola"
-                            :route-name-editable (wd/widget-data 16)
-                            :widgets []}]
-                :grey-bg? true
-                :nav-hint ["Architects"] 
-                :nav-hint-style {:color "black"}
-                :route-name "/"
-                :route-name-editable (wd/widget-data 16)
-                :widgets [(wd/widget-data 15)]}})
-(s/valid? ::route-widget (new-route-widget))  
-(s/valid? ::route-widget {})  
-(s/def ::route-widget (s/keys :req-un [::logo-data ::main-view-style ::nav-style ::route-widget-id ::routes-map]))
-(s/valid? ::route-widget (new-route-widget))  
-(s/valid? ::route-widget {})  
-(ns nnangpress.firebase
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require 
-    [clojure.walk :as wlk]
-    [cljs.core.async :refer [put! chan <!]]))
-(fb-copy
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/route-widget/logo-data" 
-    "/nangpress-data/admin-route-widgets/homepage/routes-map/logo-data")
-(fb-copy
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/route-widget/logo-data" 
-    "/nangpress-data/admin-route-widgets/userhome/routes-map/logo-data")
-(fb-copy
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/route-widget/nav-style" 
-    "/nangpress-data/admin-route-widgets/homepage/nav-style")
-(fb-copy
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/route-widget/nav-style" 
-    "/nangpress-data/admin-route-widgets/userhome/nav-style")
-(fb-copy
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/route-widget/routes-map/grey-bg?" 
-    "/nangpress-data/admin-route-widgets/userhome/routes-map/grey-bg?")
-(fb-copy
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/route-widget/routes-map/grey-bg?" 
-    "/nangpress-data/admin-route-widgets/homepage/routes-map/grey-bg?")
-(fb-copy
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/route-widget/routes-map/route-name-editable" 
-    "/nangpress-data/admin-route-widgets/homepage/routes-map/route-name-editable")
-(fb-copy
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/route-widget/routes-map/route-name-editable" 
-    "/nangpress-data/admin-route-widgets/userhome/routes-map/route-name-editable")
-(fb-copy
-    "/nangpress-data/admin-route-widgets/userhome/routes-map/logo-data"
-    "/nangpress-data/admin-route-widgets/userhome/logo-data")
-(fb-copy
-    "/nangpress-data/admin-route-widgets/homepage/routes-map/logo-data"
-    "/nangpress-data/admin-route-widgets/homepage/logo-data")
-(ns nnangpress.monolith
-  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
-            [om.dom :as dom :include-macros true]
-            [nnangpress.utils :as u]
-            [nnangpress.dom :as ndom]
-            [nnangpress.specs :as spcs]
-            [nnangpress.widgetdata :as wd]
-            [clojure.zip :as z]
-            [clojure.spec :as s]
-            [clojure.walk :as wlk]
-            [cljs.core.async :refer [put! chan <!]]
-            [nnangpress.firebase :as fb]))
-(s/valid? ::route-map (new-route-widget))
-(s/explain-data ::route-map (new-route-widget))
-(s/explain ::route-map (new-route-widget))
-  (s/valid? ::route-map (:routes-map (new-route-widget)))
-(defn new-route-widget 
-  "Essentially the simplest nangpress site possible, with a tutorial widget on the homepage." 
-  []
-  {:logo-data {:logo-style {:fontSize "200%"
-                            :textTransform "inherit"}
-               :logo-text (wd/widget-data 16)}
-   :main-view-style {:style {:dispaly "inherit"
-                             :paddingLeft "170px"
-                             :paddingRight "170px"}} 
-   :nav-style {:backgroundColor "#CE4072"}
-   :route-widget-id 0
-   :routes-map {:bg-img "http://wallpaper-gallery.net/images/minimal-wallpaper/minimal-wallpaper-17.jpg"
-                :children [{:bg-img "http://wallpaper-gallery.net/images/minimal-wallpaper/minimal-wallpaper-17.jpg"
-                            :children [{:bg-img "http://wallpaper-gallery.net/images/minimal-wallpaper/minimal-wallpaper-17.jpg"
-                                        :children []
-                                        :grey-bg? true
-                                        :nav-hint ["Architects"]
-                                        :nav-hint-style {:color "black"}
-                                        :route-name "/child-ola-ola"
-                                        :route-name-editable (wd/widget-data 16)
-                                        :widgets []}]
-                            :grey-bg? true
-                            :nav-hint ["Architects"]
-                            :nav-hint-style {:color "black"}
-                            :route-name "/parent-ola-ola"
-                            :route-name-editable (wd/widget-data 16)
-                            :widgets []}]
-                :grey-bg? true
-                :nav-hint ["Architects"] 
-                :nav-hint-style {:color "black"}
-                :route-name "/"
-                :route-name-editable (wd/widget-data 16)
-                :widgets [(wd/widget-data 15)]}})
-(s/explain ::route-map (new-route-widget))
-(s/valid? ::route-map (new-route-widget))
-  (s/coll-of ::route-map [])
-  (s/valid? ::route-map (:routes-map (new-route-widget)))
-  (s/valid? ::route-map [])
-(s/def ::children (s/coll-of (s/* ::route-map)))
-  (s/valid? ::route-map [])
-  (s/valid? ::children [])
-(s/valid? ::renderable (site-meta->renderable 
-                           nangpress.testdata/nangpress-data 
-                           (mn/new-site-template) 1))
 (s/valid? ::renderable (site-meta->renderable 
                            nnangpress.testdata/nangpress-data 
                            (mn/new-site-template) 1))
@@ -498,3 +338,163 @@ l
     )
   (def cache (fb/clj-empty->firebase-empty (new-route-widget)))
   (get-in cache [:routes-map :children 0 :widgets])
+l
+(uid)
+(first @(uid))
+(go 
+    (let [c (chan)]
+      (get-user-sites @(uid) c)
+      (println "get user sites: " (<! c))
+      )  
+    )
+@(uid)
+(go 
+    (let [c (chan)]
+      (get-user-sites (first @(uid)) c)
+      (println "get user sites: " (<! c))
+      )  
+    )
+(go 
+    (let [c (chan)]
+      (fb/firebase-get (str "users/" (first @(uid))) c)
+      (println "get user sites: " (<! c))
+      )  
+    )
+(go 
+    (let [c (chan)]
+      (fb/firebase-get (str "users/" (first @(uid)) "/sites") c)
+      (println "get user sites: " (<! c))
+      )  
+    )
+(fb/fb-copy 
+   "users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites"
+   "users/test/sites")
+(go 
+    (let [c (chan)]
+      (get-user-sites "test" c)
+      (s/valid? (s/coll-of ::site-with-meta) (<! c))
+      )  
+    )
+(defn get-user-sites 
+  "Get all the site data for a given user" 
+  [uid chan]
+  (fb/firebase-get (str "users/" uid "/sites") c))
+(go 
+    (let [c (chan)]
+      (get-user-sites "test" c)
+      (s/valid? (s/coll-of ::site-with-meta) (<! c))
+      )  
+    )
+(go 
+    (let [c (chan)]
+      (get-user-sites "test" c)
+      (println (<! c))
+      #_(s/valid? (s/coll-of ::site-with-meta) (<! c))
+      )  
+    )
+(go 
+    (let [c (chan)]
+      (fb/firebase-get (str "users/" (first @(uid)) "/sites") c)
+      (println "get user sites: " (<! c))
+      )  
+    )
+(go 
+    (let [c (chan)]
+      (fb/firebase-get (str "users/" "test" "/sites") c)
+      (println "get user sites: " (<! c))
+      )  
+    )
+(defn get-user-sites 
+  "Get all the site data for a given user" 
+  [uid chan]
+  (fb/firebase-get (str "users/" uid "/sites") c))
+(defn get-user-sites 
+  "Get all the site data for a given user" 
+  [uid chan]
+  (fb/firebase-get (str "users/" uid "/sites") chan))
+(go 
+    (let [c (chan)]
+      (get-user-sites "test" c)
+      (println (<! c))
+      #_(s/valid? (s/coll-of ::site-with-meta) (<! c))
+      )  
+    )
+(go 
+    (let [c (chan)]
+      (get-user-sites "test" c)
+      (s/valid? (s/coll-of ::site-with-meta) (<! c))
+      )  
+    )
+(go 
+    (let [c (chan)]
+      (get-user-sites "test" c)
+      (println (s/valid? (s/coll-of ::site-with-meta) (<! c)))
+      )  
+    )
+(defn user-site-index 
+  "Get the index of a user's site" 
+  [uid site-id out] 
+  (let [c (chan)]
+    (go 
+      (get-user-sites uid c) 
+      (u/index-of-key-val (<! c) :site-id site-id))))
+(defn user-site-index 
+  "Get the index of a user's site" 
+  [uid site-id] 
+  (let [c (chan)]
+    (go 
+      (get-user-sites uid c) 
+      (u/index-of-key-val (<! c) :site-id site-id))))
+(go 
+    (let [c (chan)]
+      (println (<! (user-site-index "test" "91e87144-cdb9-417a-9074-b7b048771f08")))
+      ))
+(go 
+    (let [c (chan)]
+      (println (= 0 (<! (user-site-index "test" "91e87144-cdb9-417a-9074-b7b048771f08"))))
+      ))
+  (mn/site-meta->renderable td/nangpress-data (new-site-template) 1)
+  (site-meta->renderable td/nangpress-data (new-site-template) 1)
+  (site-meta->renderable nnangpress.testdata/nangpress-data (new-site-template) 1)
+  (def cache (site-meta->renderable nnangpress.testdata/nangpress-data (new-site-template) 1))
+  (:site-id-vec cache)
+  (keys cache)
+(defn site-meta->renderable 
+  "Primarily for going from userhome to an end user site." 
+  [nangpress-data site-meta & current-user]
+  (assoc 
+    (if current-user
+      (apply nangpress-data->renderable nangpress-data current-user)
+      (nangpress-data->renderable nangpress-data))
+    :route-widget 
+    (:route-widget site-meta)
+    :site-id-vec [(:site-id site-meta)]))
+  (def cache (site-meta->renderable nnangpress.testdata/nangpress-data (new-site-template) 1))
+  (:site-id-vec cache)
+(let [new-site (new-site-template)
+        cache (site-meta->renderable nnangpress.testdata/nangpress-data new-site 1)]
+  (:site-id-vec cache)
+    (:site-id new-site)
+    
+    )
+(let [new-site (new-site-template)
+        cache (site-meta->renderable nnangpress.testdata/nangpress-data new-site 1)]
+  
+    
+    (= (apply :site-id-vec cache) (:site-id new-site))
+    
+    )
+(let [new-site (new-site-template)
+        cache (site-meta->renderable nnangpress.testdata/nangpress-data new-site 1)]
+  
+    
+    (= (first (:site-id-vec cache)) (:site-id new-site))
+    
+    )
+(let [new-site (new-site-template)
+        cache (site-meta->renderable nnangpress.testdata/nangpress-data new-site 1)]
+  
+    
+    (= (first (:site-id-vec cache)) (:site-id new-site))
+    
+    )

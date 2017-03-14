@@ -25,6 +25,8 @@
 
 (def uid [""])
 
+(def site-id-vec ["nangperss-admin"])
+
 (def nangpress-data {:admin-route-widgets admin-route-widgets
                      :all-navs-data all-navs-data
                      :all-widgets-data all-widgets-data
@@ -32,6 +34,7 @@
                      :edit-mode edit-mode
                      :sidebar-data sidebar-data
                      :site-name site-name 
+                     :site-id-vec site-id-vec 
                      :site-state site-state 
                      :uid uid})
 

@@ -41,6 +41,7 @@
 (s/def ::name ::spcs/basic-mediumjs-wgt)
 (s/def ::description ::spcs/basic-mediumjs-wgt)
 (s/def ::site-id string?)
+(s/def ::site-id-vec vector?)
 (s/def ::screenshot string?)
 
 ;#Compounds
@@ -74,7 +75,7 @@
 
 ;Minimum data required for a site to render
 (s/def ::renderable (s/keys :req-un [::route-widget ::all-navs-data ::sidebar-data ::site-name ::uid ::email ::edit-mode
-                                     ::all-widgets-data ::current-route]))
+                                     ::all-widgets-data ::current-route ::site-id-vec ::site-state]))
 
 (def monolith (atom {}))
 
@@ -97,9 +98,9 @@
                              :paddingRight "170px"}} 
    :nav-style {:backgroundColor "#CE4072"}
    :route-widget-id 0
-   :routes-map {:bg-img "http://wallpaper-gallery.net/images/minimal-wallpaper/minimal-wallpaper-17.jpg"
-                :children [{:bg-img "http://wallpaper-gallery.net/images/minimal-wallpaper/minimal-wallpaper-17.jpg"
-                            :children [{:bg-img "http://wallpaper-gallery.net/images/minimal-wallpaper/minimal-wallpaper-17.jpg"
+   :routes-map {:bg-img "http://www.wallpapersbyte.com/wp-content/uploads/2015/07/Lollipops-Candy-Frosting-Sprinkling-Colorful-Yeloow-Pink-Blue-WallpapersByte-com-3840x2160.jpg"
+                :children [{:bg-img "http://www.wallpapersbyte.com/wp-content/uploads/2015/07/Lollipops-Candy-Frosting-Sprinkling-Colorful-Yeloow-Pink-Blue-WallpapersByte-com-3840x2160.jpg"
+                            :children [{:bg-img "http://www.wallpapersbyte.com/wp-content/uploads/2015/07/Lollipops-Candy-Frosting-Sprinkling-Colorful-Yeloow-Pink-Blue-WallpapersByte-com-3840x2160.jpg"
                                         :children []
                                         :grey-bg? true
                                         :nav-hint ["Architects"]
@@ -236,18 +237,26 @@
   [data]
   (assoc data :uid @(uid)))
 
+(s/fdef set-site-state 
+        :args (s/cat :renderable ::renderable :state string?))
+
+(defn set-site-state 
+  "" 
+  [renderable state]
+  (assoc renderable :site-state state))
+
 (s/fdef change-site 
         :args (s/cat :data ::renderable))
 
 (defn change-site 
-  "Load a new site" 
+  "Load a new user site." 
   [site-data]
   (-> 
     site-data 
     add-current-user-email 
     add-current-uid
-    update-all)
-  (update-site-state!))
+    (set-site-state "site")
+    update-all))
 
 (defn toggle-edit-mode 
   "Toggle edit mode" 
@@ -284,17 +293,7 @@
 (defn get-user-sites 
   "Get all the site data for a given user" 
   [uid chan]
-  (let [db (js/firebase.database)
-        data-ref (.ref db (str "users/" uid))]
-    (->
-      data-ref
-      (.once "value")
-      (.then (fn [snapshot]
-               (let [remote-map (fb/firebase-empty->clj-empty
-                                  (js->clj (.val snapshot) :keywordize-keys true))]
-                 (put! 
-                   chan 
-                   (:sites remote-map))))))))
+  (fb/firebase-get (str "users/" uid "/sites") chan))
 
 (s/fdef user-site-index 
   :args (s/cat :uid ::authed-uid-raw :site-name string? :chan ::channel)
@@ -302,11 +301,11 @@
 
 (defn user-site-index 
   "Get the index of a user's site" 
-  [uid site-name out] 
+  [uid site-id] 
   (let [c (chan)]
     (go 
       (get-user-sites uid c) 
-      (put! out (u/index-of-key-val (<! c) :site-id site-name)))))
+      (u/index-of-key-val (<! c) :site-id site-id))))
 
 (defn screenshot-data-uri 
   "Take a screenshot using html2canvas and returns a data uri string." 
@@ -321,36 +320,35 @@
         :args (s/or 
                 :empty empty? 
                 :three-args (s/cat :uid ::authed-uid-raw 
-                                   :data any? 
+                                   :data ::renderable 
                                    :idx-or-name (s/or :idx int? :site-name string?))))
 
 (defn save-site-data 
-  "Save a user's site data by site name or index" 
+  "Save a user's site data by site name or index. Saves to site meta only updating route-map and screenshot." 
   ([]
    (go 
      (let [c (chan)
            _ (screenshot-data-uri c)
-           {:keys [site-name] :as all-data} @(all-data)]
-       (save-site-data 
+           {:keys [site-name site-id-vec] :as all-data} @(all-data)]
+       (println "site-name: " site-name)
+       (println "site-id-vec " (first site-id-vec))
+       #_(save-site-data 
          (first @(uid)) 
          {:screenshot (<! c) 
-          :data all-data}
+          :route-widget all-data}
          (first site-name)))))
 
   ([uid data idx-or-site-name]
+   (println "idx or site name: " idx-or-site-name)
    (if 
      (int? idx-or-site-name)
-     (->
-       (js/firebase.database)
-       (.ref (str "users/" uid "/sites/" idx-or-site-name))
-       (.update (clj->js data)))
+     (fb/fb-update (str "users/" uid "/sites/" idx-or-site-name) data)
      (let [c (chan)
-           _ (user-site-index uid idx-or-site-name c)]
-       (go
-         (->
-           (js/firebase.database)
-           (.ref (str "users/" uid "/sites/" (<! c)))
-           (.update (clj->js data))))))))
+           _ (user-site-index uid idx-or-site-name c)
+           route (str "users/" uid "/sites/" (<! c))]
+       (println "route: " route)
+       (fb/fb-update route data)
+       ))))
 
 (s/fdef user-site-count 
   :args (s/cat :uid ::authed-uid-raw :chan ::channel)
@@ -429,7 +427,8 @@
       (apply nangpress-data->renderable nangpress-data current-user)
       (nangpress-data->renderable nangpress-data))
     :route-widget 
-    (:route-widget site-meta)))
+    (:route-widget site-meta)
+    :site-id-vec [(:site-id site-meta)]))
 
 (s/fdef renderable-site->full-monolith
         :args (s/cat :renderable-stie any? :nangpress-system-data (s/? any?)))
