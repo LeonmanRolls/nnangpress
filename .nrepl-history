@@ -1,17 +1,3 @@
-(defn clj-empty->firebase-empty 
-  "Goiing from firebase representation of empty vector to a clj empty vector" 
-  [data]
-  (wlk/postwalk 
-    (fn [x]   
-      (if 
-        (and 
-          (vector? x) 
-          (empty? x)) 
-        [000] 
-        x)) 
-    data))
-(defn firebase-empty->clj-empty 
-  "Goiing from firebase representation of empty vector to a clj empty vector" 
   [data]
   (wlk/postwalk 
     (fn [x]   
@@ -498,3 +484,17 @@ l
   (-> (new-route-widget) :logo-data :logo-text)
   (= 1 (-> (new-route-widget) :logo-data :logo-text :widget-uid))
 l
+(ns nnangpress.firebase
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require 
+    [clojure.walk :as wlk]
+    [cljs.core.async :refer [put! chan <!]]))
+(fb-copy
+    "/nangpress-data/all-widgets-data/11"
+    "/nangpress-data/all-widgets-data/3")
+(fb-copy
+    "/nangpress-data/all-widgets-data/10"
+    "/nangpress-data/all-widgets-data/6")
+(fb-copy
+    "/nangpress-data/all-widgets-data/9"
+    "/nangpress-data/all-widgets-data/7")

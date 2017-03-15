@@ -11,6 +11,7 @@
     om/IRenderState
     (render-state [_ {:keys [label] :as state}]
       (let [ref-id (u/uid)]
+        (println "remove-element: " data)
         (dom/div #js {:style #js {:marginTop "20px"}
                       :className "edit"}
                  (str label ": ")

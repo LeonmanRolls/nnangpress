@@ -133,13 +133,8 @@
     "/nangpress-data/admin-route-widgets/userhome/routes-map/route-name-editable")
 
   (fb-copy
-    "/nangpress-data/admin-route-widgets/homepage/routes-map/logo-data"
-    "/nangpress-data/admin-route-widgets/homepage/logo-data")
-
-  (fb-write 
-   "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/route-widget/" 
-    (nnangpress.monolith/new-route-widget)
-    )
+    "/nangpress-data/all-widgets-data/9"
+    "/nangpress-data/all-widgets-data/7")
 
   )
 

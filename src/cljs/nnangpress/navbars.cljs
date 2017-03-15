@@ -194,8 +194,6 @@
                (dom/div #js {:className "nav-menu"
                              :style (clj->js (merge (when advertise? {:position "relative"}) nav-style))}
 
-                        (prn "logo-data: " logo-data)
-
                         (om/build nav-menu-logo logo-data)
                         (om/build nav-menu routes-map))))))
 

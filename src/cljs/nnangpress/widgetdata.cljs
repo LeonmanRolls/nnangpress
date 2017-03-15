@@ -26,7 +26,7 @@
   [_]
   {:widget-uid 001
    :object-id (u/uid)
-   :widget-name "Standard text widget"
+   :widget-name "Simple text"
    :inner-html ["<p>Change me</p>"]})
 
 (defmethod widget-data 2 [_]
@@ -40,7 +40,7 @@
 (defmethod widget-data 003 [_]
   {:widget-uid 003
    :object-id (u/uid)
-   :widget-name "Standard text widget"
+   :widget-name "Bordered text"
    :inner-html ["<p> Hi there </p>"]})
 
 (defmethod widget-data 004 [_]

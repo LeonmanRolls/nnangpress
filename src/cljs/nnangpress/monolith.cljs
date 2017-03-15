@@ -318,7 +318,7 @@
         :args (s/or 
                 :empty empty? 
                 :three-args (s/cat :uid ::authed-uid-raw 
-                                   :data (s/keys :req-un [::screenshot ::route-widget]) 
+                                   :data (s/or :new-site ::site-with-meta :update-site (s/keys :req-un [::screenshot ::route-widget])) 
                                    :idx-or-name (s/or :idx int? :site-name string?))))
 
 (defn save-site-data 
@@ -330,7 +330,8 @@
            {:keys [site-name site-id-vec route-widget] :as all-data} @(all-data)]
        (save-site-data 
          (first @(uid)) 
-         {:screenshot (<! c) :route-widget route-widget}
+         {:screenshot (<! c) 
+          :route-widget route-widget}
          (first site-id-vec)))))
 
   ([uid data idx-or-site-name]
@@ -361,15 +362,13 @@
           c2 (chan)
           _ (user-site-count (first @uid) c)
           _ (screenshot-data-uri c2)
-          data (all-data)
-          site-name (str (first (:site-name @data)) "-" (u/uid 4)) ]
+          {:keys [site-id route-widget]} @(all-data)]
       (save-site-data 
         (first @uid) 
-        {:name (wd/widget-data 1)
-         :site-id site-name
-         :description (wd/widget-data 1) 
-         :screenshot (<! c2)
-         :data (update @data :site-name (fn [x] [site-name]))}
+        (assoc 
+          (new-site-template) 
+          :route-widget route-widget
+          :screenshot (<! c2))
         (<! c)))))
 
 (defn ref-vec-swap 
@@ -435,22 +434,24 @@
   ([renderable-site nangpress-system-data] 
    (merge nangpress-system-data renderable-site)))
 
+(s/fdef set-bg-img!
+        :args (s/cat :bg-img string?))
+
 (defn set-bg-img! 
   "Set background colour or image." 
   [bg-img]
   (cond
-    (u/string-contains? bg-img "#")
-    (do
-      (set! (-> js/document .-body .-background) "")
-      (set!
-        (-> js/document .-body .-style .-backgroundColor)
-        bg-img))
-    (u/string-contains? bg-img "linear")
-    (set! (-> js/document .-body .-background) bg-img)
-    :file
-    (set!
-      (-> js/document .-body .-background)
-      bg-img)))
+    (u/string-contains? bg-img "#") (do
+                                      (set! (-> js/document .-body .-background) "")
+                                      (set!
+                                        (-> js/document .-body .-style .-backgroundColor)
+                                        bg-img))
+
+    (u/string-contains? bg-img "linear") (set! (-> js/document .-body .-background) bg-img)
+
+    :file (set!
+            (-> js/document .-body .-background)
+            bg-img)))
 
 (defn set-bg-grey! 
   "If they current route desires a grey background, then make it so, if not, remove the css class." 
@@ -470,8 +471,9 @@
         routes-map (om/observe owner (routes-map))
         {:keys [bg-img grey-bg?]}  (current-route-map (clojure.string/split (first @current-route) #"/") @routes-map)]
 
-    (set-bg-img! bg-img)
-    (set-bg-grey! grey-bg?)))
+    (when bg-img
+      (set-bg-img! bg-img)
+      (set-bg-grey! grey-bg?))))
 
 (defn ref-vec-map-delete!
   "Givec a cursor vector, remove an element based on the val of a map in the vector" 

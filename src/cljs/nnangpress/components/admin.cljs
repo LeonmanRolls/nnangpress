@@ -27,8 +27,8 @@
             site? (= "site" (:site-state @all-data-obs))]
         (dom/div #js {:className "admin-toolbar"}
                  (dom/b nil "Welcome to Nnangpress alpha | ")
-                 (dom/b nil (str " Username:  " (first @user-email-obs)))
-                 (dom/b nil (str " | Site name:  " (first @site-name-obs) " | " ))
+                 (dom/b nil (str " Username:  " (first @user-email-obs) " | "))
+                 #_(dom/b nil (str " | Site name:  " (first @site-name-obs) " | " ))
                  (when site? (cc/standard-button #(om/transact! sidebar-data :sidebar-visible u/toggle) "Menu"))
                  (when site? (cc/standard-button #(mn/auth-state-load-site! master "super-container") "Home"))
                  (when site? (cc/standard-button mn/toggle-edit-mode "Toggle edit mode"))
@@ -64,7 +64,6 @@
                (cc/edit-mode-sense 
                  owner
                  (cc/delete-button  (mn/current-widgets-builder<< owner) :object-id object-id))
-               (println "data: " (keys data))
                (om/build wgt/widget data)))))
 
 (defn simple-form 
