@@ -27,6 +27,10 @@
 (deftest new-route-widget []
   (is (s/valid? ::mn/route-widget (mn/new-route-widget))))
 
+;For correct functioning of logo-text editability.
+(deftest new-route-widget-logo-widget []
+  (is (= 1 (-> (mn/new-route-widget) :logo-data :logo-text :widget-uid))))
+
 (deftest get-user-sites []
   (async done
          (go 

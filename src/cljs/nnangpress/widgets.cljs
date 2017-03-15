@@ -785,8 +785,8 @@
   [data parent-cursor routes-map]
   (fn [event element]
     (let [uuid (-> event .-srcElement .-id)]
-      (.dir js/console event)
       (do 
+        (println "route-modifier: " (.-innerHTML (gdom/getElement uuid)))
         (om/update!
           parent-cursor 
           :route-name

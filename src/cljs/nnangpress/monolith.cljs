@@ -17,16 +17,13 @@
 
 ;#Primitives
 
-;Cursors
-(s/def ::map-cursor #(= (type %) om/MapCursor))
-(s/def ::indexed-cursor #(= (type %) om/IndexedCursor))
-
 (s/def ::all-widgets-data vector?)
 (s/def ::current-route vector?)
 (s/def ::edit-mode vector?)
-(s/def ::logo-text vector?)
+(s/def ::logo-text ::wd/widget-data-1)
+(s/def ::logo-style map?)
 (s/def ::admin-route-widgets map?)
-(s/def ::email (s/or :non-cursor vector? :cursor ::indexed-cursor))
+(s/def ::email (s/or :non-cursor vector? :cursor ::spcs/indexed-cursor))
 (s/def ::site-name vector?)
 (s/def ::site-state string?)
 (s/def ::uid vector?)
@@ -36,7 +33,6 @@
 
 (s/def ::channel #(= (type %) cljs.core.async.impl.channels/ManyToManyChannel))
 
-
 ;Site meta-data, primarily for displaying a user's sites to the user.
 (s/def ::name ::spcs/basic-mediumjs-wgt)
 (s/def ::description ::spcs/basic-mediumjs-wgt)
@@ -45,6 +41,8 @@
 (s/def ::screenshot string?)
 
 ;#Compounds
+
+(s/def ::logo-data (s/keys :req-un [::logo-text ::logo-style]))
 
 ;Unfortunately simple name. Data for a renderable site. Should be merged with system data to make a fully renderable 
 ;data structure.
@@ -92,15 +90,15 @@
   []
   {:logo-data {:logo-style {:fontSize "200%"
                             :textTransform "inherit"}
-               :logo-text (wd/widget-data 16)}
+               :logo-text (wd/widget-data 1)}
    :main-view-style {:style {:dispaly "inherit"
                              :paddingLeft "170px"
                              :paddingRight "170px"}} 
    :nav-style {:backgroundColor "#CE4072"}
    :route-widget-id 0
-   :routes-map {:bg-img "http://www.wallpapersbyte.com/wp-content/uploads/2015/07/Lollipops-Candy-Frosting-Sprinkling-Colorful-Yeloow-Pink-Blue-WallpapersByte-com-3840x2160.jpg"
-                :children [{:bg-img "http://www.wallpapersbyte.com/wp-content/uploads/2015/07/Lollipops-Candy-Frosting-Sprinkling-Colorful-Yeloow-Pink-Blue-WallpapersByte-com-3840x2160.jpg"
-                            :children [{:bg-img "http://www.wallpapersbyte.com/wp-content/uploads/2015/07/Lollipops-Candy-Frosting-Sprinkling-Colorful-Yeloow-Pink-Blue-WallpapersByte-com-3840x2160.jpg"
+   :routes-map {:bg-img "http://i.imgur.com/vRVh0IX.jpg"
+                :children [{:bg-img "http://i.imgur.com/vRVh0IX.jpg"
+                            :children [{:bg-img "http://i.imgur.com/vRVh0IX.jpg"
                                         :children []
                                         :grey-bg? true
                                         :nav-hint ["Architects"]
@@ -127,7 +125,7 @@
   {:name (wd/widget-data 1)
    :description (wd/widget-data 1)
    :site-id (u/uid)
-   :screenshot "http://placekitten.com/500/400" 
+   :screenshot "http://i.imgur.com/ZV4TMBp.png" 
    :route-widget (new-route-widget)})
 
 (defn current-route-map 
@@ -296,7 +294,7 @@
   (fb/firebase-get (str "users/" uid "/sites") chan))
 
 (s/fdef user-site-index 
-  :args (s/cat :uid ::authed-uid-raw :site-name string? :chan ::channel)
+  :args (s/cat :uid ::authed-uid-raw :site-name string?)
   :ret ::channel)
 
 (defn user-site-index 
@@ -320,7 +318,7 @@
         :args (s/or 
                 :empty empty? 
                 :three-args (s/cat :uid ::authed-uid-raw 
-                                   :data ::renderable 
+                                   :data (s/keys :req-un [::screenshot ::route-widget]) 
                                    :idx-or-name (s/or :idx int? :site-name string?))))
 
 (defn save-site-data 
@@ -329,26 +327,18 @@
    (go 
      (let [c (chan)
            _ (screenshot-data-uri c)
-           {:keys [site-name site-id-vec] :as all-data} @(all-data)]
-       (println "site-name: " site-name)
-       (println "site-id-vec " (first site-id-vec))
-       #_(save-site-data 
+           {:keys [site-name site-id-vec route-widget] :as all-data} @(all-data)]
+       (save-site-data 
          (first @(uid)) 
-         {:screenshot (<! c) 
-          :route-widget all-data}
-         (first site-name)))))
+         {:screenshot (<! c) :route-widget route-widget}
+         (first site-id-vec)))))
 
   ([uid data idx-or-site-name]
-   (println "idx or site name: " idx-or-site-name)
-   (if 
-     (int? idx-or-site-name)
-     (fb/fb-update (str "users/" uid "/sites/" idx-or-site-name) data)
-     (let [c (chan)
-           _ (user-site-index uid idx-or-site-name c)
-           route (str "users/" uid "/sites/" (<! c))]
-       (println "route: " route)
-       (fb/fb-update route data)
-       ))))
+   (go 
+     (if 
+       (int? idx-or-site-name)
+       (fb/fb-update (str "users/" uid "/sites/" idx-or-site-name) data)
+       (fb/fb-update (str "users/" uid "/sites/" (<! (user-site-index uid idx-or-site-name))) data)))))
 
 (s/fdef user-site-count 
   :args (s/cat :uid ::authed-uid-raw :chan ::channel)

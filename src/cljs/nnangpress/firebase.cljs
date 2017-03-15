@@ -135,5 +135,11 @@
   (fb-copy
     "/nangpress-data/admin-route-widgets/homepage/routes-map/logo-data"
     "/nangpress-data/admin-route-widgets/homepage/logo-data")
+
+  (fb-write 
+   "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/route-widget/" 
+    (nnangpress.monolith/new-route-widget)
+    )
+
   )
 

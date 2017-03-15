@@ -1,7 +1,18 @@
 (ns nnangpress.widgetdata
   (:require 
     [om.dom :as dom :include-macros true]
+    [cljs.spec :as s]
+    [nnangpress.specs :as spcs]
     [nnangpress.utils :as u]))
+
+(s/def ::inner-html (s/or :non-cursor vector? :cursor ::spcs/indexed-cursor))
+(s/def ::widget-uid int?)
+(s/def ::widget-name string?)
+(s/def ::object-id string?)
+
+(s/def ::widget-data-1 (s/keys :req-un [::inner-html ::widget-uid ::widget-name ::object-id]))
+
+(s/def ::widget-data-16 (s/keys :req-un [::inner-html ::widget-uid ::widget-name ::object-id]))
 
 (defmulti widget-data 
   "Data for widget components." 
@@ -16,7 +27,7 @@
   {:widget-uid 001
    :object-id (u/uid)
    :widget-name "Standard text widget"
-   :inner-html [(str "<p>" (u/uid) "</p>" )]})
+   :inner-html ["<p>Change me</p>"]})
 
 (defmethod widget-data 2 [_]
   {:widget-uid 2
@@ -146,5 +157,5 @@
   {:widget-uid 16
    :object-id (u/uid)
    :widget-name "Standard text widget"
-   :inner-html [(str "<p>Route Name</p>" )]})
+   :inner-html ["Route Name"]})
 

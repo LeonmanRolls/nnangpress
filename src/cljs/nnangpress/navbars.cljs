@@ -43,45 +43,7 @@
                  (when (first @edit-mode-obs) "Choose a navbar to add routing."))))))
 
 (defmethod navbar-data 1 [_]
-  {:route-widget-id 1
-   :main-view-style {:style {:paddingLeft "320px"}}
-   :routes-map {:route-name "/"
-                :bg-img "home_page.jpg"
-                :nav-hint ["Architects"]
-                :nav-hint-style {:color "black"}
-                :widgets [{:widget-uid 001
-                           :object-id "a"
-                           :widget-name "Standard text widget"
-                           :inner-html ["<p> Hi there lol</p>"]}]
-                :children [{:route-name "/for-you"
-                            :bg-img "home_page.jpg"
-                            :grey-bg? true
-                            :nav-hint ["For you"]
-                            :nav-hint-style {:color "white"}
-                            :widgets []
-                            :children [{:route-name "/all-projects"
-                                        :bg-img "#333"
-                                        :nav-hint ["All Projects"]
-                                        :nav-hint-style {:color "white"}
-                                        :widgets [{:widget-uid 001
-                                                   :object-id "b"
-                                                   :widget-name "Standard text widget"
-                                                   :inner-html ["<p> Hi there </p>"]}
-                                                  {:widget-uid 007
-                                                   :object-id "c"
-                                                   :widget-name "Grid"
-                                                   :imgs [{:id "entry-1"
-                                                           :className "mega-entry"
-                                                           :data-src "http://solariarchitects.com/img/teampics/jsolari_everyday.jpg"
-                                                           :data-width "320"
-                                                           :data-height "400"}
-                                                          {:id "entry-1-1"
-                                                           :className "mega-entry"
-                                                           :title "WE HAVE A LAUGH"
-                                                           :text "Cue James in a bald cap, need I say more?"
-                                                           :data-width "320"
-                                                           :data-height "400"}]}]
-                                        :children []}]}]}})
+  (mn/new-route-widget))
 
 (defn basic-route []
   {:route-name (str "/parent" (subs (u/uid) 0 3))
@@ -114,6 +76,9 @@
         (dom/div #js {:className "nav-hint-outer"}
                  (dom/div #js {:className "nav-hint-inner"}
                           "nav hint"))))))
+
+(s/fdef nav-menu-logo
+        :args (s/cat :data ::mn/logo-data :owner any?))
 
 (defn nav-menu-logo
   [{:keys [logo-text logo-style] :as data} owner]

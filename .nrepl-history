@@ -1,124 +1,3 @@
-(s/valid? ::renderable (site-meta->renderable 
-                           nnangpress.testdata/nangpress-data 
-                           (mn/new-site-template) 1))
-(s/valid? ::renderable (site-meta->renderable 
-                           nnangpress.testdata/nangpress-data 
-                           (new-site-template) 1))
-(s/explain ::renderable (site-meta->renderable 
-                           nnangpress.testdata/nangpress-data 
-                           (new-site-template) 1))
-l
-(s/explain ::renderable (site-meta->renderable 
-                           nnangpress.testdata/nangpress-data 
-                           (new-site-template) 1))
-  (s/valid? ::children [])
-(s/def ::children (s/cat (s/* ::route-map)))
-(s/def ::children (s/cat (s/* :route-map ::route-map)))
-(s/def ::children (s/cat :route-map (s/* ::route-map)))
-  (s/valid? ::children [])
-(clj->js [])
-(fb-write 
-    "test" 
-    (clj->js []) 
-    )
-(ns nnangpress.firebase
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require 
-    [clojure.walk :as wlk]
-    [cljs.core.async :refer [put! chan <!]]))
-(fb-write 
-    "test" 
-    (clj->js []) 
-    )
-(fb-write 
-    "test" 
-    (clj->js [000]) 
-    )
-(fb-write 
-    "test" 
-    (clj->js []) 
-    )
-l
-(+ 2 3)
-(def firebase-empty-test
-    {:data "hi"
-     :another "there"
-     :children [{:data "hi"
-                 :another "there"
-                 :children []}
-                {:data "hi"
-                 :another "there"
-                 :children [{:data "hi"
-                             :another "there"
-                             :children []}
-                            {:data "hi"
-                             :another "there"
-                             :children []}]}]})
-(map 
-    (fn [x]
-     (println x) 
-      ) 
-    firebase-empty-test)
-(def firebase-empty-test
-    {:data "hi"
-     :another "there"
-     :children [{:data "hi"
-                 :another "there"
-                 :children []}
-                {:data "hi"
-                 :another "there"
-                 :children [{:data "hi"
-                             :another "there"
-                             :children []}
-                            {:data "hi"
-                             :another "there"
-                             :children []}]}]})
-(map 
-    (fn [x]
-     (println x) 
-      ) 
-    firebase-empty-test)
-(map 
-    (fn [x]
-     (println x) 
-      x
-      ) 
-    firebase-empty-test)
-(map 
-    (fn [x]
-     (println x) 
-      x
-      ) 
-    firebase-empty-test)
-(defn firebase-empty->clj-empty 
-  "Goiing from firebase representation of empty vector to a clj empty vector" 
-  [data]
-  (wlk/postwalk 
-    (fn [x]   
-      (if 
-        (and 
-          (vector? x) 
-          (= 1 (count x)) 
-          (= 000 (first x))) 
-        [] 
-        x)) 
-    data))
-(def firebase-empty-test
-    {:data "hi"
-     :another "there"
-     :children [{:data "hi"
-                 :another "there"
-                 :children [000]}
-                {:data "hi"
-                 :another "there"
-                 :children [{:data "hi"
-                             :another "there"
-                             :children [000]}
-                            {:data "hi"
-                             :another "there"
-                             :children [000]}]}]})
-(firebase-empty->clj-empty 
-    firebase-empty-test)
 (defn clj-empty->firebase-empty 
   "Goiing from firebase representation of empty vector to a clj empty vector" 
   [data]
@@ -498,3 +377,124 @@ l
     (= (first (:site-id-vec cache)) (:site-id new-site))
     
     )
+(ns nnangpress.firebase
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require 
+    [clojure.walk :as wlk]
+    [cljs.core.async :refer [put! chan <!]]))
+(fb-write 
+   "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/route-widget/" 
+    (mn/new-route-widget)
+    )
+(fb-write 
+   "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/route-widget/" 
+    (nnangpress.monolith/new-route-widget)
+    )
+any?
+(any?)
+l
+(ns nnangpress.widgetdata
+  (:require 
+    [om.dom :as dom :include-macros true]
+    [nnangpress.utils :as u]))
+ (widget-data 16) 
+(ns nnangpress.widgetdata
+  (:require 
+    [om.dom :as dom :include-macros true]
+    [nnangpress.utils :as u]))
+ (widget-data 16) 
+(defmethod widget-data 16  
+  [_]
+  {:widget-uid 16
+   :object-id (u/uid)
+   :widget-name "Standard text widget"
+   :inner-html ["Route Name"]})
+ (widget-data 16) 
+(s/def ::inner-html (s/and vector? #(clojure.string/includes? (first %) "<")))
+(ns nnangpress.widgetdata
+  (:require 
+    [om.dom :as dom :include-macros true]
+    [cljs.spec :as s]
+    [nnangpress.utils :as u]))
+(s/def ::inner-html (s/and vector? #(clojure.string/includes? (first %) "<")))
+  (s/valid? ::inner-html "bla")
+  (s/valid? ::inner-html ["bla"])
+(s/def ::inner-html (s/and vector? #(not (clojure.string/includes? (first %) "<"))))
+  (s/valid? ::inner-html ["bla"])
+  (s/valid? ::inner-html ["<bla"])
+(u/uid)
+  (s/def ::widget-data-16 (s/keys :req-un [::inner-html ::widget-uid ::widget-name ::uid]))
+  (s/valid? ::widget-data-16 (widget-data 16))
+  (s/explain ::widget-data-16 (widget-data 16))
+  (s/def ::widget-data-16 (s/keys :req-un [::inner-html ::widget-uid ::widget-name ::uid]))
+  (s/valid? ::widget-data-16 (widget-data 16))
+  (s/explain ::widget-data-16 (widget-data 16))
+(widget-data 16)
+  (s/def ::object-id string?)
+  (s/def ::widget-data-16 (s/keys :req-un [::inner-html ::widget-uid ::widget-name ::object-id]))
+  (s/valid? ::widget-data-16 (widget-data 16))
+ll
+l
+ (s/valid? ::route-widget (new-route-widget)) 
+(ns nnangpress.monolith
+  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [nnangpress.utils :as u]
+            [nnangpress.dom :as ndom]
+            [nnangpress.specs :as spcs]
+            [nnangpress.widgetdata :as wd]
+            [clojure.zip :as z]
+            [clojure.spec :as s]
+            [clojure.walk :as wlk]
+            [cljs.core.async :refer [put! chan <!]]
+            [nnangpress.firebase :as fb]))
+(s/valid? ::route-widget (new-route-widget))
+ (s/valid? ::route-widget (new-route-widget)) 
+(ns nnangpress.monolith
+  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [nnangpress.utils :as u]
+            [nnangpress.dom :as ndom]
+            [nnangpress.specs :as spcs]
+            [nnangpress.widgetdata :as wd]
+            [clojure.zip :as z]
+            [clojure.spec :as s]
+            [clojure.walk :as wlk]
+            [cljs.core.async :refer [put! chan <!]]
+            [nnangpress.firebase :as fb]))
+ (s/valid? ::route-widget (new-route-widget)) 
+(s/def ::route-widget (s/keys :req-un [::logo-data ::main-view-style ::nav-style ::route-widget-id ::routes-map]))
+(s/def ::logo-data (s/keys :req-un [::logo-text ::logo-style]))
+ (s/valid? ::route-widget (new-route-widget)) 
+ (s/explain ::route-widget (new-route-widget)) 
+(s/def ::logo-text ::wd/widget-data-1)
+(ns nnangpress.widgetdata
+  (:require 
+    [om.dom :as dom :include-macros true]
+    [cljs.spec :as s]
+    [nnangpress.utils :as u]))
+(s/def ::widget-data-1 (s/keys :req-un [::inner-html ::widget-uid-1 ::widget-name ::object-id]))
+(ns nnangpress.monolith
+  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [nnangpress.utils :as u]
+            [nnangpress.dom :as ndom]
+            [nnangpress.specs :as spcs]
+            [nnangpress.widgetdata :as wd]
+            [clojure.zip :as z]
+            [clojure.spec :as s]
+            [clojure.walk :as wlk]
+            [cljs.core.async :refer [put! chan <!]]
+            [nnangpress.firebase :as fb]))
+(s/def ::logo-text ::wd/widget-data-1)
+ (s/explain ::route-widget (new-route-widget)) 
+  (-> (new-route-widget) :logo-text)
+  (-> (new-route-widget) :logo-data :logo-text)
+  (= 1 (-> (new-route-widget) :logo-data :logo-text :widget-uid))
+l
