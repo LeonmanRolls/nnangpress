@@ -136,5 +136,9 @@
     "/nangpress-data/all-widgets-data/9"
     "/nangpress-data/all-widgets-data/7")
 
+  (fb-write
+    "/nangpress-data/all-widgets-data/9"
+   (nnangpress.widgetdata/widget-data 17) )
+
   )
 

@@ -548,3 +548,8 @@
     (str "users/" uid  "/sites")
     user-sites))
 
+(defn toggle-menu 
+  "" 
+  []
+  (om/transact! (sidebar-data) :sidebar-visible u/toggle))
+

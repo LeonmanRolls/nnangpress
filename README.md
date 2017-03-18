@@ -28,6 +28,7 @@ philosophy of the language it is written in.
 
 ## Deploy
 - boot production build target
+- firebase deploy
 
 #Application architecture
 

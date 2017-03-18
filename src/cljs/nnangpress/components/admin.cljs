@@ -15,6 +15,32 @@
 
 (declare master)
 
+
+;Sign in
+(defmethod wgt/widget 9 [{:keys [style]} owner]
+  (reify
+    om/IInitState
+    (init-state [_]
+      {:advertise? false
+       :local-style {:display ""}})
+
+    om/IRenderState
+    (render-state [_ {:keys [local-style]}]
+      (let [all-data (om/observe owner (mn/all-data))]
+
+        (dom/div #js {:style #js {:textAlign "center"}}
+                 (dom/div #js {:id "firebase"} "")
+                 (dom/button
+                   #js {:id "firebase-button"
+                        :style (clj->js (merge style local-style))
+                        :onClick (fn [_] 
+                                   (mn/update-local-style! owner :display "none")
+                                   (fb/fb-initiate-auth 
+                                     "firebase"
+                                     (fn [user]
+                                       (mn/auth-state-load-site! master "super-container"))))}
+                   "Sign up / Sign in"))))))
+
 (defn admin-toolbar 
   "Toolbar to aid in editing the site and provide information. Should not be visible when ordinarily visting the site." 
   [{:keys [sidebar-data]} owner]
@@ -29,7 +55,7 @@
                  (dom/b nil "Welcome to Nnangpress alpha | ")
                  (dom/b nil (str " Username:  " (first @user-email-obs) " | "))
                  #_(dom/b nil (str " | Site name:  " (first @site-name-obs) " | " ))
-                 (when site? (cc/standard-button #(om/transact! sidebar-data :sidebar-visible u/toggle) "Menu"))
+                 (when site? (cc/standard-button mn/toggle-menu "Menu"))
                  (when site? (cc/standard-button #(mn/auth-state-load-site! master "super-container") "Home"))
                  (when site? (cc/standard-button mn/toggle-edit-mode "Toggle edit mode"))
                  (when site? (cc/standard-button mn/new-site "Save new site"))

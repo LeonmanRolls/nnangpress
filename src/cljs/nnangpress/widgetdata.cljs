@@ -159,3 +159,15 @@
    :widget-name "Standard text widget"
    :inner-html ["Route Name"]})
 
+(defmethod widget-data 17  
+  [_]
+  {:widget-uid 17
+   :object-id (u/uid)
+   :widget-name "Some widget"})
+
+(defmethod widget-data 18  
+  [_]
+  {:widget-uid 18
+   :object-id (u/uid)
+   :widget-name "Edit this site!"})
+

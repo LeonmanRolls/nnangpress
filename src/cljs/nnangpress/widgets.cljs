@@ -21,7 +21,7 @@
     [cljs.spec :as s]
     [clojure.set :as st]))
 
-(declare widget-data-type master admin-sidebar main-view)
+(declare widget-data-type admin-sidebar main-view)
 
 (s/def ::imgs vector?)
 (s/def ::text vector?)
@@ -468,31 +468,6 @@
 (defmethod widget-data-type 9 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name]))
 
-;Sign in
-(defmethod widget 9 [{:keys [style]} owner]
-  (reify
-    om/IInitState
-    (init-state [_]
-      {:advertise? false
-       :local-style {:display ""}})
-
-    om/IRenderState
-    (render-state [_ {:keys [local-style]}]
-      (let [all-data (om/observe owner (mn/all-data))]
-
-        (dom/div #js {:style #js {:textAlign "center"}}
-                 (dom/div #js {:id "firebase"} "")
-                 (dom/button
-                   #js {:id "firebase-button"
-                        :style (clj->js (merge style local-style))
-                        :onClick (fn [_] 
-                                   (mn/update-local-style! owner :display "none")
-                                   (fb/fb-initiate-auth 
-                                     "firebase"
-                                     (fn [user]
-                                       (mn/auth-state-load-site! master "super-container"))))}
-                   "Sign up / Sign in"))))))
-
 (defmethod widget-data-type 10 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::user-sites]))
 
@@ -733,9 +708,11 @@
   "Given a youtube video url, return embedable string" 
   [youtube-video-id]
   (str 
-    "<iframe id=\"ytplayer\" type=\"text/html\" width=\"100%\" height=\"360\" src=\"https://www.youtube.com/embed/" 
+    "<iframe id=\"ytplayer\" type=\"text/html\" width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/" 
     youtube-video-id  
-    "?autoplay=0\" frameborder=\"0\"></iframe>"))
+    "?autoplay=1&mute=1&loop=1&playlist=" 
+    youtube-video-id  
+    "\" frameborder=\"0\" allowfullscreen=\"allowfullscreen\" volume=\"0\"></iframe>"))
 
 ;Youtube embed
 (defmethod widget 14 [{:keys [youtube-video-id] :as data} owner]
@@ -786,7 +763,6 @@
   (fn [event element]
     (let [uuid (-> event .-srcElement .-id)]
       (do 
-        (println "route-modifier: " (.-innerHTML (gdom/getElement uuid)))
         (om/update!
           parent-cursor 
           :route-name
@@ -873,4 +849,102 @@
                (om/build rich-text-edit-rt (:inner-html data) {:state {:edit false 
                                                                        :parent-cursor parent-cursor 
                                                                        :routes-map routes-map}})))))
+
+(defmethod widget 17  
+  [data owner]
+  (reify
+    om/IDidMount
+    (did-mount [_]
+      (FB.XFBML.parse))
+
+    om/IDidUpdate
+    (did-update [_ _ _]
+      (FB.XFBML.parse))
+
+
+    om/IRender
+    (render[_]
+      (dom/div nil 
+               (dom/div #js {:className "box-paragraph"
+                             :style #js {:textAlign "center" :fontSize "1.5em" :fontWeight "900"}} 
+                        "I'm a mostly functional programmer who mostly makes web apps with Clojure and Clojurescript.")        
+
+               (dom/div #js {:className "box-paragraph"
+                             :style #js {:textAlign "center" :fontSize "1.5em" :fontWeight "900" :padding "0px"}} 
+
+                        (dom/p #js {:style #js {:textDecoration "" :marginBottom "20px" :fontSize "0.8em" 
+                                                :fontWeight "500"}} 
+                               "This site itself is part of my portfolio. It was built using a single page application 
+                               that makes single page applications, called Nangpress. The basic idea is that you can 
+                               make and edit sites as you might with the browser dev tools, except graphically. It's 
+                               also open source!")
+
+                        (dom/div #js {:className "aspect-ratio"
+                                      :style #js {:marginTop "-10px" :textAlign "center"}
+                                      :dangerouslySetInnerHTML #js {:__html (youtube-string-gen "Yd5RGZXdSUs")}})
+
+                        )
+
+               (dom/div #js {:className "box-paragraph"
+                             :style #js {:textAlign "center" :fontSize "1.5em" :fontWeight "900"}} 
+
+                        (dom/p #js {:style #js {:textDecoration "" :margin "-10px" :fontSize "1em" 
+                                                :fontWeight "900"}} 
+                               "Most commercially sucessful app")
+
+                        (dom/p #js {:style #js {:textDecoration "" :marginBottom "20px" :fontSize "0.8em" 
+                                             :fontWeight "500"}}
+                               "The game bonus collector. At its peak had 150,000 daily active users. Long story 
+                               short Facebook wanted to start putting ads into the newsfeed and that killed the app. 
+                               The 450k likes remain however.")
+
+                        (dom/div nil 
+                                 (dom/div #js {:style #js {:marginTop "-10px" :textAlign "center"}
+                                               :dangerouslySetInnerHTML #js {:__html "<div class=\"fb-page\" data-href=\"https://www.facebook.com/U1stGamesOfficial/\"  data-width=\"500\" data-height=\"300\" data-small-header=\"true\" data-adapt-container-width=\"true\" data-show-posts=\"false\" data-hide-cover=\"false\" data-show-facepile=\"false\"><div class=\"fb-xfbml-parse-ignore\"><blockquote cite=\"https://www.facebook.com/U1stGamesOfficial/\"><a href=\"https://www.facebook.com/U1stGamesOfficial/\">U1st Games</a></blockquote></div></div>"}})         
+
+                                 (dom/div #js {:style #js {:marginTop "-10px" :textAlign "center"}
+                                               :dangerouslySetInnerHTML #js {:__html "<div class=\"fb-page\" data-href=\"https://www.facebook.com/GameBonusCollector/\"  data-width=\"500\" data-height=\"300\" data-small-header=\"true\" data-adapt-container-width=\"true\" data-show-posts=\"false\" data-hide-cover=\"false\" data-show-facepile=\"false\"><div class=\"fb-xfbml-parse-ignore\"><blockquote cite=\"https://www.facebook.com/U1stGamesOfficial/\"><a href=\"https://www.facebook.com/U1stGamesOfficial/\">U1st Games</a></blockquote></div></div>"}})
+                                 )
+
+
+
+                        )
+
+               (dom/div #js {:className "box-paragraph"
+                             :style #js {:textAlign "center" :fontSize "1.5em" :fontWeight "900"}} 
+
+                        (dom/p #js {:style #js {:textDecoration "" :margin "-10px" :fontSize "1em" 
+                                                :fontWeight "900"}} 
+                               "My favourite project")                       
+
+                        (dom/p #js {:style #js {:textDecoration "" :marginBottom "20px" :fontSize "0.8em" 
+                                                :fontWeight "500"}}
+                               "One of my first programming projects. I wanted to use the accelerometer in my Android 
+                               phone to make a three dimensional ruler. Got it working in one dimension before uni work 
+                               got in the way. Would love to finish it one day.")
+
+                        (dom/div #js {:className "aspect-ratio"
+                                      :style #js {:marginTop "-10px" :textAlign "center"}
+                                      :dangerouslySetInnerHTML #js {:__html (youtube-string-gen "ZRkUjjb7xYM")}})
+
+                        )
+
+               )
+      )))
+
+;Edit this site now.
+(defmethod widget 18  
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/div #js {:className "box-paragraph"
+                    :style #js {:textAlign "center" :fontSize "1.5em" :fontWeight "900" :padding "0px"}} 
+
+               (dom/p #js {:style #js {:textDecoration "" :margin "-10px" :fontSize "2em" :fontWeight "900"}} 
+                      "EDIT THIS SITE NOW!")
+
+               (dom/div #js {:style #js {:marginBottom "1em"}} 
+                        (dom/button #js {:onClick #(mn/toggle-menu), :className "button-one"} "OPEN MENU")
+                        (dom/button #js {:onClick #(mn/toggle-edit-mode), :className "button-one"} "EDIT MODE"))))))
 
