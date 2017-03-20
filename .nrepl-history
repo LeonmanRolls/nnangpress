@@ -1,118 +1,3 @@
-                 :another "there"
-                 :children [{:data "hi"
-                             :another "there"
-                             :children [000]}
-                            {:data "hi"
-                             :another "there"
-                             :children [000]}]}]})
-(firebase-empty->clj-empty 
-    firebase->clojure-empty-test)
-(clj-empty->firebase-empty 
-    clojure->firebase-empty-test)
-(def clojure->firebase-empty-test
-    {:data "hi"
-     :another "there"
-     :children [{:data "hi"
-                 :another "there"
-                 :children []}
-                {:data "hi"
-                 :another "there"
-                 :children [{:data "hi"
-                             :another "there"
-                             :children []}
-                            {:data "hi"
-                             :another "there"
-                             :children []}]}]})
-(clj-empty->firebase-empty 
-    clojure->firebase-empty-test)
-(defn firebase-empty->clj-empty 
-  "Goiing from firebase representation of empty vector to a clj empty vector" 
-  [data]
-  (wlk/postwalk 
-    (fn [x]   
-      (if 
-        (and 
-          (vector? x) 
-          (= 1 (count x)) 
-          (= "empty" (first x))) 
-        [] 
-        x)) 
-    data))
-(defn clj-empty->firebase-empty 
-  "Goiing from firebase representation of empty vector to a clj empty vector" 
-  [data]
-  (wlk/postwalk 
-    (fn [x]   
-      (if 
-        (and 
-          (vector? x) 
-          (empty? x)) 
-        ["empty"] 
-        x)) 
-    data))
-(def firebase->clojure-empty-test
-    {:data "hi"
-     :another "there"
-     :children [{:data "hi"
-                 :another "there"
-                 :children [000]}
-                {:data "hi"
-                 :another "there"
-                 :children [{:data "hi"
-                             :another "there"
-                             :children [000]}
-                            {:data "hi"
-                             :another "there"
-                             :children [000]}]}]})
-(def clojure->firebase-empty-test
-    {:data "hi"
-     :another "there"
-     :children [{:data "hi"
-                 :another "there"
-                 :children []}
-                {:data "hi"
-                 :another "there"
-                 :children [{:data "hi"
-                             :another "there"
-                             :children []}
-                            {:data "hi"
-                             :another "there"
-                             :children []}]}]})
-(firebase-empty->clj-empty 
-    firebase->clojure-empty-test)
-(def firebase->clojure-empty-test
-    {:data "hi"
-     :another "there"
-     :children [{:data "hi"
-                 :another "there"
-                 :children ["empty"]}
-                {:data "hi"
-                 :another "there"
-                 :children [{:data "hi"
-                             :another "there"
-                             :children ["empty"]}
-                            {:data "hi"
-                             :another "there"
-                             :children ["empty"]}]}]})
-(def firebase->clojure-empty-test
-    {:data "hi"
-     :another "there"
-     :children [{:data "hi"
-                 :another "there"
-                 :children ["empty"]}
-                {:data "hi"
-                 :another "there"
-                 :children [{:data "hi"
-                             :another "there"
-                             :children ["empty"]}
-                            {:data "hi"
-                             :another "there"
-                             :children ["empty"]}]}]})
-(def clojure->firebase-empty-test
-    {:data "hi"
-     :another "there"
-     :children [{:data "hi"
-                 :another "there"
                  :children []}
                 {:data "hi"
                  :another "there"
@@ -498,3 +383,118 @@ l
 (fb-write
     "/nangpress-data/all-widgets-data/10"
    (nnangpress.widgetdata/widget-data 18) )
+l
+   (or false nil)   
+   (or false false)   
+   (or false nil)   
+lklkl
+(nnangpress.widgetdata/widget-data 1)
+(ns nnangpress.firebase
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require 
+    [clojure.walk :as wlk]
+    [cljs.core.async :refer [put! chan <!]]))
+(nnangpress.widgetdata/widget-data 1)
+(ns nnangpress.widgetdata
+  (:require 
+    [om.dom :as dom :include-macros true]
+    [cljs.spec :as s]
+    [nnangpress.specs :as spcs]
+    [nnangpress.utils :as u]))
+(defmethod widget-data 001  
+  [_]
+  {:widget-uid 001
+   :object-id (u/uid)
+   :widget-name "Simple text"
+   :inner-html ["<p>Change me</p>"]
+   :style {:textAlign "center"}})
+(ns nnangpress.firebase
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require 
+    [clojure.walk :as wlk]
+    [cljs.core.async :refer [put! chan <!]]))
+(nnangpress.widgetdata/widget-data 1)
+(ns nnangpress.widgetdata
+  (:require 
+    [om.dom :as dom :include-macros true]
+    [cljs.spec :as s]
+    [nnangpress.specs :as spcs]
+    [nnangpress.utils :as u]))
+(defmethod widget-data 0  
+  [_]
+  {:widget-uid 0
+   :object-id (u/uid)
+   :widget-name "Simple text"
+   :inner-html ["<p>Change me</p>"]
+   :style {:textAlign "center"}})
+(ns nnangpress.firebase
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require 
+    [clojure.walk :as wlk]
+    [cljs.core.async :refer [put! chan <!]]))
+(nnangpress.widgetdata/widget-data 0)
+(ns nnangpress.widgetdata
+  (:require 
+    [om.dom :as dom :include-macros true]
+    [cljs.spec :as s]
+    [nnangpress.specs :as spcs]
+    [nnangpress.utils :as u]))
+(defmethod widget-data 0  
+  [_]
+  {:widget-uid 0
+   :object-id (u/uid)
+   :widget-name "Simple text"
+   :inner-html ["Change me"]
+   :style {:textAlign "center"}})
+(ns nnangpress.firebase
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require 
+    [clojure.walk :as wlk]
+    [cljs.core.async :refer [put! chan <!]]))
+(nnangpress.widgetdata/widget-data 0)
+(fb-write
+    "/nangpress-data/all-widgets-data/0"
+    (nnangpress.widgetdata/widget-data 0))
+(ns nnangpress.widgetdata
+  (:require 
+    [om.dom :as dom :include-macros true]
+    [cljs.spec :as s]
+    [nnangpress.specs :as spcs]
+    [nnangpress.utils :as u]))
+(defmethod widget-data 001  
+  [_]
+  {:widget-uid 001
+   :object-id (u/uid)
+   :widget-name "Simple text"
+   :inner-html ["Change me"]
+   :style {:textAlign "center"}})
+(ns nnangpress.firebase
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require 
+    [clojure.walk :as wlk]
+    [cljs.core.async :refer [put! chan <!]]))
+(nnangpress.widgetdata/widget-data 1)
+(fb-write
+    "/nangpress-data/all-widgets-data/0"
+    (nnangpress.widgetdata/widget-data 1))
+(ns nnangpress.widgetdata
+  (:require 
+    [om.dom :as dom :include-macros true]
+    [cljs.spec :as s]
+    [nnangpress.specs :as spcs]
+    [nnangpress.utils :as u]))
+(defmethod widget-data 003 [_]
+  {:widget-uid 003
+   :object-id (u/uid)
+   :widget-name "Bordered text"
+   :inner-html ["Hi there"]
+   :style {:textAlign "center"}})
+(ns nnangpress.firebase
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require 
+    [clojure.walk :as wlk]
+    [cljs.core.async :refer [put! chan <!]]))
+(nnangpress.widgetdata/widget-data 3)
+(fb-write
+    "/nangpress-data/all-widgets-data/2"
+    (nnangpress.widgetdata/widget-data 3))

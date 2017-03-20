@@ -31,18 +31,27 @@
 
 (defn medium-init 
   "Helper for mediumjs components. Initializes a medium instance. Returns a function that can be used to destroy 
-  instance and related listeners" 
-  [uuid data link-btn-id link-input-id]
-  (let [medium (js/Medium. #js {:element (.getElementById js/document uuid)
+  instance and related listeners. Listening to events that modify text, including saving the text is handled by 
+  functions attached to the container of the mediumjs object. Therefore buttons need to be on the top level of 
+  the contentEditable element's container." 
+  [uuid data link-btn-id link-input-id edit-uid]
+  (let [article (.getElementById js/document uuid)
+        container (.-parentNode article)
+        edit-container (.getElementById js/document edit-uid)
+        medium (js/Medium. #js {:element article 
                                 :mode js/Medium.richMode
                                 :placeholder "Your Text here"
                                 :attributes nil
                                 :tags nil
                                 :pasteAsText false
-                                :modifiers #js {:q (fn [event element]
+                                :modifiers #js {:b (fn [event element]
+                                                    (println "B!") 
+                                                     ) 
+                                                :q (fn [event element]
                                                      (om/update!
                                                        data
                                                        [(.-innerHTML (gdom/getElement uuid))]))}})
+        _ (set! (-> medium .-fontSize) 1)
 
         cb (ndom/attach-click-listener-by-id 
              link-btn-id 
@@ -58,6 +67,48 @@
                         :href (.-value 
                                 (ndom/get-node-by-id link-input-id))}))))]
 
+    (set! 
+      (-> edit-container (.querySelector ".header-one") .-onmousedown)
+      (fn [] 
+        (do 
+          (.focus medium)
+          (.invokeElement medium "h1" #js {}))))
+
+    (set! 
+      (-> edit-container (.querySelector ".header-two") .-onmousedown)
+      (fn [] 
+        (do 
+          (.focus medium)
+          (.invokeElement medium "h2" #js {}))))
+
+    (set! 
+      (-> edit-container (.querySelector ".header-three") .-onmousedown)
+      (fn [] 
+        (do 
+          (.focus medium)
+          (.invokeElement medium "h3" #js {}))))
+
+    (set! 
+      (-> edit-container (.querySelector ".header-four") .-onmousedown)
+      (fn [] 
+        (do 
+          (.focus medium)
+          (.invokeElement medium "h4" #js {}))))
+
+    (set! 
+      (-> edit-container (.querySelector ".header-five") .-onmousedown)
+      (fn [] 
+        (do 
+          (.focus medium)
+          (.invokeElement medium "h5" #js {}))))
+
+    (set! 
+      (-> edit-container (.querySelector ".header-six") .-onmousedown)
+      (fn [] 
+        (do 
+          (.focus medium)
+          (.invokeElement medium "h6" #js {}))))
+
     (fn []
       (.destroy medium)
       (ndom/remove-listener link-btn-id cb))))
@@ -70,36 +121,62 @@
     (init-state [_]
       {:uid (u/uid)
        :advertise? false
+       :edit-uid (u/uid)
        :link-btn-id (u/uid)
        :link-input-id (u/uid)})
 
     om/IDidMount
     (did-mount [_]
-      (let [{:keys [uid advertise? link-btn-id link-input-id edit]} (om/get-state owner)
+      (let [{:keys [uid advertise? edit-uid link-btn-id link-input-id edit]} (om/get-state owner)
             edit-mode-obs (first (om/observe owner (mn/edit-mode)))]
-        (medium-init uid data link-btn-id link-input-id)
-        (ndom/set-attr-by-id uid "contenteditable" (str (or edit-mode-obs edit)))))
+        (medium-init uid data link-btn-id link-input-id edit-uid)
+        (ndom/set-attr-by-id uid "contenteditable" (if (or edit-mode-obs edit) "true" "false"))))
 
     om/IDidUpdate
     (did-update [_ _ _]
-      (let [{:keys [uid advertise? link-btn-id link-input-id edit]} (om/get-state owner)
+      (let [{:keys [uid advertise? edit-uid link-btn-id link-input-id edit]} (om/get-state owner)
             edit-mode-obs (first (mn/edit-mode))
-            medium-destroy (medium-init uid data link-btn-id link-input-id)]
+            medium-destroy (medium-init uid data link-btn-id link-input-id edit-uid)]
         (medium-destroy)
-        (medium-init uid data link-btn-id link-input-id)
-        (ndom/set-attr-by-id uid "contenteditable" (str (or edit-mode-obs edit)))))
+        (medium-init uid data link-btn-id link-input-id edit-uid)
+        (ndom/set-attr-by-id uid "contenteditable" (if (or edit-mode-obs edit) "true" "false"))))
 
     om/IRenderState
-    (render-state [_ {:keys [uid advertise? link-btn-id link-input-id]}]
+    (render-state [_ {:keys [uid advertise? edit-uid link-btn-id link-input-id style]}]
       (let [edit-mode-obs (first (om/observe owner (mn/edit-mode)))]
-        (dom/div nil 
+        (dom/div #js {:style (clj->js style)} 
                  (dom/div #js {:id uid
                                :style #js {:marginTop "-10px"}
                                :dangerouslySetInnerHTML #js {:__html (first data)}})
 
-                 (dom/div #js {:style #js {:display (cc/edit-mode-display edit-mode-obs)}}
+                 (dom/div #js {:id edit-uid 
+                               :style #js {:display (cc/edit-mode-display edit-mode-obs) :textAlign "left"}}
+
+                          (dom/button #js {:className "header-one"} "H1")
+                          (dom/button #js {:className "header-two"} "H2")
+                          (dom/button #js {:className "header-three"} "H3")
+                          (dom/button #js {:className "header-four"} "H4")
+                          (dom/button #js {:className "header-five"} "H5")
+                          (dom/button #js {:className "header-six"} "H6")
+                          (dom/button #js {:className "align-left" :onClick #(om/update! style :textAlign "left")} 
+                                      (dom/i #js {:className "fa fa-align-left"}))
+                          (dom/button #js {:className "align-middle" :onClick #(om/update! style :textAlign "center")} 
+                                      (dom/i #js {:className "fa fa-align-justify"}))
+                          (dom/button #js {:className "align-right" :onClick #(om/update! style :textAlign "right")} 
+                                      (dom/i #js {:className "fa fa-align-right"}))
+
                           (dom/input #js {:id link-input-id})
                           (dom/button #js{:id link-btn-id} "Link")))))))
+
+(s/def ::textAlign (s/and string? #{"left" "center" "right"}))
+
+(s/fdef build-rich-text
+        :args (s/cat :data ::spcs/indexed-cursor :style (s/and (s/keys :req-un [::textAlign]) ::spcs/map-cursor)))
+
+(defn build-rich-text 
+  "Gives us a chance to spec the buliding of the simple text component." 
+  [data style]
+    (om/build rich-text-edit data {:state {:style style}}))
 
 ;##Wdigets 
 ;The main widget multimethods. 
@@ -120,11 +197,10 @@
     om/IRenderState
     (render-state [_ {:keys [edit]}]
       (dom/div nil 
-               (om/build rich-text-edit (:inner-html data) {:state {:edit edit}})))))
+               (om/build rich-text-edit (:inner-html data) {:state {:edit edit :style (:style data)}})))))
 
 (defmethod widget-data-type 2 [_]
   (s/keys :req-un [::widget-uid ::object-id ::imgs]))
-
 
 ;Image slider widget.
 (defmethod widget 002 [{:keys [imgs] :as data} owner] 
@@ -210,7 +286,8 @@
     om/IRender
     (render [_]
       (dom/div #js {:className "box-paragraph"}
-               (om/build rich-text-edit (:inner-html data))))))
+               (build-rich-text (:inner-html data) (:style data))
+               #_(om/build rich-text-edit {:state {:style (:style data)}})))))
 
 (defmethod widget-data-type 4 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::text]))

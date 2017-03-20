@@ -61,3 +61,9 @@
     (fn [x] 
       (om/update! cursor [(-> x .-srcElement .-innerHTML)]))))
 
+(defn set-style-by-id
+  "" 
+  []
+
+  )
+

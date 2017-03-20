@@ -27,7 +27,8 @@
   {:widget-uid 001
    :object-id (u/uid)
    :widget-name "Simple text"
-   :inner-html ["<p>Change me</p>"]})
+   :inner-html ["Change me"]
+   :style {:textAlign "center"}})
 
 (defmethod widget-data 2 [_]
   {:widget-uid 2
@@ -41,7 +42,8 @@
   {:widget-uid 003
    :object-id (u/uid)
    :widget-name "Bordered text"
-   :inner-html ["<p> Hi there </p>"]})
+   :inner-html ["Hi there"]
+   :style {:textAlign "center"}})
 
 (defmethod widget-data 004 [_]
   {:widget-uid 004
