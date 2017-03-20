@@ -182,3 +182,12 @@
    :style {:textAlign "center"}
    :vid-id (widget-data 14)})
 
+(defmethod widget-data 20  
+  [_]
+  {:widget-uid 20
+   :object-id (u/uid)
+   :widget-name "Box text with youtube vids"
+   :inner-html ["hi there"]
+   :style {:textAlign "center"}
+   :like-boxes [(widget-data 13)(widget-data 13)]})
+

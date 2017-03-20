@@ -1033,6 +1033,15 @@
     (render [_]
       (dom/div #js {:className "box-paragraph"}
                (build-rich-text inner-html style)
-               (om/build widget vid-id)
-               ))))
+               (om/build widget vid-id)))))
+
+;Text with like box
+(defmethod widget 20 [{:keys [inner-html style like-boxes]} owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/div #js {:className "box-paragraph"}
+               (build-rich-text inner-html style)
+               (apply dom/div #js {:style #js {:marginTop "10px"}} 
+                      (om/build-all widget like-boxes))))))
 

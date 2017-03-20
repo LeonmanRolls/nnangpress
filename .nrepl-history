@@ -1,27 +1,3 @@
-    (let [c (chan)]
-      (get-user-sites (first @(uid)) c)
-      (println "get user sites: " (<! c))
-      )  
-    )
-(go 
-    (let [c (chan)]
-      (fb/firebase-get (str "users/" (first @(uid))) c)
-      (println "get user sites: " (<! c))
-      )  
-    )
-(go 
-    (let [c (chan)]
-      (fb/firebase-get (str "users/" (first @(uid)) "/sites") c)
-      (println "get user sites: " (<! c))
-      )  
-    )
-(fb/fb-copy 
-   "users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites"
-   "users/test/sites")
-(go 
-    (let [c (chan)]
-      (get-user-sites "test" c)
-      (s/valid? (s/coll-of ::site-with-meta) (<! c))
       )  
     )
 (defn get-user-sites 
@@ -498,3 +474,27 @@ l
 (fb-write
     "/nangpress-data/all-widgets-data/10"
     (nnangpress.widgetdata/widget-data 19))
+(nnangpress.widgetdata/widget-data 20)
+(ns nnangpress.widgetdata
+  (:require 
+    [om.dom :as dom :include-macros true]
+    [cljs.spec :as s]
+    [nnangpress.specs :as spcs]
+    [nnangpress.utils :as u]))
+(defmethod widget-data 20  
+  [_]
+  {:widget-uid 20
+   :object-id (u/uid)
+   :widget-name "Box text with youtube vids"
+   :inner-html ["hi there"]
+   :style {:textAlign "center"}
+   :like-boxes [(widget-data 13)(widget-data 13)]})
+(ns nnangpress.firebase
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require 
+    [clojure.walk :as wlk]
+    [cljs.core.async :refer [put! chan <!]]))
+(nnangpress.widgetdata/widget-data 20)
+(fb-write
+    "/nangpress-data/all-widgets-data/11"
+    (nnangpress.widgetdata/widget-data 20))

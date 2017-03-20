@@ -143,7 +143,7 @@
 
                    #_(cc/delete-button prev-children :route-name route-name)
 
-                   (dom/li #js {:className (str "sub-nav-li ")
+                   (dom/li #js {:className (str (if (> depth 2) "sub-nav-li " "nav-li ") (when active? "active-text"))
                                 :onClick (partial rt/js-link @routes-map-obs route-name)}
 
                            (dom/div #js {:className (str (when active? "active-text"))}
@@ -170,7 +170,7 @@
                                            {:state {:label "remove nth route"}})])))))
 
           :else
-          (dom/li #js {:className (str "sub-nav-li " (when active? "active-text"))
+          (dom/li #js {:className (str (if (> depth 2) "sub-nav-li " "nav-li ") (when active? "active-text"))
                        :onClick (partial rt/js-link @routes-map-obs route-name)}
 
                   (om/build wgt/widget route-name-editable {:state {:parent-cursor all
