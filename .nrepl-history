@@ -1,72 +1,3 @@
-                 :children []}
-                {:data "hi"
-                 :another "there"
-                 :children [{:data "hi"
-                             :another "there"
-                             :children []}
-                            {:data "hi"
-                             :another "there"
-                             :children []}]}]})
-(firebase-empty->clj-empty 
-    firebase->clojure-empty-test)
-(clj-empty->firebase-empty 
-    clojure->firebase-empty-test)
-  (firebase-empty->clj-empty 
-    firebase->clojure-empty-test)
-  (def cache (firebase-empty->clj-empty 
-               firebase->clojure-empty-test))
-cache
-  (get-in cache [:children 0 :children])
-  (get-in cache [:children 0])
-h  (get-in cache [:children 1 :children 0])
-  (get-in cache [:children 1 :children 0])
-  (get-in cache [:children 1 :children 0 :children])
-  (get-in cache [:children 1 :children 1 :children])
-l
-(ns nnangpress.firebase
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require 
-    [clojure.walk :as wlk]
-    [cljs.core.async :refer [put! chan <!]]))
-(start-repl)
-(ns nnangpress.firebase
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require 
-    [clojure.walk :as wlk]
-    [cljs.core.async :refer [put! chan <!]]))
-  (fb/clj-empty->firebase-empty new-route-widget)
-(ns nnangpress.monolith
-  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
-            [om.dom :as dom :include-macros true]
-            [nnangpress.utils :as u]
-            [nnangpress.dom :as ndom]
-            [nnangpress.specs :as spcs]
-            [nnangpress.widgetdata :as wd]
-            [clojure.zip :as z]
-            [clojure.spec :as s]
-            [clojure.walk :as wlk]
-            [cljs.core.async :refer [put! chan <!]]
-            [nnangpress.firebase :as fb]))
-  (fb/clj-empty->firebase-empty new-route-widget)
-  (fb/clj-empty->firebase-empty (new-route-widget))
-(cljs.pprint/pprint
-  (fb/clj-empty->firebase-empty (new-route-widget))
-    )
-  (def cache (fb/clj-empty->firebase-empty (new-route-widget)))
-  (get-in cache [:routes-map :children 0 :widgets])
-l
-(uid)
-(first @(uid))
-(go 
-    (let [c (chan)]
-      (get-user-sites @(uid) c)
-      (println "get user sites: " (<! c))
-      )  
-    )
-@(uid)
-(go 
     (let [c (chan)]
       (get-user-sites (first @(uid)) c)
       (println "get user sites: " (<! c))
@@ -498,3 +429,72 @@ lklkl
 (fb-write
     "/nangpress-data/all-widgets-data/2"
     (nnangpress.widgetdata/widget-data 3))
+l
+(ns nnangpress.widgetdata
+  (:require 
+    [om.dom :as dom :include-macros true]
+    [cljs.spec :as s]
+    [nnangpress.specs :as spcs]
+    [nnangpress.utils :as u]))
+(defmethod widget-data 19  
+  [_]
+  {:widget-uid 19
+   :object-id (u/uid)
+   :widget-name "Box text with youtube vids"
+   :inner-html ["hi there"]
+   :style {:textAlign "center"}
+   :vid-ids ["Yd5RGZXdSUs"]})
+(ns nnangpress.firebase
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require 
+    [clojure.walk :as wlk]
+    [cljs.core.async :refer [put! chan <!]]))
+(nnangpress.widgetdata/widget-data 19)
+(fb-write
+    "/nangpress-data/all-widgets-data/10"
+    (nnangpress.widgetdata/widget-data 19))
+(ns nnangpress.widgetdata
+  (:require 
+    [om.dom :as dom :include-macros true]
+    [cljs.spec :as s]
+    [nnangpress.specs :as spcs]
+    [nnangpress.utils :as u]))
+(defmethod widget-data 19  
+  [_]
+  {:widget-uid 19
+   :object-id (u/uid)
+   :widget-name "Box text with youtube vids"
+   :inner-html ["hi there"]
+   :style {:textAlign "center"}
+   :vid-id "Yd5RGZXdSUs"})
+(ns nnangpress.firebase
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require 
+    [clojure.walk :as wlk]
+    [cljs.core.async :refer [put! chan <!]]))
+(nnangpress.widgetdata/widget-data 19)
+(fb-write
+    "/nangpress-data/all-widgets-data/10"
+    (nnangpress.widgetdata/widget-data 19))
+(ns nnangpress.widgetdata
+  (:require 
+    [om.dom :as dom :include-macros true]
+    [cljs.spec :as s]
+    [nnangpress.specs :as spcs]
+    [nnangpress.utils :as u]))
+(defmethod widget-data 19  
+  [_]
+  {:widget-uid 19
+   :object-id (u/uid)
+   :widget-name "Box text with youtube vids"
+   :inner-html ["hi there"]
+   :style {:textAlign "center"}
+   :vid-id (widget-data 14)})
+(ns nnangpress.firebase
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require 
+    [clojure.walk :as wlk]
+    [cljs.core.async :refer [put! chan <!]]))
+(fb-write
+    "/nangpress-data/all-widgets-data/10"
+    (nnangpress.widgetdata/widget-data 19))

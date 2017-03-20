@@ -51,6 +51,7 @@
                                                      (om/update!
                                                        data
                                                        [(.-innerHTML (gdom/getElement uuid))]))}})
+
         _ (set! (-> medium .-fontSize) 1)
 
         cb (ndom/attach-click-listener-by-id 
@@ -787,7 +788,7 @@
   (str 
     "<iframe id=\"ytplayer\" type=\"text/html\" width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/" 
     youtube-video-id  
-    "?autoplay=1&mute=1&loop=1&playlist=" 
+    "?autoplay=0&mute=1&loop=1&playlist=" 
     youtube-video-id  
     "\" frameborder=\"0\" allowfullscreen=\"allowfullscreen\" volume=\"0\"></iframe>"))
 
@@ -797,7 +798,8 @@
     om/IRender
     (render [_]
       (dom/div nil 
-               (dom/div #js {:style #js {:marginTop "-10px" :textAlign "center"}
+               (dom/div #js {:className "aspect-ratio"
+                             :style #js {:textAlign "center"}
                              :dangerouslySetInnerHTML #js {:__html (youtube-string-gen youtube-video-id)}})         
                (cc/edit-mode-sense 
                  owner 
@@ -938,7 +940,6 @@
     (did-update [_ _ _]
       (FB.XFBML.parse))
 
-
     om/IRender
     (render[_]
       (dom/div nil 
@@ -1024,4 +1025,14 @@
                (dom/div #js {:style #js {:marginBottom "1em"}} 
                         (dom/button #js {:onClick #(mn/toggle-menu), :className "button-one"} "OPEN MENU")
                         (dom/button #js {:onClick #(mn/toggle-edit-mode), :className "button-one"} "EDIT MODE"))))))
+
+;Box text with youtube vid(s)
+(defmethod widget 19 [{:keys [inner-html style vid-id]} owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/div #js {:className "box-paragraph"}
+               (build-rich-text inner-html style)
+               (om/build widget vid-id)
+               ))))
 

@@ -173,3 +173,12 @@
    :object-id (u/uid)
    :widget-name "Edit this site!"})
 
+(defmethod widget-data 19  
+  [_]
+  {:widget-uid 19
+   :object-id (u/uid)
+   :widget-name "Box text with youtube vids"
+   :inner-html ["hi there"]
+   :style {:textAlign "center"}
+   :vid-id (widget-data 14)})
+
