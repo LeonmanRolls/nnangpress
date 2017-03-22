@@ -30,3 +30,32 @@
                   :onChange (fn [e]
                               (om/update! cursor korks (.. e -target -value)))}))
 
+(defn simple-input-comp! 
+  "Implemented as a full component to avoid issues with the input text box." 
+  [cursor owner]
+  (reify 
+    om/IInitState
+    (init-state [_]
+      {:text ""})
+
+    om/IWillMount 
+    (will-mount [_]
+      (let [{:keys [k]} (om/get-state owner)]
+        (om/set-state! owner :text (k cursor))))
+
+    om/IDidUpdate
+    (did-update [_ _ _]
+      (let [input (om/get-node owner "input")]
+        (.focus input)))
+
+    om/IRenderState 
+    (render-state [_ {:keys [k text]}] 
+      (dom/input #js {:type "text"
+                      :ref "input"
+                      :value text 
+                      :style #js {:width "50%"}
+                      :onChange (fn [e]
+                                  (do 
+                                    (om/update! cursor k (.. e -target -value))
+                                    (om/set-state! owner :text (.. e -target -value))))}))))
+

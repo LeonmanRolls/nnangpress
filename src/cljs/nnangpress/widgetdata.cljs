@@ -124,8 +124,8 @@
    :widget-name "Standard text widget"
    :inner-html ["<p> Hi there </p>"]
    :visible? true
-   :tags [{:edit true} {:tag "Entrepreneurship"} {:tag "Open Source"} {:tag "Collaboration"} 
-          {:tag "PHP"} {:tag "Javascript"} {:tag "Clojure(script)"} ]})
+   :tags [{:edit true} {:tag "Open Source"} {:tag "Clojure"} {:tag "Clojurescript"}]
+   :more-info "/Nangpress"})
 
 (defmethod widget-data 12 [_]
   {:widget-uid 12   

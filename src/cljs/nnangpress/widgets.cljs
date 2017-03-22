@@ -29,6 +29,10 @@
 (s/def ::user-sites vector?)
 (s/def ::widget-data (s/multi-spec widget-data-type :widget-uid))
 
+(defn ^:export test [] 
+  (println "hi there") 
+  false)
+
 (defn medium-init 
   "Helper for mediumjs components. Initializes a medium instance. Returns a function that can be used to destroy 
   instance and related listeners. Listening to events that modify text, including saving the text is handled by 
@@ -61,12 +65,13 @@
                  (.focus medium)
                  (.invokeElement 
                    medium 
-                   "a" 
+                   "div" 
                    #js {:title "I am a link"
                         :style "color: #66d9ef"
-                        :target "_blank"
-                        :href (.-value 
-                                (ndom/get-node-by-id link-input-id))}))))]
+                        :onclick test 
+                       ; :target "_blank"
+                        :href (.-value (ndom/get-node-by-id link-input-id))
+                        }))))]
 
     (set! 
       (-> edit-container (.querySelector ".header-one") .-onmousedown)
@@ -683,17 +688,28 @@
     intersect?))
 
 ;Text widget with tags, allows the widget's display to be turned on and off by a filter widget.  
-(defmethod widget 11 [{:keys [tags visible?] :as data} owner]
+(defmethod widget 11 [{:keys [tags visible? more-info] :as data} owner]
   (reify
     om/IRender
     (render [_]
-      (dom/div #js {:style #js {:display (if (tag-intersect? owner tags) "inherit" "none")}} 
+      (let [routes-map-obs (om/observe owner (mn/routes-map))
+            edit-mode-obs (om/observe owner (mn/edit-mode))]
+        (dom/div #js {:style #js {:display (if (tag-intersect? owner tags) "inherit" "none")}} 
 
-               (apply dom/ul #js {:style #js {:display "inline-block" :margin "0px"}} 
-                      (om/build-all tag tags {:state {:tags tags}}))
+                 (apply dom/ul #js {:style #js {:display "inline-block" :margin "0px"}} 
+                        (om/build-all tag tags {:state {:tags tags}}))
 
-               (dom/div #js {:className "box-paragraph"}
-                        (om/build rich-text-edit (:inner-html data)))))))
+                 (dom/div #js {:className "box-paragraph"}
+                          (om/build rich-text-edit (:inner-html data))
+                          (dom/div #js {:style #js {:textAlign "center"}} 
+                                   (dom/button #js {:style #js {:padding "10px 20px"}
+                                                    :onClick (partial rt/js-link @routes-map-obs more-info) 
+                                                    :className "button-one"} "more info")
+                                   
+                                   (println "edit-mode-obs: " @edit-mode-obs)
+                                   (when (first @edit-mode-obs) 
+                                     (om/build cre/simple-input-comp! data {:state {:k :more-info}}))
+                                   )))))))
 
 (defmethod widget-data-type 12 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::img]))
@@ -932,83 +948,9 @@
 (defmethod widget 17  
   [data owner]
   (reify
-    om/IDidMount
-    (did-mount [_]
-      (FB.XFBML.parse))
-
-    om/IDidUpdate
-    (did-update [_ _ _]
-      (FB.XFBML.parse))
-
     om/IRender
     (render[_]
-      (dom/div nil 
-               (dom/div #js {:className "box-paragraph"
-                             :style #js {:textAlign "center" :fontSize "1.5em" :fontWeight "900"}} 
-                        "I'm a mostly functional programmer who mostly makes web apps with Clojure and Clojurescript.")        
-
-               (dom/div #js {:className "box-paragraph"
-                             :style #js {:textAlign "center" :fontSize "1.5em" :fontWeight "900" :padding "0px"}} 
-
-                        (dom/p #js {:style #js {:textDecoration "" :marginBottom "20px" :fontSize "0.8em" 
-                                                :fontWeight "500"}} 
-                               "This site itself is part of my portfolio. It was built using a single page application 
-                               that makes single page applications, called Nangpress. The basic idea is that you can 
-                               make and edit sites as you might with the browser dev tools, except graphically. It's 
-                               also open source!")
-
-                        (dom/div #js {:className "aspect-ratio"
-                                      :style #js {:marginTop "-10px" :textAlign "center"}
-                                      :dangerouslySetInnerHTML #js {:__html (youtube-string-gen "Yd5RGZXdSUs")}})
-
-                        )
-
-               (dom/div #js {:className "box-paragraph"
-                             :style #js {:textAlign "center" :fontSize "1.5em" :fontWeight "900"}} 
-
-                        (dom/p #js {:style #js {:textDecoration "" :margin "-10px" :fontSize "1em" 
-                                                :fontWeight "900"}} 
-                               "Most commercially sucessful app")
-
-                        (dom/p #js {:style #js {:textDecoration "" :marginBottom "20px" :fontSize "0.8em" 
-                                             :fontWeight "500"}}
-                               "The game bonus collector. At its peak had 150,000 daily active users. Long story 
-                               short Facebook wanted to start putting ads into the newsfeed and that killed the app. 
-                               The 450k likes remain however.")
-
-                        (dom/div nil 
-                                 (dom/div #js {:style #js {:marginTop "-10px" :textAlign "center"}
-                                               :dangerouslySetInnerHTML #js {:__html "<div class=\"fb-page\" data-href=\"https://www.facebook.com/U1stGamesOfficial/\"  data-width=\"500\" data-height=\"300\" data-small-header=\"true\" data-adapt-container-width=\"true\" data-show-posts=\"false\" data-hide-cover=\"false\" data-show-facepile=\"false\"><div class=\"fb-xfbml-parse-ignore\"><blockquote cite=\"https://www.facebook.com/U1stGamesOfficial/\"><a href=\"https://www.facebook.com/U1stGamesOfficial/\">U1st Games</a></blockquote></div></div>"}})         
-
-                                 (dom/div #js {:style #js {:marginTop "-10px" :textAlign "center"}
-                                               :dangerouslySetInnerHTML #js {:__html "<div class=\"fb-page\" data-href=\"https://www.facebook.com/GameBonusCollector/\"  data-width=\"500\" data-height=\"300\" data-small-header=\"true\" data-adapt-container-width=\"true\" data-show-posts=\"false\" data-hide-cover=\"false\" data-show-facepile=\"false\"><div class=\"fb-xfbml-parse-ignore\"><blockquote cite=\"https://www.facebook.com/U1stGamesOfficial/\"><a href=\"https://www.facebook.com/U1stGamesOfficial/\">U1st Games</a></blockquote></div></div>"}})
-                                 )
-
-
-
-                        )
-
-               (dom/div #js {:className "box-paragraph"
-                             :style #js {:textAlign "center" :fontSize "1.5em" :fontWeight "900"}} 
-
-                        (dom/p #js {:style #js {:textDecoration "" :margin "-10px" :fontSize "1em" 
-                                                :fontWeight "900"}} 
-                               "My favourite project")                       
-
-                        (dom/p #js {:style #js {:textDecoration "" :marginBottom "20px" :fontSize "0.8em" 
-                                                :fontWeight "500"}}
-                               "One of my first programming projects. I wanted to use the accelerometer in my Android 
-                               phone to make a three dimensional ruler. Got it working in one dimension before uni work 
-                               got in the way. Would love to finish it one day.")
-
-                        (dom/div #js {:className "aspect-ratio"
-                                      :style #js {:marginTop "-10px" :textAlign "center"}
-                                      :dangerouslySetInnerHTML #js {:__html (youtube-string-gen "ZRkUjjb7xYM")}})
-
-                        )
-
-               )
-      )))
+      (dom/div nil "Hi there"))))
 
 ;Edit this site now.
 (defmethod widget 18  
