@@ -21,8 +21,8 @@
   (-> 
     js/document 
     (.getElementById id)
-    (.addEventListener "click" cb)
-    cb))
+    (.addEventListener "click" cb))
+  cb)
 
 (defn remove-listener 
   "Remove a listener" 

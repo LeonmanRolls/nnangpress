@@ -259,9 +259,17 @@
 (defn toggle-edit-mode 
   "Toggle edit mode" 
   []
+(do 
+  (println "scroll to top" (.scrollTop (js/$ "body")))
   (om/transact! 
     (edit-mode) 
-    (fn [dabool] [(not (first dabool))])))
+    (fn [dabool] [(not (first dabool))]))
+  
+  )
+  
+  
+  
+  )
 
 (s/fdef clj-empty->firebase-empty 
         :args (s/cat :data any?))
@@ -496,9 +504,9 @@
   (om/transact! ref-cur (fn [x] (conj x subject))))
 
 (defn update-local-style!
- "Update a component's local style." 
+  "Update a component's local style." 
   [owner key val]
- (om/update-state! owner :local-style (fn [x] (update x key (fn [_] val)))) )
+  (om/update-state! owner :local-style (fn [x] (update x key (fn [_] val)))))
 
 (defn site-state-decider 
   "Site state is important as it modifies various functions of nangpress." 

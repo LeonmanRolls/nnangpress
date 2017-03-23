@@ -45,6 +45,7 @@
         medium (js/Medium. #js {:element article 
                                 :mode js/Medium.richMode
                                 :placeholder "Your Text here"
+                                :autofocus false
                                 :attributes nil
                                 :tags nil
                                 :pasteAsText false
@@ -62,6 +63,7 @@
              link-btn-id 
              (fn []
                (do 
+                 (println "do da do")
                  (.focus medium)
                  (.invokeElement 
                    medium 
@@ -119,6 +121,7 @@
       (.destroy medium)
       (ndom/remove-listener link-btn-id cb))))
 
+;false false
 (defn rich-text-edit 
   "Mediumjs rich text editor" 
   [data owner]
@@ -872,6 +875,7 @@
   (let [medium (js/Medium. #js {:element (.getElementById js/document uuid)
                                 :mode js/Medium.richMode
                                 :placeholder "Your Text here"
+                                :autofocus false
                                 :attributes nil
                                 :tags nil
                                 :pasteAsText false
