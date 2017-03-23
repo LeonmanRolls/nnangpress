@@ -107,6 +107,7 @@ jquery plugins.
 
 #Testing 
 
+- boot test-reload test-cljs
 - All pure functions should have unit tests.
 
 #Coding guideliens 
