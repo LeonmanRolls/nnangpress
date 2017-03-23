@@ -47,7 +47,7 @@
         (build)))
 
 (deftask production []
-  (task-options! cljs {:optimizations :none})
+  (task-options! cljs {:optimizations :simple})
   identity)
 
 (deftask development []

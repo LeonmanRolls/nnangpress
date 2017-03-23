@@ -1,4 +1,5 @@
-(ns nnangpress.utils)
+(ns nnangpress.utils
+  (:require [clojure.string :as stg]))
 
 (defn index-of
     "return the index of the supplied item, or nil"
@@ -55,12 +56,12 @@
   [s]
   (->
     (subs s 1)
-    (clojure.string/replace #"-" " ")))
+    (stg/replace #"-" " ")))
 
 (defn str-uglify 
   "Mainly for making a string storable as a route name."
   [s]
-  (str "/" (clojure.string/replace s #" " "-")))
+  (str "/" (stg/replace s #" " "-")))
 
 (defn atom? 
   ""

@@ -20,9 +20,7 @@
     (.setUseFragment false)))
 
 ;This is probably why state is not responsing to url change anymore
-(defn handle-url-change [e]
-  (println "url chagne: ")
-  (.dir js/console e))
+(defn handle-url-change [e])
 
 (defonce history (doto (make-history)
                    (goog.events/listen EventType.NAVIGATE #(handle-url-change %))
@@ -56,8 +54,3 @@
     (.preventDefault e)
     (nav! route-name routes-map)))
 
-(comment 
-  
-  (get-token )
-  
-  )

@@ -528,14 +528,19 @@
   [root-component root-node-id]
   (go 
     (let [current-user (-> js/firebase .auth .-currentUser)
-          c (chan)
-          _ (fb/firebase-get "nangpress-data/" c)
-          nangpress-data (<! c)]
+          current-location (-> js/window .-location .-href)
+          ]
 
       (reset-monolith-atom! 
-        (nangpress-data->renderable nangpress-data current-user))
+
+        (nangpress-data->renderable @nangpress-data-cache current-user)
+
+        )
+
       (update-site-state!)
-      (om/root root-component monolith {:target (. js/document (getElementById root-node-id))}))))
+      (om/root root-component monolith {:target (. js/document (getElementById root-node-id))})
+      (.addClass (js/$ "body") "loaded") 
+      )))
 
 (s/fdef update-sites!!
         :args (s/cat :user-sites (s/coll-of ::site-with-meta) :uid any?))
