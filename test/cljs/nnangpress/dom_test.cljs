@@ -12,6 +12,5 @@
 (deftest attach-click-listener-by-id-test
   (let [_ (set! js/document.body.innerHTML "<div id=\"hi-there\">hi</div>")
         cb (ndom/attach-click-listener-by-id "hi-there" (fn [x] true))]
-
     (is (fn? cb))
     (is (cb))))

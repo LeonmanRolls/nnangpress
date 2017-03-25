@@ -51,8 +51,9 @@
             site-name-obs (om/observe owner (mn/site-name))
             all-data-obs (om/observe owner (mn/all-data))
             site? (= "site" (:site-state @all-data-obs))]
+        (println "admin-toolbar site state: " (:site-state @all-data-obs))
         (dom/div #js {:className "admin-toolbar"}
-                 (dom/b nil "Welcome to Nnangpress alpha | ")
+                 (dom/b nil "Welcome to Nangpress alpha | ")
                  (dom/b nil (str " Username:  " (first @user-email-obs) " | "))
                  #_(dom/b nil (str " | Site name:  " (first @site-name-obs) " | " ))
                  (when site? (cc/standard-button mn/toggle-menu "Menu"))
@@ -268,7 +269,7 @@
 
         (dom/div #js {:id "master-container"} 
                  (om/build admin-sidebar data)
-                 (when (not (= "" (first @email))) (om/build admin-toolbar data))
+                 (om/build admin-toolbar data)
                  (om/build main-view widgets)
                  (om/build nv/navbar route-widget))))))
 

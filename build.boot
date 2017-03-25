@@ -29,22 +29,18 @@
 (deftask testing [] (merge-env! :source-paths #{"test/cljs"}) identity)
 
 ;boot test-reload test-cljs
-(deftask test-reload []
- (comp (watch)
-       (testing)))
 
 (deftask build []
   (comp (speak)
-        (marginalia)
-        (testing)
         (cljs)))
 
 (deftask run []
-  (comp (serve)
-        (watch)
-        (cljs-repl)
-        (reload)
-        (build)))
+  (comp 
+    (serve)
+    (watch)
+    (cljs-repl)
+    (reload)
+    (build)))
 
 (deftask production []
   (task-options! cljs {:optimizations :simple})
@@ -60,4 +56,20 @@
   []
   (comp (development)
         (run)))
+
+(deftask testing []
+  (set-env! :source-paths #(conj % "test/cljs"))
+  identity)
+
+(ns-unmap 'boot.user 'test)
+
+(deftask test [] 
+  (comp (testing)
+        (test-cljs :js-env :phantom
+                   :exit? true)))
+
+(deftask auto-test []
+  (comp (testing)
+        (watch)
+        (test-cljs :js-env :phantom)))
 

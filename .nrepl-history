@@ -1,168 +1,56 @@
-(go 
-    (let [c (chan)]
-      (fb/firebase-get (str "users/" (first @(uid)) "/sites") c)
-      (println "get user sites: " (<! c))
-      )  
-    )
-(go 
-    (let [c (chan)]
-      (fb/firebase-get (str "users/" "test" "/sites") c)
-      (println "get user sites: " (<! c))
-      )  
-    )
-(defn get-user-sites 
-  "Get all the site data for a given user" 
-  [uid chan]
-  (fb/firebase-get (str "users/" uid "/sites") c))
-(defn get-user-sites 
-  "Get all the site data for a given user" 
-  [uid chan]
-  (fb/firebase-get (str "users/" uid "/sites") chan))
-(go 
-    (let [c (chan)]
-      (get-user-sites "test" c)
-      (println (<! c))
-      #_(s/valid? (s/coll-of ::site-with-meta) (<! c))
-      )  
-    )
-(go 
-    (let [c (chan)]
-      (get-user-sites "test" c)
-      (s/valid? (s/coll-of ::site-with-meta) (<! c))
-      )  
-    )
-(go 
-    (let [c (chan)]
-      (get-user-sites "test" c)
-      (println (s/valid? (s/coll-of ::site-with-meta) (<! c)))
-      )  
-    )
-(defn user-site-index 
-  "Get the index of a user's site" 
-  [uid site-id out] 
-  (let [c (chan)]
-    (go 
-      (get-user-sites uid c) 
-      (u/index-of-key-val (<! c) :site-id site-id))))
-(defn user-site-index 
-  "Get the index of a user's site" 
-  [uid site-id] 
-  (let [c (chan)]
-    (go 
-      (get-user-sites uid c) 
-      (u/index-of-key-val (<! c) :site-id site-id))))
-(go 
-    (let [c (chan)]
-      (println (<! (user-site-index "test" "91e87144-cdb9-417a-9074-b7b048771f08")))
+      (println (map :site-id (<! c)))
       ))
+(ns nnangpress.firebase
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require 
+    [clojure.walk :as wlk]
+    [cljs.core.async :refer [put! chan <!]]))
+(defn get-users-site-ids
+  "" 
+  []
+  (go 
+    (let [c (chan)
+          _ (fb/firebase-get (str "users/" (first (:uid @(all-data))) "/sites") c)]
+      (map :site-id (<! c)))))
+(defn get-users-site-ids
+  "" 
+  [uid]
+  (go 
+    (let [c (chan)
+          _ (firebase-get (str "users/" uid "/sites") c)]
+      (map :site-id (<! c)))))
+(ns nnangpress.monolith
+  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [nnangpress.utils :as u]
+            [nnangpress.dom :as ndom]
+            [nnangpress.specs :as spcs]
+            [nnangpress.widgetdata :as wd]
+            [clojure.zip :as z]
+            [clojure.spec :as s]
+            [clojure.walk :as wlk]
+            [cljs.core.async :refer [put! chan <!]]
+            [nnangpress.firebase :as fb]))
 (go 
-    (let [c (chan)]
-      (println (= 0 (<! (user-site-index "test" "91e87144-cdb9-417a-9074-b7b048771f08"))))
-      ))
-  (mn/site-meta->renderable td/nangpress-data (new-site-template) 1)
-  (site-meta->renderable td/nangpress-data (new-site-template) 1)
-  (site-meta->renderable nnangpress.testdata/nangpress-data (new-site-template) 1)
-  (def cache (site-meta->renderable nnangpress.testdata/nangpress-data (new-site-template) 1))
-  (:site-id-vec cache)
-  (keys cache)
-(defn site-meta->renderable 
-  "Primarily for going from userhome to an end user site." 
-  [nangpress-data site-meta & current-user]
-  (assoc 
-    (if current-user
-      (apply nangpress-data->renderable nangpress-data current-user)
-      (nangpress-data->renderable nangpress-data))
-    :route-widget 
-    (:route-widget site-meta)
-    :site-id-vec [(:site-id site-meta)]))
-  (def cache (site-meta->renderable nnangpress.testdata/nangpress-data (new-site-template) 1))
-  (:site-id-vec cache)
-(let [new-site (new-site-template)
-        cache (site-meta->renderable nnangpress.testdata/nangpress-data new-site 1)]
-  (:site-id-vec cache)
-    (:site-id new-site)
-    
+   (<! (fb/get-users-site-ids (first (:uid @(all-data))))) 
     )
-(let [new-site (new-site-template)
-        cache (site-meta->renderable nnangpress.testdata/nangpress-data new-site 1)]
-  
-    
-    (= (apply :site-id-vec cache) (:site-id new-site))
-    
-    )
-(let [new-site (new-site-template)
-        cache (site-meta->renderable nnangpress.testdata/nangpress-data new-site 1)]
-  
-    
-    (= (first (:site-id-vec cache)) (:site-id new-site))
-    
-    )
-(let [new-site (new-site-template)
-        cache (site-meta->renderable nnangpress.testdata/nangpress-data new-site 1)]
-  
-    
-    (= (first (:site-id-vec cache)) (:site-id new-site))
-    
+(go 
+   (println (<! (fb/get-users-site-ids (first (:uid @(all-data)))))) 
     )
 (ns nnangpress.firebase
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require 
     [clojure.walk :as wlk]
     [cljs.core.async :refer [put! chan <!]]))
-(fb-write 
-   "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/route-widget/" 
-    (mn/new-route-widget)
-    )
-(fb-write 
-   "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/route-widget/" 
-    (nnangpress.monolith/new-route-widget)
-    )
-any?
-(any?)
-l
-(ns nnangpress.widgetdata
-  (:require 
-    [om.dom :as dom :include-macros true]
-    [nnangpress.utils :as u]))
- (widget-data 16) 
-(ns nnangpress.widgetdata
-  (:require 
-    [om.dom :as dom :include-macros true]
-    [nnangpress.utils :as u]))
- (widget-data 16) 
-(defmethod widget-data 16  
-  [_]
-  {:widget-uid 16
-   :object-id (u/uid)
-   :widget-name "Standard text widget"
-   :inner-html ["Route Name"]})
- (widget-data 16) 
-(s/def ::inner-html (s/and vector? #(clojure.string/includes? (first %) "<")))
-(ns nnangpress.widgetdata
-  (:require 
-    [om.dom :as dom :include-macros true]
-    [cljs.spec :as s]
-    [nnangpress.utils :as u]))
-(s/def ::inner-html (s/and vector? #(clojure.string/includes? (first %) "<")))
-  (s/valid? ::inner-html "bla")
-  (s/valid? ::inner-html ["bla"])
-(s/def ::inner-html (s/and vector? #(not (clojure.string/includes? (first %) "<"))))
-  (s/valid? ::inner-html ["bla"])
-  (s/valid? ::inner-html ["<bla"])
-(u/uid)
-  (s/def ::widget-data-16 (s/keys :req-un [::inner-html ::widget-uid ::widget-name ::uid]))
-  (s/valid? ::widget-data-16 (widget-data 16))
-  (s/explain ::widget-data-16 (widget-data 16))
-  (s/def ::widget-data-16 (s/keys :req-un [::inner-html ::widget-uid ::widget-name ::uid]))
-  (s/valid? ::widget-data-16 (widget-data 16))
-  (s/explain ::widget-data-16 (widget-data 16))
-(widget-data 16)
-  (s/def ::object-id string?)
-  (s/def ::widget-data-16 (s/keys :req-un [::inner-html ::widget-uid ::widget-name ::object-id]))
-  (s/valid? ::widget-data-16 (widget-data 16))
-ll
-l
- (s/valid? ::route-widget (new-route-widget)) 
+(defn get-users-site-ids
+  "" 
+  [uid]
+  (go 
+    (let [c (chan)
+          _ (firebase-get (str "users/" uid "/sites") c)]
+      (map :site-id (<! c)))))
 (ns nnangpress.monolith
   "Functions for reading and updating the monlith. Most side-effecting functions should go here."
   (:require-macros [cljs.core.async.macros :refer [go]])
@@ -177,8 +65,15 @@ l
             [clojure.walk :as wlk]
             [cljs.core.async :refer [put! chan <!]]
             [nnangpress.firebase :as fb]))
-(s/valid? ::route-widget (new-route-widget))
- (s/valid? ::route-widget (new-route-widget)) 
+(go 
+   (println (<! (fb/get-users-site-ids (first (:uid @(all-data)))))) 
+    )
+(ns nnangpress.utils
+  (:require [clojure.string :as stg]))
+(defn coll-contains? 
+  "Core contains? only works on maps."
+  [coll x]
+  (some #(= x %) coll))
 (ns nnangpress.monolith
   "Functions for reading and updating the monlith. Most side-effecting functions should go here."
   (:require-macros [cljs.core.async.macros :refer [go]])
@@ -193,18 +88,35 @@ l
             [clojure.walk :as wlk]
             [cljs.core.async :refer [put! chan <!]]
             [nnangpress.firebase :as fb]))
- (s/valid? ::route-widget (new-route-widget)) 
-(s/def ::route-widget (s/keys :req-un [::logo-data ::main-view-style ::nav-style ::route-widget-id ::routes-map]))
-(s/def ::logo-data (s/keys :req-un [::logo-text ::logo-style]))
- (s/valid? ::route-widget (new-route-widget)) 
- (s/explain ::route-widget (new-route-widget)) 
-(s/def ::logo-text ::wd/widget-data-1)
-(ns nnangpress.widgetdata
+(first (:site-id-vec @(all-data)))
+(go 
+    (println (u/contains? 
+               (<! (fb/get-users-site-ids (first (:uid @(all-data)))))  
+               (first (:site-id-vec @(all-data)))             
+               )) 
+    )
+(go 
+    (println (u/coll-contains? 
+               (<! (fb/get-users-site-ids (first (:uid @(all-data)))))  
+               (first (:site-id-vec @(all-data)))             
+               )) 
+    )
+(ns nnangpress.firebase
+  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require 
-    [om.dom :as dom :include-macros true]
-    [cljs.spec :as s]
-    [nnangpress.utils :as u]))
-(s/def ::widget-data-1 (s/keys :req-un [::inner-html ::widget-uid-1 ::widget-name ::object-id]))
+    [clojure.walk :as wlk]
+    [cljs.core.async :refer [put! chan <!]]))
+(ns nnangpress.firebase
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require 
+    [nnangpress.utils :as u]
+    [clojure.walk :as wlk]
+    [cljs.core.async :refer [put! chan <!]]))
+(defn site-owner?
+  ""
+  [user-uid site-id]
+  (go 
+    (u/coll-contains? (<! (get-users-site-ids user-uid)) site-id)))
 (ns nnangpress.monolith
   "Functions for reading and updating the monlith. Most side-effecting functions should go here."
   (:require-macros [cljs.core.async.macros :refer [go]])
@@ -219,282 +131,370 @@ l
             [clojure.walk :as wlk]
             [cljs.core.async :refer [put! chan <!]]
             [nnangpress.firebase :as fb]))
-(s/def ::logo-text ::wd/widget-data-1)
- (s/explain ::route-widget (new-route-widget)) 
-  (-> (new-route-widget) :logo-text)
-  (-> (new-route-widget) :logo-data :logo-text)
-  (= 1 (-> (new-route-widget) :logo-data :logo-text :widget-uid))
-l
+(ns nnangpress.monolith
+  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [nnangpress.utils :as u]
+            [nnangpress.dom :as ndom]
+            [nnangpress.specs :as spcs]
+            [nnangpress.widgetdata :as wd]
+            [clojure.zip :as z]
+            [clojure.spec :as s]
+            [clojure.walk :as wlk]
+            [cljs.core.async :refer [put! chan <!]]
+            [nnangpress.firebase :as fb]))
+(:site-id-vec @(all-data))
+(:uid @(all-data))
+  (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data))))
+(println 
+    (<! 
+      (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data))))))
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+(:uid @(all-data))
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+(ns nnangpress.monolith
+  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [nnangpress.utils :as u]
+            [nnangpress.dom :as ndom]
+            [nnangpress.specs :as spcs]
+            [nnangpress.widgetdata :as wd]
+            [clojure.zip :as z]
+            [clojure.spec :as s]
+            [clojure.walk :as wlk]
+            [cljs.core.async :refer [put! chan <!]]
+            [nnangpress.firebase :as fb]))
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+(first (:uid @(all-data)))
+(first (:site-id-vec @(all-data)))
 (ns nnangpress.firebase
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require 
+    [nnangpress.utils :as u]
     [clojure.walk :as wlk]
     [cljs.core.async :refer [put! chan <!]]))
-(fb-copy
-    "/nangpress-data/all-widgets-data/11"
-    "/nangpress-data/all-widgets-data/3")
-(fb-copy
-    "/nangpress-data/all-widgets-data/10"
-    "/nangpress-data/all-widgets-data/6")
-(fb-copy
-    "/nangpress-data/all-widgets-data/9"
-    "/nangpress-data/all-widgets-data/7")
-(nnangpress.widgetdata/widget-data 17)
-(ns nnangpress.widgetdata
-  (:require 
-    [om.dom :as dom :include-macros true]
-    [cljs.spec :as s]
-    [nnangpress.specs :as spcs]
-    [nnangpress.utils :as u]))
-(defmethod widget-data 17  
-  [_]
-  {:widget-uid 17
-   :object-id (u/uid)
-   :widget-name "Some widget"})
+(defn site-owner?
+  ""
+  [user-uid site-id]
+  (cond 
+    (empty? user-id)  false
+    :else (go 
+            (u/coll-contains? (<! (get-users-site-ids user-uid)) site-id))))
+(ns nnangpress.monolith
+  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [nnangpress.utils :as u]
+            [nnangpress.dom :as ndom]
+            [nnangpress.specs :as spcs]
+            [nnangpress.widgetdata :as wd]
+            [clojure.zip :as z]
+            [clojure.spec :as s]
+            [clojure.walk :as wlk]
+            [cljs.core.async :refer [put! chan <!]]
+            [nnangpress.firebase :as fb]))
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
 (ns nnangpress.firebase
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require 
+    [nnangpress.utils :as u]
     [clojure.walk :as wlk]
     [cljs.core.async :refer [put! chan <!]]))
-(nnangpress.widgetdata/widget-data 17)
-(fb-write
-    "/nangpress-data/all-widgets-data/9"
-   (nnangpress.widgetdata/widget-data 17) )
+(defn site-owner?
+  ""
+  [user-uid site-id]
+  (go 
+    (cond 
+      (empty? user-id)  false
+      :else (u/coll-contains? (<! (get-users-site-ids user-uid)) site-id))))
+(ns nnangpress.monolith
+  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [nnangpress.utils :as u]
+            [nnangpress.dom :as ndom]
+            [nnangpress.specs :as spcs]
+            [nnangpress.widgetdata :as wd]
+            [clojure.zip :as z]
+            [clojure.spec :as s]
+            [clojure.walk :as wlk]
+            [cljs.core.async :refer [put! chan <!]]
+            [nnangpress.firebase :as fb]))
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+(fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data))))
+(<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+(:uid @(all-data))
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+(first (:uid @(all-data)))
+(first (:site-id-vec @(all-data)))
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+(ns nnangpress.monolith
+  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [nnangpress.utils :as u]
+            [nnangpress.dom :as ndom]
+            [nnangpress.specs :as spcs]
+            [nnangpress.widgetdata :as wd]
+            [clojure.zip :as z]
+            [clojure.spec :as s]
+            [clojure.walk :as wlk]
+            [cljs.core.async :refer [put! chan <!]]
+            [nnangpress.firebase :as fb]))
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+(println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data))))))
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+fb/site-owner?
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+(use 'nnangpress.monolith :reload)
 l
+(ns nnangpress.monolith
+  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [nnangpress.utils :as u]
+            [nnangpress.dom :as ndom]
+            [nnangpress.specs :as spcs]
+            [nnangpress.widgetdata :as wd]
+            [clojure.zip :as z]
+            [clojure.spec :as s]
+            [clojure.walk :as wlk]
+            [cljs.core.async :refer [put! chan <!]]
+            [nnangpress.firebase :as fb]))
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+  (load-namespace 'nnangpress.monolith)
+(all-data)
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+(go
+    (println 
+      (<! 
+        (nnangpress.firebase/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+  (load-namespace 'nnangpress.firebase)
+  (load-namespace 'nnangpress.monolith)
+(go
+    (println 
+      (<! 
+        (/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+l
+(go
+    (println 
+      (<! 
+        (/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+  (load-namespace 'nnangpress.firebase)
+(defn site-owner?
+  ""
+  [user-uid site-id]
+  (go 
+    (cond 
+      (empty? user-uid)  false
+      :else (u/coll-contains? (<! (get-users-site-ids user-uid)) site-id))))
+  (load-namespace 'nnangpress.monolith)
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+  (load-namespace 'nnangpress.monolith)
 (start-repl)
+  (load-namespace 'nnangpress.monolith)
+live-site?
+(ns nnangpress.monolith
+  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [nnangpress.utils :as u]
+            [nnangpress.dom :as ndom]
+            [nnangpress.specs :as spcs]
+            [nnangpress.widgetdata :as wd]
+            [clojure.zip :as z]
+            [clojure.spec :as s]
+            [clojure.walk :as wlk]
+            [cljs.core.async :refer [put! chan <!]]
+            [nnangpress.firebase :as fb]))
+live-site?
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+(first (:uid @(all-data)))
+(first (:site-id-vec @(all-data)))
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+(ns nnangpress.utils
+  (:require [clojure.string :as stg]))
+(coll-contains? [1 2 3] 1)
+(coll-contains? [1 2 3] 0)
+(defn coll-contains? 
+  "This exists because core contains? only works on maps."
+  [coll x]
+  (if (some #(= x %) coll) true false))
+(coll-contains? [1 2 3] 0)
+(coll-contains? [1 2 3] 1)
+(ns nnangpress.monolith
+  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [nnangpress.utils :as u]
+            [nnangpress.dom :as ndom]
+            [nnangpress.specs :as spcs]
+            [nnangpress.widgetdata :as wd]
+            [clojure.zip :as z]
+            [clojure.spec :as s]
+            [clojure.walk :as wlk]
+            [cljs.core.async :refer [put! chan <!]]
+            [nnangpress.firebase :as fb]))
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+(go
+    (println 
+      (<! 
+        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+(user-email)
 (ns nnangpress.firebase
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require 
+    [nnangpress.utils :as u]
     [clojure.walk :as wlk]
     [cljs.core.async :refer [put! chan <!]]))
-(nnangpress.widgetdata/widget-data 18)
+(nnangpress.monolith/new-site-template)
 (fb-write
-    "/nangpress-data/all-widgets-data/10"
-   (nnangpress.widgetdata/widget-data 18) )
-l
-   (or false nil)   
-   (or false false)   
-   (or false nil)   
-lklkl
-(nnangpress.widgetdata/widget-data 1)
-(ns nnangpress.firebase
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require 
-    [clojure.walk :as wlk]
-    [cljs.core.async :refer [put! chan <!]]))
-(nnangpress.widgetdata/widget-data 1)
-(ns nnangpress.widgetdata
-  (:require 
-    [om.dom :as dom :include-macros true]
-    [cljs.spec :as s]
-    [nnangpress.specs :as spcs]
-    [nnangpress.utils :as u]))
-(defmethod widget-data 001  
-  [_]
-  {:widget-uid 001
-   :object-id (u/uid)
-   :widget-name "Simple text"
-   :inner-html ["<p>Change me</p>"]
-   :style {:textAlign "center"}})
-(ns nnangpress.firebase
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require 
-    [clojure.walk :as wlk]
-    [cljs.core.async :refer [put! chan <!]]))
-(nnangpress.widgetdata/widget-data 1)
-(ns nnangpress.widgetdata
-  (:require 
-    [om.dom :as dom :include-macros true]
-    [cljs.spec :as s]
-    [nnangpress.specs :as spcs]
-    [nnangpress.utils :as u]))
-(defmethod widget-data 0  
-  [_]
-  {:widget-uid 0
-   :object-id (u/uid)
-   :widget-name "Simple text"
-   :inner-html ["<p>Change me</p>"]
-   :style {:textAlign "center"}})
-(ns nnangpress.firebase
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require 
-    [clojure.walk :as wlk]
-    [cljs.core.async :refer [put! chan <!]]))
-(nnangpress.widgetdata/widget-data 0)
-(ns nnangpress.widgetdata
-  (:require 
-    [om.dom :as dom :include-macros true]
-    [cljs.spec :as s]
-    [nnangpress.specs :as spcs]
-    [nnangpress.utils :as u]))
-(defmethod widget-data 0  
-  [_]
-  {:widget-uid 0
-   :object-id (u/uid)
-   :widget-name "Simple text"
-   :inner-html ["Change me"]
-   :style {:textAlign "center"}})
-(ns nnangpress.firebase
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require 
-    [clojure.walk :as wlk]
-    [cljs.core.async :refer [put! chan <!]]))
-(nnangpress.widgetdata/widget-data 0)
+    "/nangpress-data/admin-sites/"
+    (nnangpress.monolith/new-site-template))
 (fb-write
-    "/nangpress-data/all-widgets-data/0"
-    (nnangpress.widgetdata/widget-data 0))
-(ns nnangpress.widgetdata
-  (:require 
-    [om.dom :as dom :include-macros true]
-    [cljs.spec :as s]
-    [nnangpress.specs :as spcs]
-    [nnangpress.utils :as u]))
-(defmethod widget-data 001  
-  [_]
-  {:widget-uid 001
-   :object-id (u/uid)
-   :widget-name "Simple text"
-   :inner-html ["Change me"]
-   :style {:textAlign "center"}})
-(ns nnangpress.firebase
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require 
-    [clojure.walk :as wlk]
-    [cljs.core.async :refer [put! chan <!]]))
-(nnangpress.widgetdata/widget-data 1)
+    "/nangpress-data/admin-sites/homepage"
+    (nnangpress.monolith/new-site-template))
 (fb-write
-    "/nangpress-data/all-widgets-data/0"
-    (nnangpress.widgetdata/widget-data 1))
-(ns nnangpress.widgetdata
-  (:require 
-    [om.dom :as dom :include-macros true]
-    [cljs.spec :as s]
-    [nnangpress.specs :as spcs]
-    [nnangpress.utils :as u]))
-(defmethod widget-data 003 [_]
-  {:widget-uid 003
-   :object-id (u/uid)
-   :widget-name "Bordered text"
-   :inner-html ["Hi there"]
-   :style {:textAlign "center"}})
-(ns nnangpress.firebase
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require 
-    [clojure.walk :as wlk]
-    [cljs.core.async :refer [put! chan <!]]))
-(nnangpress.widgetdata/widget-data 3)
-(fb-write
-    "/nangpress-data/all-widgets-data/2"
-    (nnangpress.widgetdata/widget-data 3))
-l
-(ns nnangpress.widgetdata
-  (:require 
-    [om.dom :as dom :include-macros true]
-    [cljs.spec :as s]
-    [nnangpress.specs :as spcs]
-    [nnangpress.utils :as u]))
-(defmethod widget-data 19  
-  [_]
-  {:widget-uid 19
-   :object-id (u/uid)
-   :widget-name "Box text with youtube vids"
-   :inner-html ["hi there"]
-   :style {:textAlign "center"}
-   :vid-ids ["Yd5RGZXdSUs"]})
-(ns nnangpress.firebase
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require 
-    [clojure.walk :as wlk]
-    [cljs.core.async :refer [put! chan <!]]))
-(nnangpress.widgetdata/widget-data 19)
-(fb-write
-    "/nangpress-data/all-widgets-data/10"
-    (nnangpress.widgetdata/widget-data 19))
-(ns nnangpress.widgetdata
-  (:require 
-    [om.dom :as dom :include-macros true]
-    [cljs.spec :as s]
-    [nnangpress.specs :as spcs]
-    [nnangpress.utils :as u]))
-(defmethod widget-data 19  
-  [_]
-  {:widget-uid 19
-   :object-id (u/uid)
-   :widget-name "Box text with youtube vids"
-   :inner-html ["hi there"]
-   :style {:textAlign "center"}
-   :vid-id "Yd5RGZXdSUs"})
-(ns nnangpress.firebase
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require 
-    [clojure.walk :as wlk]
-    [cljs.core.async :refer [put! chan <!]]))
-(nnangpress.widgetdata/widget-data 19)
-(fb-write
-    "/nangpress-data/all-widgets-data/10"
-    (nnangpress.widgetdata/widget-data 19))
-(ns nnangpress.widgetdata
-  (:require 
-    [om.dom :as dom :include-macros true]
-    [cljs.spec :as s]
-    [nnangpress.specs :as spcs]
-    [nnangpress.utils :as u]))
-(defmethod widget-data 19  
-  [_]
-  {:widget-uid 19
-   :object-id (u/uid)
-   :widget-name "Box text with youtube vids"
-   :inner-html ["hi there"]
-   :style {:textAlign "center"}
-   :vid-id (widget-data 14)})
-(ns nnangpress.firebase
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require 
-    [clojure.walk :as wlk]
-    [cljs.core.async :refer [put! chan <!]]))
-(fb-write
-    "/nangpress-data/all-widgets-data/10"
-    (nnangpress.widgetdata/widget-data 19))
-(nnangpress.widgetdata/widget-data 20)
-(ns nnangpress.widgetdata
-  (:require 
-    [om.dom :as dom :include-macros true]
-    [cljs.spec :as s]
-    [nnangpress.specs :as spcs]
-    [nnangpress.utils :as u]))
-(defmethod widget-data 20  
-  [_]
-  {:widget-uid 20
-   :object-id (u/uid)
-   :widget-name "Box text with youtube vids"
-   :inner-html ["hi there"]
-   :style {:textAlign "center"}
-   :like-boxes [(widget-data 13)(widget-data 13)]})
-(ns nnangpress.firebase
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require 
-    [clojure.walk :as wlk]
-    [cljs.core.async :refer [put! chan <!]]))
-(nnangpress.widgetdata/widget-data 20)
-(fb-write
-    "/nangpress-data/all-widgets-data/11"
-    (nnangpress.widgetdata/widget-data 20))
-(start-repl)
-(ns nnangpress.dom
-  (:require 
-    [om.core :as om]
-    [cemerick.url :as url]))
-(attach-click-listener-by-id "bla" (fn [x]))  
-(defn attach-click-listener-by-id 
-  "Attach a click clistener to a node. Returns the callback for removal purposes" 
-  [id cb]
-  (-> 
-    js/document 
-    (.getElementById id)
-    (.addEventListener "click" cb))
-  cb)
-(attach-click-listener-by-id "bla" (fn [x]))  
-(attach-click-listener-by-id "super-container" (fn [x]))  
-(fn? (attach-click-listener-by-id "super-container" (fn [x])))  
-(set! js/document.body.innerHTML "<div>hi</div>")
-(fn? (attach-click-listener-by-id "super-container" (fn [x])))
+    "/nangpress-data/admin-sites/userhome"
+    (nnangpress.monolith/new-site-template))
+(fb-copy
+    "/nangpress-data/admin-route-widgets/homepage/" 
+    "/nangpress-data/admin-sites/homepage/route-widget/" 
+    )
+(fb-copy
+    "/nangpress-data/admin-route-widgets/userhome/" 
+    "/nangpress-data/admin-sites/userhome/route-widget/" 
+    )

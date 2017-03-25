@@ -6,6 +6,23 @@ philosophy of the language it is written in.
 - Make sure boot is using clojure version 1.8.0
 - If you encounter problems try this boot version: BOOT_VERSION=2.7.1
 
+#Technical Overview
+
+As we are using om to render sites from a single large datastructure (monolith), and each change in the data 
+causes a re-render, we could consider each render loading a new and different site, although for example we wouldn't 
+typically think of transitioning between pages in a single page application as moving to a new site. Well 
+if the change of state is large enough, and we have the logic in the code to render a large change in 
+the underlying data stucture, then we could render a change that would be percieved as a new site. 
+Then if you wanted to code a new site you would just code a new data structure, and the logic would do the rest. 
+
+In Nangpress the aim is to provide enough logic to render a range of sites, and then render a particular site by 
+loading its corresponding data strucutre. Moving the 'coding' of sites to the datastructure level has many advanatges.
+
+For example we can provide a GUI for creating these datastructures, allowing non-coders to create sites. In Nangpress 
+this GUI is the site itself. Having two people collaborate in real-time on editing a site through this GUI is more or 
+less reduced to the problem of keeping their site datastructures synced. Creating sites is very cheap, baring assets 
+a site is just a few kb of data. Backing up a site is easy, the user can just download their datastructure. 
+
 #Running and deploying
 
 ## Dev mode

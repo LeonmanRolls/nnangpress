@@ -29,10 +29,6 @@
 (s/def ::user-sites vector?)
 (s/def ::widget-data (s/multi-spec widget-data-type :widget-uid))
 
-(defn ^:export test [] 
-  (println "hi there") 
-  false)
-
 (defn medium-init 
   "Helper for mediumjs components. Initializes a medium instance. Returns a function that can be used to destroy 
   instance and related listeners. Listening to events that modify text, including saving the text is handled by 
@@ -63,17 +59,14 @@
              link-btn-id 
              (fn []
                (do 
-                 (println "do da do")
                  (.focus medium)
                  (.invokeElement 
                    medium 
                    "div" 
                    #js {:title "I am a link"
                         :style "color: #66d9ef"
-                        :onclick test 
-                       ; :target "_blank"
-                        :href (.-value (ndom/get-node-by-id link-input-id))
-                        }))))]
+                        :target "_blank"
+                        :href (.-value (ndom/get-node-by-id link-input-id))}))))]
 
     (set! 
       (-> edit-container (.querySelector ".header-one") .-onmousedown)
@@ -187,7 +180,7 @@
   [data style]
     (om/build rich-text-edit data {:state {:style style}}))
 
-;##Wdigets 
+;##Widgets 
 ;The main widget multimethods. 
 (defmulti widget-data-type 
   "Spec multimethod." 
@@ -576,8 +569,7 @@
                                          :right "10px"} 
                              :alt "Loading..." :src screenshot :width "300" :height "200"})
 
-               (cc/standard-button 
-                 #(mn/change-site (mn/site-meta->renderable @mn/nangpress-data-cache @all-data))
+               (cc/standard-button #(mn/site-transition @all-data)
                  "Go to site")
 
                (cc/standard-button 

@@ -1,6 +1,7 @@
 (ns nnangpress.firebase
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require 
+    [nnangpress.utils :as u]
     [clojure.walk :as wlk]
     [cljs.core.async :refer [put! chan <!]]))
 
@@ -127,17 +128,32 @@
     (<! fb-copy)
     (fb-delete source)))
 
+(defn get-users-site-ids
+  "" 
+  [user-uid]
+  (go 
+    (let [c (chan)
+          _ (firebase-get (str "users/" user-uid "/sites") c)]
+      (map :site-id (<! c)))))
+
+(defn site-owner?
+  ""
+  [user-uid site-id]
+  (go 
+    (cond 
+      (empty? user-uid)  false
+      :else (u/coll-contains? (<! (get-users-site-ids user-uid)) site-id))))
+
 (comment 
-  (fb-copy
-    "/users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/0/route-widget/routes-map/route-name-editable" 
-    "/nangpress-data/admin-route-widgets/userhome/routes-map/route-name-editable")
 
   (fb-copy
-    "/nangpress-data/all-widgets-data/9"
-    "/nangpress-data/all-widgets-data/7")
+    "/nangpress-data/admin-route-widgets/userhome/" 
+    "/nangpress-data/admin-sites/userhome/route-widget/" 
+    )
 
   (fb-write
-    "/nangpress-data/all-widgets-data/11"
-    (nnangpress.widgetdata/widget-data 20))
+    "/nangpress-data/admin-sites/userhome"
+    (nnangpress.monolith/new-site-template))
+
   )
 

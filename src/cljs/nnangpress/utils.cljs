@@ -28,7 +28,9 @@
                            (mapcat (partial walk new-path) (children node)))))))]
     (walk [] root)))
 
-(defn string-contains? [x y]
+(defn string-contains? 
+  "Subject then thing you are searching for." 
+  [x y]
   (not= -1 (.indexOf x y)))
 
 (defn vec-remove
@@ -67,4 +69,15 @@
   ""
   [x]
   (instance? cljs.core/Atom x))
+
+(defn coll-contains? 
+  "This exists because core contains? only works on maps."
+  [coll x]
+  (if (some #(= x %) coll) true false))
+
+(comment 
+
+  (coll-contains? [1 2 3] 1)
+
+  )
 
