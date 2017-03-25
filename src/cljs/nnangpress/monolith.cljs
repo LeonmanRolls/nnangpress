@@ -475,7 +475,7 @@
   [owner]
   (let [current-route (om/observe owner (current-route))
         routes-map (om/observe owner (routes-map))
-        {:keys [bg-img grey-bg?]}  (current-route-map (clojure.string/split (first @current-route) #"/") @routes-map)]
+        {:keys [bg-img grey-bg?]} (current-route-map (clojure.string/split (first @current-route) #"/") @routes-map)]
 
     (when bg-img
       (set-bg-img! bg-img)
@@ -507,7 +507,8 @@
   (om/update-state! owner :local-style (fn [x] (update x key (fn [_] val)))))
 
 (defn live-site? 
-  "While waiting for proper system for dealing with user's sites, DNS etc." 
+  "While waiting for proper system for dealing with user's sites, DNS etc. Live site refers to the state where the site 
+  is being viewed under a custom domain name, not just the onwer browsing to it from their userhome." 
   []
   (u/string-contains? (-> js/window .-location .-href) "leontalbert"))
 
@@ -522,12 +523,15 @@
   [site-owner?]
   (let [site? (live-site?)
         login-state (not (empty? (first (user-email))))]
+    (println "***site-owner?: " site-owner?)
+    (println "***site?: " site?)
+    (println "***login-state: " login-state)
     (cond 
-      (and site? (not login-state)) "site-stranger"
-      (and site? login-state site-owner?) "site-owner"
-      (and site? login-state (not site-owner?)) "site-visitor"
-      (and (not site?) (not login-state)) "splash"
-      (and (not site?) login-state) "user")))
+      (and (not login-state)) "site-stranger"
+      (and login-state site-owner?) "site-owner"
+      (and login-state (not site-owner?)) "site-visitor"
+      (and (not login-state)) "splash"
+      (and login-state) "user")))
 
 (defn update-site-state! 
   "Utility for keeping site state up to date. Should be called on every major change to the monolith." 
@@ -551,13 +555,15 @@
   Portfolio site is being hardcoded for now until the system for dealing with DNS is implemented." 
   [root-component root-node-id]
   (go 
-    (cond 
-      (live-site?) 
-      (let [c (chan)
-            _ (fb/firebase-get "users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/3" c)]
-        (site-transition (<! c)))
-      :else 
-      (site-transition @nangpress-data-cache))
+    (<! 
+      (go 
+        (cond 
+          (live-site?) 
+          (let [c (chan)
+                _ (fb/firebase-get "users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/3" c)]
+            (site-transition (<! c)))
+          :else 
+          (site-transition @nangpress-data-cache))))
 
     (om/root root-component monolith {:target (. js/document (getElementById root-node-id))})
     (.addClass (js/$ "body") "loaded")))
@@ -583,7 +589,6 @@
 (defmulti site-transition (fn [x]
                             (cond 
                               (contains? x :admin-sites) "nangpress-admin"
-                              (= (:site-id x) "3f42f071-5575-4160-8589-cac4e720741d") "leontalbert"
                               :else :default)))
 
 ;For initial render before we have cursors going.
@@ -596,28 +601,32 @@
                                               (-> nangpress-data :admin-sites :userhome :route-widget)
                                               (-> nangpress-data :admin-sites :homepage :route-widget)))
         (assoc :site-id-vec (if current-user ["userhome"] ["homepage"]))
-        (update-monolith-user-data current-user)
+        (assoc :site-state (if current-user "user" "splash"))
         (dissoc :admin-route-widgets)
-        (dissoc :admin-sites)))
-    (update-site-state!)))
-
-(defmethod site-transition "leontalbert"
-  [leon-site]
-  (let [current-user (fb/current-user)]
-    (reset-monolith-atom! 
-      (-> 
-        (assoc @nangpress-data-cache :route-widget (:route-widget leon-site))
+        (dissoc :admin-sites)
         (update-monolith-user-data current-user)
-        (dissoc :admin-route-widgets)))
-    (update-site-state!)))
+        )
+      #_(om/root root-component monolith {:target (. js/document (getElementById root-node-id))})
+      #_(.addClass (js/$ "body") "loaded")
 
+      )))
+
+;For live sites
 (defmethod site-transition :default  
   [x]
-  (let [current-user (fb/current-user)]
-    (reset-monolith-atom! 
-      (-> 
-        (assoc @nangpress-data-cache :route-widget (:route-widget x))
-        (update-monolith-user-data current-user)
-        (dissoc :admin-route-widgets)))
-    (update-site-state!)))
+  (go 
+    (let [current-user (fb/current-user)
+          site-owner? (if current-user (<! (fb/site-owner? (.-uid current-user) (:site-id x))) false)]
+      (reset-monolith-atom! 
+        (-> 
+          (assoc @nangpress-data-cache :route-widget (:route-widget x))
+          (assoc :site-id-vec [(:site-id x)])
+          (assoc :site-state (cond 
+                               site-owner? "site-owner" 
+                               current-user "site-visitor"
+                               :else "site-stranger"))
+          (update-monolith-user-data current-user)))
+      #_(om/root root-component monolith {:target (. js/document (getElementById root-node-id))})
+      #_(.addClass (js/$ "body") "loaded")
+      )))
 

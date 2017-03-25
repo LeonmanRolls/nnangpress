@@ -1,5 +1,8 @@
 (ns nnangpress.utils
-  (:require [clojure.string :as stg]))
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require 
+    [cljs.core.async :refer [put! chan <! close!]]
+    [clojure.string :as stg]))
 
 (defn index-of
     "return the index of the supplied item, or nil"
@@ -75,9 +78,8 @@
   [coll x]
   (if (some #(= x %) coll) true false))
 
-(comment 
-
-  (coll-contains? [1 2 3] 1)
-
-  )
+(defn timeout [ms]
+    (let [c (chan)]
+          (js/setTimeout (fn [] (close! c)) ms)
+          c))
 
