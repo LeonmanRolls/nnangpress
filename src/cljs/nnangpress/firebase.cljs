@@ -10,7 +10,6 @@
   [cb]
   #js {:callbacks
        #js {:signInSuccess (fn [user credential redirectUrl]
-                             (println "sucessful sign in")
                              (.dir js/console user)
                              (cb user)
                              false)}

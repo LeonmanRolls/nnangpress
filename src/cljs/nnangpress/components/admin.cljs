@@ -52,8 +52,6 @@
             site-state (:site-state @all-data-obs)
             site? (= "site" (:site-state @all-data-obs))]
 
-        (println "admin-toolbar site state: " (:site-state @all-data-obs))
-
         (dom/div #js {:className "admin-toolbar"}
                  (dom/b nil "Welcome to Nangpress alpha | ")
 

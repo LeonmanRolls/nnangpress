@@ -524,10 +524,6 @@
   [site-owner?]
   (let [site? (live-site?)
         login-state (not (empty? (first (user-email))))]
-    (println "***site-owner?: " site-owner?)
-    (println "***site?: " site?)
-    (println "***login-state: " login-state)
-
     (cond 
       (and (not login-state)) "site-stranger"
       (and login-state site-owner?) "site-owner"
@@ -556,7 +552,6 @@
   "Load site based on the auth state and/or the particular user. Also initializes the root component. 
   Portfolio site is being hardcoded for now until the system for dealing with DNS is implemented." 
   [root-component root-node-id]
-  #_(println ",,,,,,,,,,,,,,,auth-state-load-site: " @(all-data))
   (go 
     (cond 
       (live-site?)

@@ -46,7 +46,6 @@
                                 :tags nil
                                 :pasteAsText false
                                 :modifiers #js {:b (fn [event element]
-                                                    (println "B!") 
                                                      ) 
                                                 :q (fn [event element]
                                                      (om/update!
@@ -701,7 +700,6 @@
                                                     :onClick (partial rt/js-link @routes-map-obs more-info) 
                                                     :className "button-one"} "more info")
                                    
-                                   (println "edit-mode-obs: " @edit-mode-obs)
                                    (when (first @edit-mode-obs) 
                                      (om/build cre/simple-input-comp! data {:state {:k :more-info}}))
                                    )))))))
