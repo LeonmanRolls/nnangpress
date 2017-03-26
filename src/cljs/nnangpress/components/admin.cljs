@@ -68,21 +68,20 @@
                                                    (cc/standard-button 
                                                      (fn [_] (fb/firebase-signout identity)) "Sign Out"))
                    (= "site-owner" site-state) (dom/span nil 
-                                                         (cc/standard-button mn/toggle-menu "Menu")
-                                                         (cc/standard-button mn/toggle-edit-mode "Edit Mode")
+                                                         (cc/standard-button mn/new-site "Save New Site")
+                                                         (cc/standard-button mn/save-site-data "Save")
+                                                         (cc/standard-button mn/toggle-edit-mode "Toggle Edit Mode")
                                                          (cc/standard-button 
                                                            (fn [_] (fb/firebase-signout identity)) "Sign Out"))
                    (= "site-visitor" site-state) (dom/span nil 
-                                                           (cc/standard-button mn/toggle-menu "Menu")
-                                                           (cc/standard-button mn/toggle-edit-mode "Edit Mode")
+                                                           (cc/standard-button mn/toggle-edit-mode "Toggle Edit Mode")
                                                            (cc/standard-button 
                                                              (fn [_] (fb/firebase-signout identity)) "Sign Out"))
                    (= "site-stranger" site-state) (dom/span nil 
                                                             (cc/standard-button  
                                                               #(mn/site-transition @mn/nangpress-data-cache)
                                                               "Sign in")
-                                                            (cc/standard-button mn/toggle-menu "Menu")
-                                                            (cc/standard-button mn/toggle-edit-mode "Edit Mode"))))))))
+                                                            (cc/standard-button mn/toggle-edit-mode "Toggle Edit Mode"))))))))
 
 (defn select-widget-wrapper 
   "Primarily for edit mode. Allows the widget this wraps to be added to the current route." 
@@ -252,18 +251,30 @@
   the site." 
   [{:keys [sidebar-data]} owner]
   (reify 
-    om/IRender
-    (render 
-      [_]
+    om/IInitState
+    (init-state [_]
+      {:hidden false})
+
+    om/IRenderState
+    (render-state 
+      [_ {:keys [hidden]}]
+
       (dom/div #js {:id "mySidenav"
                     :className "sidenav"
-                    :style #js {:width "400px" :display (if (:sidebar-visible sidebar-data) "" "none")}} 
+                    :style #js {:width "400px" :display (if (:sidebar-visible sidebar-data) "" "none") 
+                                :marginLeft (if hidden "-400px" "0px")}} 
+
+               (dom/i #js {:style #js {:background "rgba(0,0,0,0.9)" :borderRadius "0px 100em 100em 0px" :padding "10px"
+                                       :position "fixed" :top "50%" :zIndex "1000" :left (if hidden "0px" "400px")
+                                       :cursor "pointer"}
+                           :onClick #(om/update-state! owner :hidden u/toggle)
+                           :className (str "fa " (if hidden "fa-chevron-right" "fa-chevron-left") " fa-2x")})
 
                (dom/p #js {:style (clj->js sidebar-header-p)} 
                       "Nangpress Menu"
                       (dom/i #js {:style (clj->js sidebar-close-icon)
                                   :className "fa fa-times fa-2x"
-                                  :onClick #(om/transact! sidebar-data :sidebar-visible u/toggle)})
+                                  :onClick #(om/update-state! owner :hidden u/toggle)})
                       (dom/i #js {:style (clj->js (merge sidebar-close-icon {:marginRight "10px"}))
                                   :className "fa fa-home fa-2x"
                                   :onClick #(update-sidebar-page! "base-menu")}))

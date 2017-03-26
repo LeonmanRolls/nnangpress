@@ -147,7 +147,7 @@
       (let [edit-mode-obs (first (om/observe owner (mn/edit-mode)))]
         (dom/div #js {:style (clj->js style)} 
                  (dom/div #js {:id uid
-                               :style #js {:marginTop "-10px"}
+                               :style #js {:marginTop "-10px" :outline (if edit-mode-obs "1px solid blue" "")}
                                :dangerouslySetInnerHTML #js {:__html (first data)}})
 
                  (dom/div #js {:id edit-uid 
@@ -922,6 +922,7 @@
       (let [edit-mode-obs (first (om/observe owner (mn/edit-mode)))]
         (dom/div nil 
                  (dom/div #js {:id uid
+                               :style #js {:outline (if edit-mode-obs "1px solid blue" "")}
                                :dangerouslySetInnerHTML #js {:__html (first data)}})
 
                  (dom/div #js {:style #js {:display "none"}}
@@ -952,15 +953,15 @@
   (reify
     om/IRender
     (render [_]
-      (dom/div #js {:className "box-paragraph"
-                    :style #js {:textAlign "center" :fontSize "1.5em" :fontWeight "900" :padding "0px"}} 
+      (let [edit-mode-obs (first (om/observe owner (mn/edit-mode)))]
+        (dom/div #js {:className "box-paragraph"
+                      :style #js {:textAlign "center" :fontSize "1.5em" :fontWeight "900" :padding "0px"}} 
 
-               (dom/p #js {:style #js {:textDecoration "" :margin "-10px" :fontSize "2em" :fontWeight "900"}} 
-                      "EDIT THIS SITE NOW!")
+                 (dom/p #js {:style #js {:textDecoration "" :margin "-10px" :fontSize "2em" :fontWeight "900"}} 
+                        "EDIT THIS SITE NOW!")
 
-               (dom/div #js {:style #js {:marginBottom "1em"}} 
-                        (dom/button #js {:onClick #(mn/toggle-menu), :className "button-one"} "OPEN MENU")
-                        (dom/button #js {:onClick #(mn/toggle-edit-mode), :className "button-one"} "EDIT MODE"))))))
+                 (dom/div #js {:style #js {:marginBottom "1em"}} 
+                          (dom/button #js {:onClick #(mn/toggle-edit-mode), :className "button-one"} (if edit-mode-obs "EXIT EDIT MODE" "CLICK HERE!"))))))))
 
 ;Box text with youtube vid(s)
 (defmethod widget 19 [{:keys [inner-html style vid-id]} owner]

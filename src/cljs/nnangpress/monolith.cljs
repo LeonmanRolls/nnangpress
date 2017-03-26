@@ -246,27 +246,10 @@
   [renderable state]
   (assoc renderable :site-state state))
 
-(s/fdef change-site 
-        :args (s/cat :data ::renderable))
-
-;Implement site state changes in an atom watcher
-(defn change-site 
-  "Load a new user site. A change in a site should always result in a change in the site-id-vec." 
-  [site-data]
-  (go 
-    (-> 
-      site-data 
-      add-current-user-email 
-      add-current-uid
-      (set-site-state (site-state-decider 
-                        (<! (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-      update-all) 
-    )
-  )
-
 (defn toggle-edit-mode 
   "Toggle edit mode" 
   []
+  (om/transact! (sidebar-data) :sidebar-visible u/toggle)
   (om/transact! (edit-mode) (fn [dabool] [(not (first dabool))])))
 
 (s/fdef clj-empty->firebase-empty 
