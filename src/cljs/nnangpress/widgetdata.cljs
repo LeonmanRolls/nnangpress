@@ -28,7 +28,7 @@
    :object-id (u/uid)
    :widget-name "Simple text"
    :inner-html ["Change me"]
-   :style {:textAlign "center"}})
+   :style {:textAlign "left"}})
 
 (defmethod widget-data 2 [_]
   {:widget-uid 2
@@ -43,7 +43,7 @@
    :object-id (u/uid)
    :widget-name "Bordered text"
    :inner-html ["Hi there"]
-   :style {:textAlign "center"}})
+   :style {:textAlign "left"}})
 
 (defmethod widget-data 004 [_]
   {:widget-uid 004
@@ -179,7 +179,7 @@
    :object-id (u/uid)
    :widget-name "Box text with youtube vids"
    :inner-html ["hi there"]
-   :style {:textAlign "center"}
+   :style {:textAlign "left"}
    :vid-id (widget-data 14)})
 
 (defmethod widget-data 20  
@@ -188,6 +188,6 @@
    :object-id (u/uid)
    :widget-name "Box text with youtube vids"
    :inner-html ["hi there"]
-   :style {:textAlign "center"}
+   :style {:textAlign "left"}
    :like-boxes [(widget-data 13)(widget-data 13)]})
 

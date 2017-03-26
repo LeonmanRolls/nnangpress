@@ -9,18 +9,6 @@
     [nnangpress.monolith :as mn]
     [nnangpress.widgets :as wgt]))
 
-(deftest site-meta->renderable []
-  (is (s/valid? ::mn/renderable (mn/site-meta->renderable td/nangpress-data (mn/new-site-template) 1))))
-
-;Ensure that the site-id-vec gets updated with correct id coming from the site meta data.
-(deftest site-meta->renderable-site-id-vec
-  (let [new-site (mn/new-site-template)
-        cache (mn/site-meta->renderable td/nangpress-data new-site 1)]
-    (is (= (first (:site-id-vec cache)) (:site-id new-site)))))
-
-(deftest nangpress-data->renderable []
-  (is (s/valid? ::mn/renderable (mn/nangpress-data->renderable td/nangpress-data nil))))
-
 (deftest new-site-template
    (is (s/valid? ::mn/site-with-meta (mn/new-site-template))))
 

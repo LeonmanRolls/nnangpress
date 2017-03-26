@@ -57,26 +57,22 @@
 
                  (dom/b nil (str " Username:  " (if (empty? (first @user-email-obs)) 
                                                   "Stranger" 
-                                                   (first @user-email-obs)) " | "))
+                                                  (first @user-email-obs)) " | "))
 
                  (cond 
                    (= "splash" site-state) (dom/span nil 
-                                                       (cc/standard-button  
-                                                         #(mn/site-transition @mn/nangpress-data-cache)
-                                                         "Sign in"))
+                                                     (cc/standard-button  
+                                                       #(mn/site-transition @mn/nangpress-data-cache)
+                                                       "Sign in"))
                    (= "user" site-state) (dom/span nil 
-                                                       (cc/standard-button 
-                                                         (fn [_] (fb/firebase-signout identity)) "Sign Out"))
+                                                   (cc/standard-button 
+                                                     (fn [_] (fb/firebase-signout identity)) "Sign Out"))
                    (= "site-owner" site-state) (dom/span nil 
-                                                         (cc/standard-button 
-                                                           #(mn/auth-state-load-site! master "super-container") "Home")
                                                          (cc/standard-button mn/toggle-menu "Menu")
                                                          (cc/standard-button mn/toggle-edit-mode "Edit Mode")
                                                          (cc/standard-button 
                                                            (fn [_] (fb/firebase-signout identity)) "Sign Out"))
                    (= "site-visitor" site-state) (dom/span nil 
-                                                           (cc/standard-button 
-                                                             #(mn/auth-state-load-site! master "super-container") "Home")
                                                            (cc/standard-button mn/toggle-menu "Menu")
                                                            (cc/standard-button mn/toggle-edit-mode "Edit Mode")
                                                            (cc/standard-button 
@@ -86,17 +82,7 @@
                                                               #(mn/site-transition @mn/nangpress-data-cache)
                                                               "Sign in")
                                                             (cc/standard-button mn/toggle-menu "Menu")
-                                                            (cc/standard-button mn/toggle-edit-mode "Edit Mode")))
-
-                 (when site? (cc/standard-button mn/toggle-menu "Menu"))
-                 (when site? (cc/standard-button #(mn/auth-state-load-site! master "super-container") "Home"))
-                 (when site? (cc/standard-button mn/toggle-edit-mode "Toggle edit mode"))
-                 (when site? (cc/standard-button mn/new-site "Save new site"))
-                 (when site? (cc/standard-button mn/save-site-data "Save"))
-
-                 #_(cc/standard-button (fn [_] (fb/firebase-signout identity)) "Sign Out")
-                 
-                 )))))
+                                                            (cc/standard-button mn/toggle-edit-mode "Edit Mode"))))))))
 
 (defn select-widget-wrapper 
   "Primarily for edit mode. Allows the widget this wraps to be added to the current route." 

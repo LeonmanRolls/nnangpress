@@ -394,38 +394,6 @@
      :uid [(if current-user (.-uid current-user) "")] 
      :email [(if current-user (.-email current-user) "")])))
 
-(s/fdef nangpress-data->renderable
-        :args (s/cat :nangpess-data ::nangpress-data :current-user (s/? any?)))
-
-(defn nangpress-data->renderable 
-  "Raw nnangpress to renderable based on user auth status. Not getting nangpress-data on its own because 
-  this requires an async call."  
-  ([nangpress-data]
-   (nangpress-data->renderable nangpress-data (fb/current-user)))
-
-  ([nangpress-data current-user]
-   (-> 
-     (assoc nangpress-data :route-widget (if current-user
-                                           (-> nangpress-data :admin-sites :userhome :route-widget)
-                                           (-> nangpress-data :admin-sites :homepage :route-widget)))
-     (update-monolith-user-data current-user)
-     (dissoc :admin-route-widgets)
-     (dissoc :admin-sites))))
-
-(s/fdef site-meta->renderable
-        :args (s/cat :nangpress-data ::nangpress-data :site-meta ::site-with-meta :current-user (s/? any?)))
-
-(defn site-meta->renderable 
-  "Primarily for going from userhome to an end user site." 
-  [nangpress-data site-meta & current-user]
-  (assoc 
-    (if current-user
-      (apply nangpress-data->renderable nangpress-data current-user)
-      (nangpress-data->renderable nangpress-data))
-    :route-widget 
-    (:route-widget site-meta)
-    :site-id-vec [(:site-id site-meta)]))
-
 (s/fdef renderable-site->full-monolith
         :args (s/cat :renderable-stie any? :nangpress-system-data (s/? any?)))
 
@@ -559,7 +527,7 @@
             _ (fb/firebase-get "users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/3" c)]
         (<! (site-transition (<! c))))
       :else 
-      (site-transition @nangpress-data-cache cb))
+      (site-transition @nangpress-data-cache))
 
     (om/root root-component monolith {:target (. js/document (getElementById root-node-id))})
     (.addClass (js/$ "body") "loaded")))

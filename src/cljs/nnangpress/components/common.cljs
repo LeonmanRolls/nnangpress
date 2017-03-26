@@ -10,11 +10,10 @@
   and details identifying the specific element in that vector that this component is appearing over should be 
   provided. "
   [vec-ref ikey match-val]
-  (dom/img #js {:style #js {:width "20px" :right "-10px" :top "-10px" 
-                            :position "absolute"}
-                :src "http://www.stabilita.sk/media/image/cross-icon.png"
-                :onClick (fn [_] 
-                           (mn/ref-vec-map-delete! vec-ref ikey match-val))}))
+  (dom/i #js {:className "fa fa-close fa-2x"
+              :style #js {:right "-10px" :top "-10px" :position "absolute" :cursor "pointer" :zIndex "100"}
+              :onClick (fn [_] 
+                         (mn/ref-vec-map-delete! vec-ref ikey match-val))}))
 
 (defn edit-mode-sense 
   "Display empty div or what you feed me. Intended for componentes that are only meant to be down in edit mode." 
