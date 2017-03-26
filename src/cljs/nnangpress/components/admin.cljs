@@ -15,7 +15,6 @@
 
 (declare master)
 
-
 ;Sign in
 (defmethod wgt/widget 9 [{:keys [style]} owner]
   (reify
@@ -50,18 +49,56 @@
       (let [user-email-obs (om/observe owner (mn/user-email))
             site-name-obs (om/observe owner (mn/site-name))
             all-data-obs (om/observe owner (mn/all-data))
+            site-state (:site-state @all-data-obs)
             site? (= "site" (:site-state @all-data-obs))]
+
         (println "admin-toolbar site state: " (:site-state @all-data-obs))
+
         (dom/div #js {:className "admin-toolbar"}
                  (dom/b nil "Welcome to Nangpress alpha | ")
-                 (dom/b nil (str " Username:  " (first @user-email-obs) " | "))
-                 #_(dom/b nil (str " | Site name:  " (first @site-name-obs) " | " ))
+
+                 (dom/b nil (str " Username:  " (if (empty? (first @user-email-obs)) 
+                                                  "Stranger" 
+                                                   (first @user-email-obs)) " | "))
+
+                 (cond 
+                   (= "splash" site-state) (dom/span nil 
+                                                       (cc/standard-button  
+                                                         #(mn/site-transition @mn/nangpress-data-cache)
+                                                         "Sign in"))
+                   (= "user" site-state) (dom/span nil 
+                                                       (cc/standard-button 
+                                                         (fn [_] (fb/firebase-signout identity)) "Sign Out"))
+                   (= "site-owner" site-state) (dom/span nil 
+                                                         (cc/standard-button 
+                                                           #(mn/auth-state-load-site! master "super-container") "Home")
+                                                         (cc/standard-button mn/toggle-menu "Menu")
+                                                         (cc/standard-button mn/toggle-edit-mode "Edit Mode")
+                                                         (cc/standard-button 
+                                                           (fn [_] (fb/firebase-signout identity)) "Sign Out"))
+                   (= "site-visitor" site-state) (dom/span nil 
+                                                           (cc/standard-button 
+                                                             #(mn/auth-state-load-site! master "super-container") "Home")
+                                                           (cc/standard-button mn/toggle-menu "Menu")
+                                                           (cc/standard-button mn/toggle-edit-mode "Edit Mode")
+                                                           (cc/standard-button 
+                                                             (fn [_] (fb/firebase-signout identity)) "Sign Out"))
+                   (= "site-stranger" site-state) (dom/span nil 
+                                                            (cc/standard-button  
+                                                              #(mn/site-transition @mn/nangpress-data-cache)
+                                                              "Sign in")
+                                                            (cc/standard-button mn/toggle-menu "Menu")
+                                                            (cc/standard-button mn/toggle-edit-mode "Edit Mode")))
+
                  (when site? (cc/standard-button mn/toggle-menu "Menu"))
                  (when site? (cc/standard-button #(mn/auth-state-load-site! master "super-container") "Home"))
                  (when site? (cc/standard-button mn/toggle-edit-mode "Toggle edit mode"))
                  (when site? (cc/standard-button mn/new-site "Save new site"))
                  (when site? (cc/standard-button mn/save-site-data "Save"))
-                 (cc/standard-button (fn [_] (fb/firebase-signout identity)) "Sign Out"))))))
+
+                 #_(cc/standard-button (fn [_] (fb/firebase-signout identity)) "Sign Out")
+                 
+                 )))))
 
 (defn select-widget-wrapper 
   "Primarily for edit mode. Allows the widget this wraps to be added to the current route." 

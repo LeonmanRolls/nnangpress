@@ -23,6 +23,7 @@
 (s/def ::logo-text ::wd/widget-data-1)
 (s/def ::logo-style map?)
 (s/def ::admin-route-widgets map?)
+(s/def ::admin-sites map?)
 (s/def ::email (s/or :non-cursor vector? :cursor ::spcs/indexed-cursor))
 (s/def ::site-name vector?)
 (s/def ::site-state string?)
@@ -55,7 +56,7 @@
 
 ;For the sake of not overcomplicating initializing reference cursors, nangpress-data should be renderable and have 
 ;the shape that reference cursor initialization requires
-(s/def ::nangpress-data (s/keys :req-un [::admin-route-widgets ::all-navs-data ::all-widgets-data ::current-route 
+(s/def ::nangpress-data (s/keys :req-un [::admin-sites ::all-navs-data ::all-widgets-data ::current-route 
                                          ::edit-mode ::sidebar-data ::site-name ::site-state ::uid]))
 
 ;Primarily for displaying site on a user's homepage
@@ -526,6 +527,7 @@
     (println "***site-owner?: " site-owner?)
     (println "***site?: " site?)
     (println "***login-state: " login-state)
+
     (cond 
       (and (not login-state)) "site-stranger"
       (and login-state site-owner?) "site-owner"
@@ -554,16 +556,15 @@
   "Load site based on the auth state and/or the particular user. Also initializes the root component. 
   Portfolio site is being hardcoded for now until the system for dealing with DNS is implemented." 
   [root-component root-node-id]
+  #_(println ",,,,,,,,,,,,,,,auth-state-load-site: " @(all-data))
   (go 
-    (<! 
-      (go 
-        (cond 
-          (live-site?) 
-          (let [c (chan)
-                _ (fb/firebase-get "users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/3" c)]
-            (site-transition (<! c)))
-          :else 
-          (site-transition @nangpress-data-cache))))
+    (cond 
+      (live-site?)
+      (let [c (chan)
+            _ (fb/firebase-get "users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/3" c)]
+        (<! (site-transition (<! c))))
+      :else 
+      (site-transition @nangpress-data-cache cb))
 
     (om/root root-component monolith {:target (. js/document (getElementById root-node-id))})
     (.addClass (js/$ "body") "loaded")))
@@ -604,12 +605,7 @@
         (assoc :site-state (if current-user "user" "splash"))
         (dissoc :admin-route-widgets)
         (dissoc :admin-sites)
-        (update-monolith-user-data current-user)
-        )
-      #_(om/root root-component monolith {:target (. js/document (getElementById root-node-id))})
-      #_(.addClass (js/$ "body") "loaded")
-
-      )))
+        (update-monolith-user-data current-user)))))
 
 ;For live sites
 (defmethod site-transition :default  
@@ -625,8 +621,5 @@
                                site-owner? "site-owner" 
                                current-user "site-visitor"
                                :else "site-stranger"))
-          (update-monolith-user-data current-user)))
-      #_(om/root root-component monolith {:target (. js/document (getElementById root-node-id))})
-      #_(.addClass (js/$ "body") "loaded")
-      )))
+          (update-monolith-user-data current-user))))))
 

@@ -25,7 +25,6 @@
 
 (enable-console-print!)
 
-
 (defn dev-mode-helper<< 
   "Handle development mode query params e.g. turn on intrumentation." 
   []
@@ -44,8 +43,6 @@
       (reset! mn/nangpress-data-cache (<! c))
       (dev-mode-helper<<)
       (mn/ref-cursor-init mn/monolith)
-      #_(mn/monolith-watcher-init mn/monolith)
-      (mn/auth-state-load-site! cadmin/master "super-container")
-
-      )))
+      (mn/monolith-watcher-init mn/monolith)
+      (mn/auth-state-load-site! cadmin/master "super-container"))))
 
