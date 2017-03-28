@@ -507,7 +507,7 @@
     (cond 
       (live-site?)
       (let [c (chan)
-            _ (fb/firebase-get "users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/3" c)]
+            _ (fb/firebase-get "users/eKWcekJm6GMc4klsRG7CNvteCQN2/sites/1" c)]
         (<! (site-transition (<! c))))
       :else 
       (site-transition @nangpress-data-cache))

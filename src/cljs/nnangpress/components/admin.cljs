@@ -259,28 +259,29 @@
     (render-state 
       [_ {:keys [hidden]}]
 
-      (dom/div #js {:id "mySidenav"
-                    :className "sidenav"
-                    :style #js {:width "400px" :display (if (:sidebar-visible sidebar-data) "" "none") 
-                                :marginLeft (if hidden "-400px" "0px")}} 
-
+      (dom/div nil 
                (dom/i #js {:style #js {:background "rgba(0,0,0,0.9)" :borderRadius "0px 100em 100em 0px" :padding "10px"
                                        :position "fixed" :top "50%" :zIndex "1000" :left (if hidden "0px" "400px")
-                                       :cursor "pointer"}
+                                       :cursor "pointer" :display (if (:sidebar-visible sidebar-data) "" "none")}
                            :onClick #(om/update-state! owner :hidden u/toggle)
                            :className (str "fa " (if hidden "fa-chevron-right" "fa-chevron-left") " fa-2x")})
 
-               (dom/p #js {:style (clj->js sidebar-header-p)} 
-                      "Nangpress Menu"
-                      (dom/i #js {:style (clj->js sidebar-close-icon)
-                                  :className "fa fa-times fa-2x"
-                                  :onClick #(om/update-state! owner :hidden u/toggle)})
-                      (dom/i #js {:style (clj->js (merge sidebar-close-icon {:marginRight "10px"}))
-                                  :className "fa fa-home fa-2x"
-                                  :onClick #(update-sidebar-page! "base-menu")}))
+               (dom/div #js {:id "mySidenav"
+                             :className "sidenav"
+                             :style #js {:width "400px" :display (if (:sidebar-visible sidebar-data) "" "none") 
+                                         :marginLeft (if hidden "-400px" "0px")}} 
 
-               (dom/div #js {:style #js {:padding "5px" :fontWeight "600"}} 
-                        (sidebar-content (:sidebar-page sidebar-data) owner))))))
+                        (dom/p #js {:style (clj->js sidebar-header-p)} 
+                               "Nangpress Menu"
+                               (dom/i #js {:style (clj->js sidebar-close-icon)
+                                           :className "fa fa-times fa-2x"
+                                           :onClick #(om/update-state! owner :hidden u/toggle)})
+                               (dom/i #js {:style (clj->js (merge sidebar-close-icon {:marginRight "10px"}))
+                                           :className "fa fa-home fa-2x"
+                                           :onClick #(update-sidebar-page! "base-menu")}))
+
+                        (dom/div #js {:style #js {:padding "5px" :fontWeight "600"}} 
+                                 (sidebar-content (:sidebar-page sidebar-data) owner)))))))
 
 (defn master 
   "This component is the master of routing. The current route of the app is considered part of the monolith i.e. 

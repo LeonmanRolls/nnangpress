@@ -61,7 +61,7 @@
                  (.focus medium)
                  (.invokeElement 
                    medium 
-                   "div" 
+                   "a" 
                    #js {:title "I am a link"
                         :style "color: #66d9ef"
                         :target "_blank"
