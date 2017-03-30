@@ -20,7 +20,9 @@ Having two people collaborate in real-time on editing a site through this GUI is
 less reduced to the problem of keeping their site datastructures synced. Creating sites is very cheap, baring assets 
 a site is just a few kb of data. Backing up a site is easy, the user can just download their datastructure. 
 
-## Future 
+# Future 
+
+- Greatly improve UX
 
 - Realtime collaboration
 
