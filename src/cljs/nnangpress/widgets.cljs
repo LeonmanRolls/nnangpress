@@ -21,6 +21,8 @@
     [cljs.spec :as s]
     [clojure.set :as st]))
 
+(enable-console-print!)
+
 (declare widget-data-type admin-sidebar main-view)
 
 (s/def ::imgs vector?)
@@ -46,10 +48,13 @@
                                 :tags nil
                                 :pasteAsText false
                                 :modifiers #js {:b (fn [event element]
+                                                     (println "medium-init b")
                                                      ) 
                                                 :q (fn [event element]
-                                                     (om/update!
+                                                     (.log js/console (str "innerhtml: " (gdom/getElement uuid)))
+                                                     #_(om/update!
                                                        data
+                                                       :inner-html
                                                        [(.-innerHTML (gdom/getElement uuid))]))}})
 
         _ (set! (-> medium .-fontSize) 1)
@@ -113,42 +118,37 @@
       (.destroy medium)
       (ndom/remove-listener link-btn-id cb))))
 
-;false false
 (defn rich-text-edit 
   "Mediumjs rich text editor" 
-  [data owner]
+  [{uid :object-id inner-html :inner-html :as data} owner]
   (reify
     om/IInitState
     (init-state [_]
-      {:uid (u/uid)
-       :advertise? false
+      {:advertise? false
        :edit-uid (u/uid)
        :link-btn-id (u/uid)
        :link-input-id (u/uid)})
 
     om/IDidMount
     (did-mount [_]
-      (let [{:keys [uid advertise? edit-uid link-btn-id link-input-id edit]} (om/get-state owner)
+      (let [{:keys [advertise? edit-uid link-btn-id link-input-id edit]} (om/get-state owner)
             edit-mode-obs (first (om/observe owner (mn/edit-mode)))]
         (medium-init uid data link-btn-id link-input-id edit-uid)
         (ndom/set-attr-by-id uid "contenteditable" (if (or edit-mode-obs edit) "true" "false"))))
 
     om/IDidUpdate
     (did-update [_ _ _]
-      (let [{:keys [uid advertise? edit-uid link-btn-id link-input-id edit]} (om/get-state owner)
-            edit-mode-obs (first (mn/edit-mode))
-            medium-destroy (medium-init uid data link-btn-id link-input-id edit-uid)]
-        (medium-destroy)
-        (medium-init uid data link-btn-id link-input-id edit-uid)
+      (let [{:keys [edit]} (om/get-state owner)
+            edit-mode-obs (first (mn/edit-mode))]
         (ndom/set-attr-by-id uid "contenteditable" (if (or edit-mode-obs edit) "true" "false"))))
 
     om/IRenderState
-    (render-state [_ {:keys [uid advertise? edit-uid link-btn-id link-input-id style]}]
+    (render-state [_ {:keys [ advertise? edit-uid link-btn-id link-input-id style]}]
       (let [edit-mode-obs (first (om/observe owner (mn/edit-mode)))]
         (dom/div #js {:style (clj->js style)} 
                  (dom/div #js {:id uid
                                :style #js {:marginTop "-10px" :outline (if edit-mode-obs "1px solid blue" "")}
-                               :dangerouslySetInnerHTML #js {:__html (first data)}})
+                               :dangerouslySetInnerHTML #js {:__html (first inner-html)}})
 
                  (dom/div #js {:id edit-uid 
                                :style #js {:display (cc/edit-mode-display edit-mode-obs) :textAlign "left"}}
@@ -165,6 +165,10 @@
                                       (dom/i #js {:className "fa fa-align-justify"}))
                           (dom/button #js {:className "align-right" :onClick #(om/update! style :textAlign "right")} 
                                       (dom/i #js {:className "fa fa-align-right"}))
+                          (dom/button #js {:className "align-left" :onClick #(om/update! 
+                                                                               inner-html 
+                                                                               [(.-innerHTML (gdom/getElement uid))])} 
+                                      (dom/i #js {:className "fa fa-save"}))
 
                           (dom/input #js {:id link-input-id})
                           (dom/button #js{:id link-btn-id} "Link")))))))
@@ -172,7 +176,8 @@
 (s/def ::textAlign (s/and string? #{"left" "center" "right"}))
 
 (s/fdef build-rich-text
-        :args (s/cat :data ::spcs/indexed-cursor :style (s/and (s/keys :req-un [::textAlign]) ::spcs/map-cursor)))
+        :args (s/cat :data (s/and ::spcs/map-cursor #(and (contains? % :object-id) (contains? % :inner-html))) 
+                     :style (s/and (s/keys :req-un [::textAlign]) ::spcs/map-cursor)))
 
 (defn build-rich-text 
   "Gives us a chance to spec the buliding of the simple text component." 
@@ -198,7 +203,7 @@
     om/IRenderState
     (render-state [_ {:keys [edit]}]
       (dom/div nil 
-               (om/build rich-text-edit (:inner-html data) {:state {:edit edit :style (:style data)}})))))
+               (om/build rich-text-edit data {:state {:edit edit :style (:style data)}})))))
 
 (defmethod widget-data-type 2 [_]
   (s/keys :req-un [::widget-uid ::object-id ::imgs]))
@@ -287,8 +292,7 @@
     om/IRender
     (render [_]
       (dom/div #js {:className "box-paragraph"}
-               (build-rich-text (:inner-html data) (:style data))
-               #_(om/build rich-text-edit {:state {:style (:style data)}})))))
+               (build-rich-text data (:style data))))))
 
 (defmethod widget-data-type 4 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::text]))
@@ -355,7 +359,7 @@
     om/IRender
     (render [_]
       (dom/div #js {:className "box-paragraph-clear"}
-               (om/build rich-text-edit (:inner-html data))))))
+               (om/build rich-text-edit data)))))
 
 (defmethod widget-data-type 6 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::img]))
@@ -694,7 +698,7 @@
                         (om/build-all tag tags {:state {:tags tags}}))
 
                  (dom/div #js {:className "box-paragraph"}
-                          (om/build rich-text-edit (:inner-html data))
+                          (om/build rich-text-edit data)
                           (dom/div #js {:style #js {:textAlign "center"}} 
                                    (dom/button #js {:style #js {:padding "10px 20px"}
                                                     :onClick (partial rt/js-link @routes-map-obs more-info) 
@@ -851,6 +855,7 @@
   (fn [event element]
     (let [uuid (-> event .-srcElement .-id)]
       (do 
+        (.log js/console "meidum-init-rt")
         (om/update!
           parent-cursor 
           :route-name
@@ -869,7 +874,9 @@
                                 :attributes nil
                                 :tags nil
                                 :pasteAsText false
-                                :modifiers #js {:q (route-modifier data parent-cursor routes-map)}})
+                                :modifiers #js {:q 
+                                                (route-modifier data parent-cursor routes-map)
+                                                }})
 
         cb (ndom/attach-click-listener-by-id 
              link-btn-id 
@@ -903,10 +910,10 @@
 
     om/IDidMount
     (did-mount [_]
-      (let [{:keys [uid advertise? link-btn-id link-input-id edit parent-cursor routes-map]} (om/get-state owner)
-            edit-mode-obs (first (om/observe owner (mn/edit-mode)))]
-        (medium-init-rt uid data link-btn-id link-input-id parent-cursor routes-map)
-        (ndom/set-attr-by-id uid "contenteditable" (str (or edit-mode-obs edit)))))
+      #_(let [{:keys [uid advertise? link-btn-id link-input-id edit parent-cursor routes-map]} (om/get-state owner)
+              edit-mode-obs (first (om/observe owner (mn/edit-mode)))]
+          (medium-init-rt uid data link-btn-id link-input-id parent-cursor routes-map)
+          (ndom/set-attr-by-id uid "contenteditable" (str (or edit-mode-obs edit)))))
 
     om/IDidUpdate
     (did-update [_ _ _]
@@ -937,8 +944,8 @@
     (render-state [_ {:keys [edit parent-cursor routes-map]}]
       (dom/div nil 
                (om/build rich-text-edit-rt (:inner-html data) {:state {:edit false 
-                                                                       :parent-cursor parent-cursor 
-                                                                       :routes-map routes-map}})))))
+                                                         :parent-cursor parent-cursor 
+                                                         :routes-map routes-map}})))))
 
 (defmethod widget 17  
   [data owner]
@@ -961,24 +968,25 @@
                         "EDIT THIS SITE NOW!")
 
                  (dom/div #js {:style #js {:marginBottom "1em"}} 
-                          (dom/button #js {:onClick #(mn/toggle-edit-mode), :className "button-one"} (if edit-mode-obs "EXIT EDIT MODE" "CLICK HERE!"))))))))
+                          (dom/button #js {:onClick #(mn/toggle-edit-mode), :className "button-one"} 
+                                      (if edit-mode-obs "EXIT EDIT MODE" "CLICK HERE!"))))))))
 
 ;Box text with youtube vid(s)
-(defmethod widget 19 [{:keys [inner-html style vid-id]} owner]
+(defmethod widget 19 [{:keys [inner-html style vid-id] :as data} owner]
   (reify
     om/IRender
     (render [_]
       (dom/div #js {:className "box-paragraph"}
-               (build-rich-text inner-html style)
+               (build-rich-text data style)
                (om/build widget vid-id)))))
 
 ;Text with like box
-(defmethod widget 20 [{:keys [inner-html style like-boxes]} owner]
+(defmethod widget 20 [{:keys [inner-html style like-boxes] :as data} owner]
   (reify
     om/IRender
     (render [_]
       (dom/div #js {:className "box-paragraph"}
-               (build-rich-text inner-html style)
+               (build-rich-text data style)
                (apply dom/div #js {:style #js {:marginTop "10px"}} 
                       (om/build-all widget like-boxes))))))
 
