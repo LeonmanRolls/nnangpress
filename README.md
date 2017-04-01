@@ -44,7 +44,7 @@ a site is just a few kb of data. Backing up a site is easy, the user can just do
 
 ## Testing 
 
-- boot test-reload test-cljs
+- boot auto-test 
 
 ## Routing
 

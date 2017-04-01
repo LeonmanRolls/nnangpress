@@ -1,126 +1,3 @@
-      (println (map :site-id (<! c)))
-      ))
-(ns nnangpress.firebase
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require 
-    [clojure.walk :as wlk]
-    [cljs.core.async :refer [put! chan <!]]))
-(defn get-users-site-ids
-  "" 
-  []
-  (go 
-    (let [c (chan)
-          _ (fb/firebase-get (str "users/" (first (:uid @(all-data))) "/sites") c)]
-      (map :site-id (<! c)))))
-(defn get-users-site-ids
-  "" 
-  [uid]
-  (go 
-    (let [c (chan)
-          _ (firebase-get (str "users/" uid "/sites") c)]
-      (map :site-id (<! c)))))
-(ns nnangpress.monolith
-  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
-            [om.dom :as dom :include-macros true]
-            [nnangpress.utils :as u]
-            [nnangpress.dom :as ndom]
-            [nnangpress.specs :as spcs]
-            [nnangpress.widgetdata :as wd]
-            [clojure.zip :as z]
-            [clojure.spec :as s]
-            [clojure.walk :as wlk]
-            [cljs.core.async :refer [put! chan <!]]
-            [nnangpress.firebase :as fb]))
-(go 
-   (<! (fb/get-users-site-ids (first (:uid @(all-data))))) 
-    )
-(go 
-   (println (<! (fb/get-users-site-ids (first (:uid @(all-data)))))) 
-    )
-(ns nnangpress.firebase
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require 
-    [clojure.walk :as wlk]
-    [cljs.core.async :refer [put! chan <!]]))
-(defn get-users-site-ids
-  "" 
-  [uid]
-  (go 
-    (let [c (chan)
-          _ (firebase-get (str "users/" uid "/sites") c)]
-      (map :site-id (<! c)))))
-(ns nnangpress.monolith
-  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
-            [om.dom :as dom :include-macros true]
-            [nnangpress.utils :as u]
-            [nnangpress.dom :as ndom]
-            [nnangpress.specs :as spcs]
-            [nnangpress.widgetdata :as wd]
-            [clojure.zip :as z]
-            [clojure.spec :as s]
-            [clojure.walk :as wlk]
-            [cljs.core.async :refer [put! chan <!]]
-            [nnangpress.firebase :as fb]))
-(go 
-   (println (<! (fb/get-users-site-ids (first (:uid @(all-data)))))) 
-    )
-(ns nnangpress.utils
-  (:require [clojure.string :as stg]))
-(defn coll-contains? 
-  "Core contains? only works on maps."
-  [coll x]
-  (some #(= x %) coll))
-(ns nnangpress.monolith
-  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
-            [om.dom :as dom :include-macros true]
-            [nnangpress.utils :as u]
-            [nnangpress.dom :as ndom]
-            [nnangpress.specs :as spcs]
-            [nnangpress.widgetdata :as wd]
-            [clojure.zip :as z]
-            [clojure.spec :as s]
-            [clojure.walk :as wlk]
-            [cljs.core.async :refer [put! chan <!]]
-            [nnangpress.firebase :as fb]))
-(first (:site-id-vec @(all-data)))
-(go 
-    (println (u/contains? 
-               (<! (fb/get-users-site-ids (first (:uid @(all-data)))))  
-               (first (:site-id-vec @(all-data)))             
-               )) 
-    )
-(go 
-    (println (u/coll-contains? 
-               (<! (fb/get-users-site-ids (first (:uid @(all-data)))))  
-               (first (:site-id-vec @(all-data)))             
-               )) 
-    )
-(ns nnangpress.firebase
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require 
-    [clojure.walk :as wlk]
-    [cljs.core.async :refer [put! chan <!]]))
-(ns nnangpress.firebase
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require 
-    [nnangpress.utils :as u]
-    [clojure.walk :as wlk]
-    [cljs.core.async :refer [put! chan <!]]))
-(defn site-owner?
-  ""
-  [user-uid site-id]
-  (go 
-    (u/coll-contains? (<! (get-users-site-ids user-uid)) site-id)))
-(ns nnangpress.monolith
-  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
             [om.dom :as dom :include-macros true]
             [nnangpress.utils :as u]
             [nnangpress.dom :as ndom]
@@ -497,4 +374,127 @@ live-site?
 (fb-copy
     "/nangpress-data/admin-route-widgets/userhome/" 
     "/nangpress-data/admin-sites/userhome/route-widget/" 
+    )
+(start-repl)
+(ns nnangpress.firebase
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require 
+    [nnangpress.utils :as u]
+    [clojure.walk :as wlk]
+    [cljs.core.async :refer [put! chan <!]]))
+  (firebase-get "/users")
+  (println (<! (firebase-get "/users")))
+(go 
+  (println (<! (firebase-get "/users")))
+    )
+(go 
+    (let [c (chan)]
+      (firebase-get "/users" c)
+      (println (<! c))
+      )
+    )
+(go 
+    (let [c (chan)]
+      (firebase-get "/users" c)
+      (println (map first (<! c)))
+      )
+    )
+(go 
+    (let [c (chan)]
+      (firebase-get "/users" c)
+      (println (keys (<! c)))
+      )
+    )
+(.log js/console "hi there")
+(go 
+    (let [c (chan)]
+      (firebase-get "/users" c)
+      (println (keys (<! c)))
+      )
+    )
+      (println (map name (keys (<! c))))
+(go 
+    (let [c (chan)]
+      (firebase-get "/users" c)
+      (println (map name (keys (<! c))))
+      )
+    )
+(defn current-users 
+  "Potential for performance issues as child nodes are being returned. "
+  []
+  (go 
+    (let [c (chan)
+          _  (firebase-get "/users" c)]
+      (map str (keys (<! c))))))
+(go 
+    (println (<! (current-users)))
+    )
+  (map (comp str name) [:hi :there])
+  (map (comp str ) [:hi :there])
+(defn current-users 
+  "Potential for performance issues as child nodes are being returned. "
+  []
+  (go 
+    (let [c (chan)
+          _  (firebase-get "/users" c)]
+      (map (comp str name) (keys (<! c))))))
+(go 
+    (println (<! (current-users)))
+    )
+(go 
+    (println 
+      (<! (current-users))
+      )
+    )
+(go 
+    (println 
+      (coll-contains? "test" (<! (current-users)))
+      )
+    )
+(go 
+    (println 
+      (u/coll-contains? "test" (<! (current-users)))
+      )
+    )
+(go 
+    (println 
+      (u/coll-contains? (<! (current-users)) "test")
+      )
+    )
+(go 
+    (println 
+      (u/coll-contains? (<! (current-users)) "test")
+      )
+    )
+(go 
+    (println 
+      (not (u/coll-contains? (<! (current-users)) "test"))
+      )
+    )
+(go 
+    (println 
+      (not (u/coll-contains? (<! (current-users)) "blabla"))
+      )
+    )
+(defn new-user? 
+  "" 
+  []
+  (go 
+    (not (u/coll-contains? (<! (current-users)) "blabla"))))
+(go 
+   (<! (new-user? "test")) 
+    )
+(go 
+   (prn (<! (new-user? "test"))) 
+    )
+(defn new-user? 
+  "" 
+  [uid]
+  (go 
+    (not (u/coll-contains? (<! (current-users)) uid))))
+(go 
+   (prn (<! (new-user? "test"))) 
+    )
+(go 
+   (prn (<! (new-user? "testest"))) 
     )

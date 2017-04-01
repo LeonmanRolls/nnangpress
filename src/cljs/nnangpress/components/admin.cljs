@@ -1,7 +1,9 @@
 (ns nnangpress.components.admin
   "Admin components that the user is not able to edit. Some admin components are able to be used by the end user such 
   as the 'sign in' widget."
+  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require 
+    [cljs.core.async :refer [put! chan <!]]
     [nnangpress.utils :as u]
     [nnangpress.components.common :as cc]
     [nnangpress.widgets :as wgt]
@@ -37,7 +39,10 @@
                                    (fb/fb-initiate-auth 
                                      "firebase"
                                      (fn [user]
-                                       (mn/auth-state-load-site! master "super-container"))))}
+                                       (go 
+                                         (when (<! (fb/new-user? (.-uid user))) 
+                                           (fb/register-new-user (.-uid user) (mn/new-site-template)))
+                                         (mn/auth-state-load-site! master "super-container")))))}
                    "Sign up / Sign in"))))))
 
 (defn admin-toolbar 

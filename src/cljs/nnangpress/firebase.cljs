@@ -10,7 +10,6 @@
   [cb]
   #js {:callbacks
        #js {:signInSuccess (fn [user credential redirectUrl]
-                             (.dir js/console user)
                              (cb user)
                              false)}
        :signInFlow "popup"
@@ -143,16 +142,35 @@
       (empty? user-uid)  false
       :else (u/coll-contains? (<! (get-users-site-ids user-uid)) site-id))))
 
+(defn current-users 
+  "Potential for performance issues as child nodes are being returned. "
+  []
+  (go 
+    (let [c (chan)
+          _  (firebase-get "/users" c)]
+      (map (comp str name) (keys (<! c))))))
+
+(defn new-user? 
+  "" 
+  [uid]
+  (go 
+    (not (u/coll-contains? (<! (current-users)) uid))))
+
+(defn register-new-user 
+  ""
+  [uid data]
+  (fb-write (str "/users/" uid "/sites/0") data))
+
 (comment 
+
+  (fb-write (str "/users/" "new-user")  )
+
+  (go 
+    (prn (<! (new-user? "testest"))))
 
   (fb-copy
     "/nangpress-data/admin-route-widgets/userhome/" 
-    "/nangpress-data/admin-sites/userhome/route-widget/" 
-    )
-
-  (fb-write
-    "/nangpress-data/admin-sites/userhome"
-    (nnangpress.monolith/new-site-template))
+    "/nangpress-data/admin-sites/userhome/route-widget/")
 
   )
 
