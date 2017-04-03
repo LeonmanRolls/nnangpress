@@ -61,9 +61,14 @@
     (fn [x] 
       (om/update! cursor [(-> x .-srcElement .-innerHTML)]))))
 
-(defn set-style-by-id
-  "" 
-  []
+(defn left-click? [event-which] (= 1 event-which))
 
-  )
+(defn inside-element? [e element-id]
+  (if 
+    (= 1 (-> 
+           (js/$ (.-target e)) 
+           (.closest (str "#" element-id))
+           .-length)) 
+    true
+    false))
 

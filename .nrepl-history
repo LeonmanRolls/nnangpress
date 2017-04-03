@@ -1,500 +1,500 @@
-            [om.dom :as dom :include-macros true]
-            [nnangpress.utils :as u]
-            [nnangpress.dom :as ndom]
-            [nnangpress.specs :as spcs]
-            [nnangpress.widgetdata :as wd]
-            [clojure.zip :as z]
-            [clojure.spec :as s]
-            [clojure.walk :as wlk]
-            [cljs.core.async :refer [put! chan <!]]
-            [nnangpress.firebase :as fb]))
-(ns nnangpress.monolith
-  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
-            [om.dom :as dom :include-macros true]
-            [nnangpress.utils :as u]
-            [nnangpress.dom :as ndom]
-            [nnangpress.specs :as spcs]
-            [nnangpress.widgetdata :as wd]
-            [clojure.zip :as z]
-            [clojure.spec :as s]
-            [clojure.walk :as wlk]
-            [cljs.core.async :refer [put! chan <!]]
-            [nnangpress.firebase :as fb]))
-(:site-id-vec @(all-data))
-(:uid @(all-data))
-  (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data))))
-(println 
-    (<! 
-      (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data))))))
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-(:uid @(all-data))
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-(ns nnangpress.monolith
-  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
-            [om.dom :as dom :include-macros true]
-            [nnangpress.utils :as u]
-            [nnangpress.dom :as ndom]
-            [nnangpress.specs :as spcs]
-            [nnangpress.widgetdata :as wd]
-            [clojure.zip :as z]
-            [clojure.spec :as s]
-            [clojure.walk :as wlk]
-            [cljs.core.async :refer [put! chan <!]]
-            [nnangpress.firebase :as fb]))
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-(first (:uid @(all-data)))
-(first (:site-id-vec @(all-data)))
-(ns nnangpress.firebase
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require 
-    [nnangpress.utils :as u]
-    [clojure.walk :as wlk]
-    [cljs.core.async :refer [put! chan <!]]))
-(defn site-owner?
-  ""
-  [user-uid site-id]
-  (cond 
-    (empty? user-id)  false
-    :else (go 
-            (u/coll-contains? (<! (get-users-site-ids user-uid)) site-id))))
-(ns nnangpress.monolith
-  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
-            [om.dom :as dom :include-macros true]
-            [nnangpress.utils :as u]
-            [nnangpress.dom :as ndom]
-            [nnangpress.specs :as spcs]
-            [nnangpress.widgetdata :as wd]
-            [clojure.zip :as z]
-            [clojure.spec :as s]
-            [clojure.walk :as wlk]
-            [cljs.core.async :refer [put! chan <!]]
-            [nnangpress.firebase :as fb]))
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-(ns nnangpress.firebase
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require 
-    [nnangpress.utils :as u]
-    [clojure.walk :as wlk]
-    [cljs.core.async :refer [put! chan <!]]))
-(defn site-owner?
-  ""
-  [user-uid site-id]
-  (go 
-    (cond 
-      (empty? user-id)  false
-      :else (u/coll-contains? (<! (get-users-site-ids user-uid)) site-id))))
-(ns nnangpress.monolith
-  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
-            [om.dom :as dom :include-macros true]
-            [nnangpress.utils :as u]
-            [nnangpress.dom :as ndom]
-            [nnangpress.specs :as spcs]
-            [nnangpress.widgetdata :as wd]
-            [clojure.zip :as z]
-            [clojure.spec :as s]
-            [clojure.walk :as wlk]
-            [cljs.core.async :refer [put! chan <!]]
-            [nnangpress.firebase :as fb]))
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-(fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data))))
-(<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-(:uid @(all-data))
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-(first (:uid @(all-data)))
-(first (:site-id-vec @(all-data)))
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-(ns nnangpress.monolith
-  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
-            [om.dom :as dom :include-macros true]
-            [nnangpress.utils :as u]
-            [nnangpress.dom :as ndom]
-            [nnangpress.specs :as spcs]
-            [nnangpress.widgetdata :as wd]
-            [clojure.zip :as z]
-            [clojure.spec :as s]
-            [clojure.walk :as wlk]
-            [cljs.core.async :refer [put! chan <!]]
-            [nnangpress.firebase :as fb]))
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-(println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data))))))
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-fb/site-owner?
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-(use 'nnangpress.monolith :reload)
+       (<! (nnangpress.utils/timeout 1000))
+       (set! (-> (ndom/get-node-by-id "body") .-style .-left) (str % "px")))  
+    (take 1000 (repeatedly #(rand-int 42)))
+    )
 l
-(ns nnangpress.monolith
-  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
-            [om.dom :as dom :include-macros true]
-            [nnangpress.utils :as u]
-            [nnangpress.dom :as ndom]
-            [nnangpress.specs :as spcs]
-            [nnangpress.widgetdata :as wd]
-            [clojure.zip :as z]
-            [clojure.spec :as s]
-            [clojure.walk :as wlk]
-            [cljs.core.async :refer [put! chan <!]]
-            [nnangpress.firebase :as fb]))
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-  (load-namespace 'nnangpress.monolith)
-(all-data)
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-(go
-    (println 
-      (<! 
-        (nnangpress.firebase/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-  (load-namespace 'nnangpress.firebase)
-  (load-namespace 'nnangpress.monolith)
-(go
-    (println 
-      (<! 
-        (/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
+(run! 
+    #(go 
+       (<! (nnangpress.utils/timeout 1000))
+       (set! (-> (ndom/get-node-by-id "body") .-style .-left) (str % "px")))  
+    (take 10 (repeatedly #(rand-int 42)))
+    )
+(run! 
+    (fn [x]
+      (go 
+       (<! (nnangpress.utils/timeout 1000))
+       (set! (-> (ndom/get-node-by-id "body") .-style .-left) (str x "px")))
+      )  
+    (take 10 (repeatedly #(rand-int 42)))
+    )
+(run! 
+    (fn [x]
+      (go 
+       (<! (nnangpress.utils/timeout 1000))
+       (set! (-> (ndom/get-node-by-id "body") .-style .-left) (str x "px")))
+      )  
+    (take 10 (repeatedly #(rand-int 42)))
+    )
 l
-(go
-    (println 
-      (<! 
-        (/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-  (load-namespace 'nnangpress.firebase)
-(defn site-owner?
-  ""
-  [user-uid site-id]
-  (go 
-    (cond 
-      (empty? user-uid)  false
-      :else (u/coll-contains? (<! (get-users-site-ids user-uid)) site-id))))
-  (load-namespace 'nnangpress.monolith)
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-  (load-namespace 'nnangpress.monolith)
-(start-repl)
-  (load-namespace 'nnangpress.monolith)
-live-site?
-(ns nnangpress.monolith
-  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
-            [om.dom :as dom :include-macros true]
-            [nnangpress.utils :as u]
-            [nnangpress.dom :as ndom]
-            [nnangpress.specs :as spcs]
-            [nnangpress.widgetdata :as wd]
-            [clojure.zip :as z]
-            [clojure.spec :as s]
-            [clojure.walk :as wlk]
-            [cljs.core.async :refer [put! chan <!]]
-            [nnangpress.firebase :as fb]))
-live-site?
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-(first (:uid @(all-data)))
-(first (:site-id-vec @(all-data)))
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-(ns nnangpress.utils
-  (:require [clojure.string :as stg]))
-(coll-contains? [1 2 3] 1)
-(coll-contains? [1 2 3] 0)
-(defn coll-contains? 
-  "This exists because core contains? only works on maps."
-  [coll x]
-  (if (some #(= x %) coll) true false))
-(coll-contains? [1 2 3] 0)
-(coll-contains? [1 2 3] 1)
-(ns nnangpress.monolith
-  "Functions for reading and updating the monlith. Most side-effecting functions should go here."
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
-            [om.dom :as dom :include-macros true]
-            [nnangpress.utils :as u]
-            [nnangpress.dom :as ndom]
-            [nnangpress.specs :as spcs]
-            [nnangpress.widgetdata :as wd]
-            [clojure.zip :as z]
-            [clojure.spec :as s]
-            [clojure.walk :as wlk]
-            [cljs.core.async :refer [put! chan <!]]
-            [nnangpress.firebase :as fb]))
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-(go
-    (println 
-      (<! 
-        (fb/site-owner? (first (:uid @(all-data))) (first (:site-id-vec @(all-data)))))))
-(user-email)
-(ns nnangpress.firebase
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require 
-    [nnangpress.utils :as u]
-    [clojure.walk :as wlk]
-    [cljs.core.async :refer [put! chan <!]]))
-(nnangpress.monolith/new-site-template)
-(fb-write
-    "/nangpress-data/admin-sites/"
-    (nnangpress.monolith/new-site-template))
-(fb-write
-    "/nangpress-data/admin-sites/homepage"
-    (nnangpress.monolith/new-site-template))
-(fb-write
-    "/nangpress-data/admin-sites/userhome"
-    (nnangpress.monolith/new-site-template))
-(fb-copy
-    "/nangpress-data/admin-route-widgets/homepage/" 
-    "/nangpress-data/admin-sites/homepage/route-widget/" 
+(doall
+  (map 
+    #(set! (-> (ndom/get-node-by-id "body") .-style .-left) (str % "px"))  
+    (take 10 (repeatedly #(rand-int 42)))
+    )  
     )
-(fb-copy
-    "/nangpress-data/admin-route-widgets/userhome/" 
-    "/nangpress-data/admin-sites/userhome/route-widget/" 
+(doall
+  (map 
+    #(set! (-> (ndom/get-node-by-id "body") .-style .-left) (str % "px"))  
+    (take 10 (repeatedly #(rand-int 42)))
+    )  
     )
-(start-repl)
-(ns nnangpress.firebase
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require 
-    [nnangpress.utils :as u]
-    [clojure.walk :as wlk]
-    [cljs.core.async :refer [put! chan <!]]))
-  (firebase-get "/users")
-  (println (<! (firebase-get "/users")))
+(run! 
+    (fn [x]
+      (go 
+       (<! (nnangpress.utils/timeout 1000))
+       (set! (-> (ndom/get-node-by-id "body") .-style .-left) (str x "px")))
+      )  
+    (take 10 (repeatedly #(rand-int 42)))
+    )
+l
 (go 
-  (println (<! (firebase-get "/users")))
+ (run! 
+    (fn [x]
+(<! (nnangpress.utils/timeout 1000))
+       (set! (-> (ndom/get-node-by-id "body") .-style .-left) (str x "px"))
+      )  
+    (take 10 (repeatedly #(rand-int 42)))
+    )   
     )
 (go 
-    (let [c (chan)]
-      (firebase-get "/users" c)
-      (println (<! c))
+ (run! 
+    (fn [x]
+(<! (nnangpress.utils/timeout 1000))
+       (set! (-> (ndom/get-node-by-id "body") .-style .-left) (str x "px"))
+      )  
+    (take 10 (repeatedly #(rand-int 42)))
+    )   
+    )
+(doall
+    (map 
+(fn [x]
+      (go 
+       (<! (nnangpress.utils/timeout 1000))
+       (set! (-> (ndom/get-node-by-id "body") .-style .-left) (str x "px")))
       )
+      (take 10 (repeatedly #(rand-int 42)))
+      )  
     )
-(go 
-    (let [c (chan)]
-      (firebase-get "/users" c)
-      (println (map first (<! c)))
+l
+(doall
+    (map 
+(fn [x]
+      (go 
+       (<! (nnangpress.utils/timeout 1000))
+       (set! (-> (ndom/get-node-by-id "body") .-style .-left) (str x "px")))
       )
+      (take 10 (repeatedly #(rand-int 42)))
+      )  
+    )
+l
+(doseq
+    (map 
+      (fn [x]
+        (go 
+          (<! (nnangpress.utils/timeout 1000))
+          (set! (-> (ndom/get-node-by-id "body") .-style .-left) (str x "px")))
+        )
+      (take 10 (repeatedly #(rand-int 42)))
+      )  
     )
 (go 
-    (let [c (chan)]
-      (firebase-get "/users" c)
-      (println (keys (<! c)))
+    (doseq
+      (map 
+        (fn [x]
+          (<! (nnangpress.utils/timeout 1000))
+          (set! (-> (ndom/get-node-by-id "body") .-style .-left) (str x "px"))
+          )
+        (take 10 (repeatedly #(rand-int 42)))
+        )  
+      )  
+    )
+(go 
+    (doseq
+      (map 
+        (fn [x]
+          (<! (nnangpress.utils/timeout 1000))
+          (set! (-> (ndom/get-node-by-id "body") .-style .-left) (str x "px"))
+          )
+        (vec (take 10 (repeatedly #(rand-int 42))))
+        )  
+      )  
+    )
+(go 
+    (doseq
+      (fn [x]
+        (<! (nnangpress.utils/timeout 1000))
+        (set! (-> (ndom/get-node-by-id "body") .-style .-left) (str x "px"))
+        )
+      (vec (take 10 (repeatedly #(rand-int 42))))
+      )  
+    )
+l
+(go 
+    (doseq
+      (fn [x]
+        (<! (nnangpress.utils/timeout 1000))
+        (set! (-> (ndom/get-node-by-id "body") .-style .-left) (str x "px"))
+        )
+      (vec (take 10 (repeatedly #(rand-int 42))))
+      )  
+    )
+(vec (take 10 (repeatedly #(rand-int 42))))
+(doseq [x (take 10 (repeatedly #(rand-int 42)))] 
+      (do
+        (<! (nnangpress.utils/timeout 1000))
+        (set! (-> (ndom/get-node-by-id "body") .-style .-left) (str x "px"))
+        )
       )
-    )
-(.log js/console "hi there")
-(go 
-    (let [c (chan)]
-      (firebase-get "/users" c)
-      (println (keys (<! c)))
+(doseq [x (take 10 (repeatedly #(rand-int 42)))] 
+      (go
+        (<! (nnangpress.utils/timeout 1000))
+        (set! (-> (ndom/get-node-by-id "body") .-style .-left) (str x "px"))
+        )
       )
-    )
-      (println (map name (keys (<! c))))
+l
 (go 
-    (let [c (chan)]
-      (firebase-get "/users" c)
-      (println (map name (keys (<! c))))
+ (doseq [x (take 10 (repeatedly #(rand-int 42)))] 
+      (do
+        (<! (nnangpress.utils/timeout 1000))
+        (set! (-> (ndom/get-node-by-id "body") .-style .-left) (str x "px"))
+        )
+      )   
+    )
+(go 
+ (doseq [x (take 10 (repeatedly #(rand-int 42)))] 
+      (do
+        (<! (nnangpress.utils/timeout 1000))
+        #_(set! (-> (ndom/get-node-by-id "body") .-style .-left) (str x "px"))
+        )
+      )   
+    )
+(go 
+ (doseq [x (take 10 (repeatedly #(rand-int 42)))] 
+      (do
+        (<! (nnangpress.utils/timeout 1000))
+        (.log js/console "hi there")
+        #_(set! (-> (ndom/get-node-by-id "body") .-style .-left) (str x "px"))
+        )
+      )   
+    )
+(go 
+ (doseq [x (take 10 (repeatedly #(rand-int 42)))] 
+      (do
+        (<! (nnangpress.utils/timeout 1000))
+        (.log js/console "hi there")
+        (set! (-> (ndom/get-node-by-id "body") .-style .-left) (str x "px"))
+        )
+      )   
+    )
+l
+(-> (ndom/get-node-by-id "body") .-style .-left)
+(go 
+ (doseq [x (take 10 (repeatedly #(rand-int 42)))] 
+      (do
+        (<! (nnangpress.utils/timeout 1000))
+        (.log js/console "hi there")
+        (set! (-> (ndom/get-node-by-id "body") .-style .-left) (str x "px"))
+        )
+      )   
+    )
+q
+        (aset (-> (ndom/get-node-by-id "body") .-style) "left" (str "100" "px"))
+(go 
+ (doseq [x (take 10 (repeatedly #(rand-int 42)))] 
+      (do
+        (<! (nnangpress.utils/timeout 1000))
+        (.log js/console "hi there")
+        (aset (-> (ndom/get-node-by-id "body") .-style) "left" (str x "px"))
+        )
+      )   
+    )
+(doseq [x (take 10 (repeatedly #(rand-int 42)))] 
+      (go
+        (<! (nnangpress.utils/timeout 1000))
+        (.log js/console "hi there")
+        (aset (-> (ndom/get-node-by-id "body") .-style) "left" (str x "px"))
+        )
       )
-    )
-(defn current-users 
-  "Potential for performance issues as child nodes are being returned. "
-  []
-  (go 
-    (let [c (chan)
-          _  (firebase-get "/users" c)]
-      (map str (keys (<! c))))))
 (go 
-    (println (<! (current-users)))
-    )
-  (map (comp str name) [:hi :there])
-  (map (comp str ) [:hi :there])
-(defn current-users 
-  "Potential for performance issues as child nodes are being returned. "
-  []
-  (go 
-    (let [c (chan)
-          _  (firebase-get "/users" c)]
-      (map (comp str name) (keys (<! c))))))
-(go 
-    (println (<! (current-users)))
+    (doseq [x (take 10 (repeatedly #(rand-int 42)))] 
+      (do
+        (<! (nnangpress.utils/timeout 1000))
+        (.log js/console "hi there")
+        (aset (-> (ndom/get-node-by-id "body") .-style) "left" (str x "px"))
+        )
+      )   
     )
 (go 
-    (println 
-      (<! (current-users))
-      )
+    (doseq [x (take 10 (repeatedly #(rand-int 42)))] 
+      (do
+        (<! (nnangpress.utils/timeout 500))
+        (aset (-> (ndom/get-node-by-id "body") .-style) "left" (str x "px"))
+        )
+      )   
     )
 (go 
-    (println 
-      (coll-contains? "test" (<! (current-users)))
-      )
+    (doseq [x (take 10 (repeatedly #(rand-int 100)))] 
+      (do
+        (<! (nnangpress.utils/timeout 500))
+        (aset (-> (ndom/get-node-by-id "body") .-style) "left" (str x "px"))
+        )
+      )   
     )
 (go 
-    (println 
-      (u/coll-contains? "test" (<! (current-users)))
-      )
+    (doseq [x (take 10 (repeatedly #(rand-int 100)))] 
+      (do
+        (<! (nnangpress.utils/timeout 500))
+        (aset (-> (ndom/get-node-by-id "body") .-style) "left" (str x "px"))
+        )
+      )   
     )
 (go 
-    (println 
-      (u/coll-contains? (<! (current-users)) "test")
-      )
+    (doseq [x (take 10 (repeatedly #(rand-int 100)))] 
+      (do
+        (<! (nnangpress.utils/timeout 100))
+        (aset (-> (ndom/get-node-by-id "body") .-style) "left" (str x "px"))
+        )
+      )   
     )
 (go 
-    (println 
-      (u/coll-contains? (<! (current-users)) "test")
-      )
+    (doseq [x (take 10 (repeatedly #(rand-int 100)))] 
+      (do
+        (<! (nnangpress.utils/timeout 100))
+        (aset (-> (ndom/get-node-by-id "body") .-style) "left" (str x "px"))
+        )
+      )   
     )
 (go 
-    (println 
-      (not (u/coll-contains? (<! (current-users)) "test"))
-      )
+    (doseq [x (take 10 (repeatedly #(rand-int 100)))] 
+      (do
+        (<! (nnangpress.utils/timeout 100))
+        (aset (-> (ndom/get-node-by-id "body") .-style) "left" (str x "px"))
+        (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "rotate(" x "px)"))
+        )
+      )   
     )
 (go 
-    (println 
-      (not (u/coll-contains? (<! (current-users)) "blabla"))
-      )
-    )
-(defn new-user? 
-  "" 
-  []
-  (go 
-    (not (u/coll-contains? (<! (current-users)) "blabla"))))
-(go 
-   (<! (new-user? "test")) 
+    (doseq [x (take 10 (repeatedly #(rand-int 100)))] 
+      (do
+        (<! (nnangpress.utils/timeout 100))
+        #_(aset (-> (ndom/get-node-by-id "body") .-style) "left" (str x "px"))
+        (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "rotate(" x "px)"))
+        )
+      )   
     )
 (go 
-   (prn (<! (new-user? "test"))) 
-    )
-(defn new-user? 
-  "" 
-  [uid]
-  (go 
-    (not (u/coll-contains? (<! (current-users)) uid))))
-(go 
-   (prn (<! (new-user? "test"))) 
+    (doseq [x (take 10 (repeatedly #(rand-int 100)))] 
+      (do
+        (<! (nnangpress.utils/timeout 100))
+        #_(aset (-> (ndom/get-node-by-id "body") .-style) "left" (str x "px"))
+        (aset (-> (ndom/get-node-by-id "body") .-style) "padding" (str x "px)"))
+        )
+      )   
     )
 (go 
-   (prn (<! (new-user? "testest"))) 
+    (doseq [x (take 10 (repeatedly #(rand-int 100)))] 
+      (do
+        (<! (nnangpress.utils/timeout 100))
+        (aset (-> (ndom/get-node-by-id "body") .-style) "left" (str x "px"))
+        (aset (-> (ndom/get-node-by-id "body") .-style) "padding" (str x "px)"))
+        )
+      )   
     )
+(go 
+    (doseq [x (take 10 (repeatedly #(rand-int 100)))] 
+      (do
+        (<! (nnangpress.utils/timeout 100))
+        (aset (-> (ndom/get-node-by-id "body") .-style) "left" (str x "px"))
+        (aset (-> (ndom/get-node-by-id "body") .-style) "margin" (str x "px)"))
+        )
+      )   
+    )
+(go 
+    (doseq [x (take 10 (repeatedly #(rand-int 100)))] 
+      (do
+        (<! (nnangpress.utils/timeout 100))
+        #_(aset (-> (ndom/get-node-by-id "body") .-style) "left" (str x "px"))
+        (aset (-> (ndom/get-node-by-id "body") .-style) "margin" (str x "px)"))
+        )
+      )   
+    )
+(go 
+    (doseq [x (take 10 (repeatedly #(rand-int 100)))] 
+      (do
+        (<! (nnangpress.utils/timeout 100))
+        #_(aset (-> (ndom/get-node-by-id "body") .-style) "left" (str x "px"))
+        (aset (-> (ndom/get-node-by-id "body") .-style) "margin" (str x "px)"))
+        )
+      )   
+    )
+(go 
+    (doseq [x (take 10 (repeatedly #(rand-int 100)))] 
+      (do
+        (<! (nnangpress.utils/timeout 100))
+        #_(aset (-> (ndom/get-node-by-id "body") .-style) "left" (str x "px"))
+        (aset (-> (ndom/get-node-by-id "body") .-style) "margin" (str x "px)"))
+        )
+      )   
+    )
+        (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(2, .5" "deg)"))
+        (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(2, .5  " ")"))
+        (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")"))
+        (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(2, .5  " ")"))
+        (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")"))
+        (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(2, 1  " ")"))
+        (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")"))
+        (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(2, .5  " ")"))
+        (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")"))
+(do 
+        (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(2, .5  " ")"))
+        (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")"))
+    )
+(go 
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(2, .5  " ")"))
+    (<! (nnangpress.utils/timeout 100))
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")"))
+    )
+(go 
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(2, .5  " ")"))
+    (<! (nnangpress.utils/timeout 100))
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")"))
+    )
+(go 
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(2, .5  " ")"))
+    (<! (nnangpress.utils/timeout 100))
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")"))
+    )
+(go 
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(2, .5  " ")"))
+    (<! (nnangpress.utils/timeout 1000))
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")"))
+    )
+(go 
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(2, .5  " ")"))
+    (<! (nnangpress.utils/timeout 500))
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")"))
+    )
+(go 
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(2, .5  " ")"))
+    (<! (nnangpress.utils/timeout 100))
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")"))
+    )
+(go 
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(2, .5  " ")"))
+    (<! (nnangpress.utils/timeout 100))
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")"))
+    )
+(go 
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(2, .5  " ")"))
+    (<! (nnangpress.utils/timeout 100))
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")"))
+    )
+(go 
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(2, .9  " ")"))
+    (<! (nnangpress.utils/timeout 100))
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")"))
+    )
+(go 
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(2, .9  " ")"))
+    (<! (nnangpress.utils/timeout 100))
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")"))
+    )
+(go 
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(2, .9  " ")"))
+    (<! (nnangpress.utils/timeout 100))
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")"))
+    )
+(go 
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1.1, .9  " ")"))
+    (<! (nnangpress.utils/timeout 500))
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")"))
+    )
+(go 
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1.1, .9  " ")"))
+    (<! (nnangpress.utils/timeout 200))
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")"))
+    )
+(go 
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1.1, .9  " ")"))
+    (<! (nnangpress.utils/timeout 200))
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")"))
+    )
+(go 
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1.1, .9  " ")"))
+    (<! (nnangpress.utils/timeout 100))
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")"))
+    )
+(go 
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1.1, .9  " ")"))
+    (<! (nnangpress.utils/timeout 150))
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")"))
+    )
+(go 
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1.1, .9  " ")"))
+    (<! (nnangpress.utils/timeout 150))
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")"))
+    )
+(go 
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1.05, .95  " ")"))
+    (<! (nnangpress.utils/timeout 150))
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")")))
+(go 
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1.05, .95  " ")"))
+    (<! (nnangpress.utils/timeout 150))
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")")))
+(go 
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1.01, .99  " ")"))
+    (<! (nnangpress.utils/timeout 150))
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")")))
+(go 
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1.01, .99  " ")"))
+    (<! (nnangpress.utils/timeout 150))
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")")))
+(go 
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1.01, .99  " ")"))
+    (<! (nnangpress.utils/timeout 150))
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")")))
+(go 
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1.01, .99  " ")"))
+    (<! (nnangpress.utils/timeout 150))
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")")))
+(go 
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1.01, .99  " ")"))
+    (<! (nnangpress.utils/timeout 150))
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")")))
+(go 
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1.01, .99  " ")"))
+    (<! (nnangpress.utils/timeout 150))
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")")))
+(go 
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1.01, .99  " ")"))
+    (<! (nnangpress.utils/timeout 150))
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")")))
+(go 
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1.01, .99  " ")"))
+    (<! (nnangpress.utils/timeout 150))
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")")))
+(go 
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1.01, .99  " ")"))
+    (<! (nnangpress.utils/timeout 150))
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")")))
+(go 
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1.01, .99  " ")"))
+    (<! (nnangpress.utils/timeout 150))
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")")))
+(go 
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1.02, .99  " ")"))
+    (<! (nnangpress.utils/timeout 150))
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")")))
+(go 
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1.02, .99  " ")"))
+    (<! (nnangpress.utils/timeout 150))
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")")))
+(go 
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1.02, .99  " ")"))
+    (<! (nnangpress.utils/timeout 150))
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")")))
+(go 
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1.02, .99  " ")"))
+    (<! (nnangpress.utils/timeout 150))
+    (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")")))

@@ -76,7 +76,7 @@
 (s/def ::renderable (s/keys :req-un [::route-widget ::all-navs-data ::sidebar-data ::site-name ::uid ::email ::edit-mode
                                      ::all-widgets-data ::current-route ::site-id-vec ::site-state]))
 
-(def monolith (atom {}))
+(defonce monolith (atom {}))
 
 ;Caching, use with caution!
 (def nangpress-data-cache (atom {}))

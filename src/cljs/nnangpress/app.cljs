@@ -38,6 +38,7 @@
   []
   (let [c (chan)
         _ (fb/firebase-get "nangpress-data" c)]
+    
     (go 
       (reset! mn/nangpress-data-cache (<! c))
       (dev-mode-helper<<)

@@ -16,7 +16,7 @@ html,body {
     color: white;
     position: absolute;
     width: 100%;
-    overflow: auto;
+    overflow-x: hidden;
 }
 
 body {
@@ -48,6 +48,10 @@ input {
 
 h1,h2,h3,h4,h5,h6{
     margin: 0px;
+}
+
+#body {
+transition: all .2s ease-in-out;
 }
 
 .edit {

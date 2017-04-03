@@ -288,15 +288,45 @@
                         (dom/div #js {:style #js {:padding "5px" :fontWeight "600"}} 
                                  (sidebar-content (:sidebar-page sidebar-data) owner)))))))
 
+(defn context-display 
+  [{:keys [x y visible?] :as context-menu} owner]
+  (reify 
+    om/IWillMount
+    (will-mount [_]
+      (.mousedown 
+        (js/$ js/window) 
+        (fn [e] 
+          (when (and (ndom/left-click? (-> e .-which)) (not (ndom/inside-element? e "context-menu"))
+                     (om/update! context-menu :visible? false)))))
+      (.addEventListener 
+        js/document 
+        "contextmenu" 
+        (fn [e] 
+          (.preventDefault e) 
+          (om/transact! context-menu #(assoc % :visible? true 
+                                             :x (.-x e) 
+                                             :y (.-y e))))))
+
+    om/IRender 
+    (render [_]
+      (dom/div #js {:id "context-menu"
+                    :style #js {:position "fixed" :top (str y "px") :left (str x "px") :width "200px" :height "100px" 
+                                :backgroundColor "blue" :zIndex "1000" 
+                                :display (if (:visible? context-menu) "inherit" "none")}} 
+
+               "Context menu" 
+               ))))
+
 (defn master 
   "This component is the master of routing. The current route of the app is considered part of the monolith i.e. 
   part of the state of the application. So this component has the job of rendering the admin-toolbar, the widgets 
   for the current route and the navbar (if one has been selected by the user). This is because the navbar 
   is present in all routes." 
 
-  [{:keys [:route-widget :current-route :active-route :email]
+  [{:keys [:route-widget :current-route :active-route :email :context-menu]
     :as data} owner]
   (reify
+
     om/IRenderState
     (render-state [_ {:keys [flatten-routes] :as state}]
       (let [{:keys [widgets]} (mn/current-route-map 
@@ -306,6 +336,7 @@
         (mn/independent-ref-cursor-watcher owner)
 
         (dom/div #js {:id "master-container"} 
+                 (om/build context-display context-menu)
                  (om/build admin-sidebar data)
                  (om/build admin-toolbar data)
                  (om/build main-view widgets)
