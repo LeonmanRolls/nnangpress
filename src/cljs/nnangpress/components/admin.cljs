@@ -15,6 +15,8 @@
     [om.dom :as dom :include-macros true]
     [om.core :as om :include-macros true :refer [set-state! update-state!]]))
 
+;(set! *warn-on-infer* true)
+
 (declare master)
 
 ;Sign in
@@ -112,7 +114,9 @@
   (reify
     om/IRender
     (render [_]
-      (dom/div #js {:style #js {:margin "10px" :position "relative"}} 
+      (dom/div #js {:id object-id
+                    :className "a-widget"
+                    :style #js {:margin "10px" :position "relative"}} 
                (cc/edit-mode-sense 
                  owner
                  (cc/delete-button  (mn/current-widgets-builder<< owner) :object-id object-id))
@@ -288,27 +292,55 @@
                         (dom/div #js {:style #js {:padding "5px" :fontWeight "600"}} 
                                  (sidebar-content (:sidebar-page sidebar-data) owner)))))))
 
+(defn menu-delete-widget 
+  "Decide if the delete widget menu section should be shown and update component state." 
+  [owner e]
+  (.log js/console (str "id: " (.-id e)))
+  (.dir js/console (-> 
+                     (js/$ (.-target e)) 
+                     (.closest ".a-widget")))
+  ;(.log js/console )
+  
+  (when (ndom/inside-element? e ".a-wdiget")
+    #_(mn/current-widgets-builder owner)
+
+    )
+  )
+
 (defn context-display 
   [{:keys [x y visible?] :as context-menu} owner]
   (reify 
+    om/IInitState
+    (init-state [_]
+      {:background-image {:relevant? true
+                          :data {}}
+       :delete-widget {:relevant? false
+                       :data {}}
+       })
+
     om/IWillMount
     (will-mount [_]
+
       (.mousedown 
         (js/$ js/window) 
         (fn [e] 
-          (when (and (ndom/left-click? (-> e .-which)) (not (ndom/inside-element? e "context-menu"))
-                     (om/update! context-menu :visible? false)))))
+          (when (and (ndom/left-click? (-> e .-which)) (not (ndom/inside-element? e "#context-menu"))
+                     (om/update! context-menu :visible? false)))
+          #_(.dir js/console e) 
+          ))
+
       (.addEventListener 
         js/document 
         "contextmenu" 
         (fn [e] 
           (.preventDefault e) 
+          (menu-delete-widget owner e)
           (om/transact! context-menu #(assoc % :visible? true 
                                              :x (.-x e) 
                                              :y (.-y e))))))
 
-    om/IRender 
-    (render [_]
+    om/IRenderState 
+    (render-state [_ {:keys [background-image delete-widget]}]
       (dom/div #js {:id "context-menu"
                     :style #js {:position "fixed" :top (str y "px") :left (str x "px") :width "200px" :height "100px" 
                                 :backgroundColor "blue" :zIndex "1000" 

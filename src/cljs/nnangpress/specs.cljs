@@ -4,6 +4,8 @@
     [om.core :as om :include-macros true :refer [set-state! update-state!]]
     [cljs.spec :as s]))
 
+;(set! *warn-on-infer* true)
+
 (s/def ::widget-uid int?)
 (s/def ::object-id string?)
 (s/def ::widget-name string?)

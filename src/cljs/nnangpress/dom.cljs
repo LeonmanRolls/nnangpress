@@ -3,7 +3,9 @@
     [om.core :as om]
     [cemerick.url :as url]))
 
-(defn get-node-by-id 
+;(set! *warn-on-infer* true)
+
+(defn ^js/window.HTMLBodyElement get-node-by-id 
   "Get a dom node by id" 
   [id]
   (js/document.getElementById id))
@@ -30,7 +32,7 @@
   (-> 
     js/document 
     (.getElementById id)
-    (.removeEventListener "click" cb)))
+    ^js/document (.removeEventListener "click" cb)))
 
 (defn set-attr-by-id 
   "Sett attr of a node by its id" 
@@ -50,24 +52,19 @@
   (input-listener 
     id  
     (fn [x] 
+      (println "content-editable-updater type: " (type x))
       (om/update! data ikey (-> x .-target .-innerText)))))
-
-(defn event-listener-cursor 
-  "Listen for events on an input or contentEditable element and update provided cursor accordingly." 
-  [id cursor]
-  (.addEventListener 
-    (get-node-by-id id) 
-    "input" 
-    (fn [x] 
-      (om/update! cursor [(-> x .-srcElement .-innerHTML)]))))
 
 (defn left-click? [event-which] (= 1 event-which))
 
-(defn inside-element? [e element-id]
+(defn inside-element? 
+  "Check if a click event happened within an identified element." 
+  [e element-identifier]
+  (println "inside-element? type: " (type e))
   (if 
     (= 1 (-> 
            (js/$ (.-target e)) 
-           (.closest (str "#" element-id))
+           (.closest element-identifier)
            .-length)) 
     true
     false))

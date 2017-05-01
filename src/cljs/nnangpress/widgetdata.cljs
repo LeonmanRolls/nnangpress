@@ -5,6 +5,8 @@
     [nnangpress.specs :as spcs]
     [nnangpress.utils :as u]))
 
+;(set! *warn-on-infer* true)
+
 (s/def ::inner-html (s/or :non-cursor vector? :cursor ::spcs/indexed-cursor))
 (s/def ::widget-uid int?)
 (s/def ::widget-name string?)

@@ -1,33 +1,3 @@
-       (<! (nnangpress.utils/timeout 1000))
-       (set! (-> (ndom/get-node-by-id "body") .-style .-left) (str % "px")))  
-    (take 1000 (repeatedly #(rand-int 42)))
-    )
-l
-(run! 
-    #(go 
-       (<! (nnangpress.utils/timeout 1000))
-       (set! (-> (ndom/get-node-by-id "body") .-style .-left) (str % "px")))  
-    (take 10 (repeatedly #(rand-int 42)))
-    )
-(run! 
-    (fn [x]
-      (go 
-       (<! (nnangpress.utils/timeout 1000))
-       (set! (-> (ndom/get-node-by-id "body") .-style .-left) (str x "px")))
-      )  
-    (take 10 (repeatedly #(rand-int 42)))
-    )
-(run! 
-    (fn [x]
-      (go 
-       (<! (nnangpress.utils/timeout 1000))
-       (set! (-> (ndom/get-node-by-id "body") .-style .-left) (str x "px")))
-      )  
-    (take 10 (repeatedly #(rand-int 42)))
-    )
-l
-(doall
-  (map 
     #(set! (-> (ndom/get-node-by-id "body") .-style .-left) (str % "px"))  
     (take 10 (repeatedly #(rand-int 42)))
     )  
@@ -498,3 +468,33 @@ q
     (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1.02, .99  " ")"))
     (<! (nnangpress.utils/timeout 150))
     (aset (-> (ndom/get-node-by-id "body") .-style) "transform" (str "scale(1, 1  " ")")))
+(start-repl)
+  (get-node-by-id "app")
+(ns nnangpress.dom
+  (:require 
+    [om.core :as om]
+    [cemerick.url :as url]))
+  (get-node-by-id "app")
+(defn get-node-by-id 
+  "Get a dom node by id" 
+  [id]
+  (js/document.getElementById id))
+  (get-node-by-id "app")
+  (get-node-by-id "body")
+  (type (get-node-by-id "body"))
+(ns nnangpress.routing
+  "Routing for a single page application. The bridge between the route in the browser bar and the application's 
+  route state."
+  (:import [goog.history Html5History EventType])
+  (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
+            [om.dom :as dom :include-macros true]
+            [goog.events :as ev]
+            [goog.dom :as gdom]
+            [nnangpress.utils :as utls]
+            [nnangpress.monolith :as mn]))
+(type (make-history))      
+(make-history)
+(type (Html5History.))      
+l
+(start-repl)
+l

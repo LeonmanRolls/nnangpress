@@ -1,6 +1,19 @@
-# Welcome to nnangpress
+<p align="center">
+<img src="http://i.imgur.com/yxKTvJJ.png"/>
+</p>
+<p align="center">
+<a href="https://youtu.be/wpqATUfApkM" target="_blank" >
+<img src="http://i.imgur.com/iLL4zjL.png"/>
+</a>
+</p>
+
+# Welcome! 
 
 Nangpress is a single page application that makes single page applications, a website that makes websites. 
+
+# Contributing
+
+Pull requests, opening issues and just saying hi are all welcome :). 
 
 # Technical Overview
 
@@ -34,6 +47,7 @@ a site is just a few kb of data. Backing up a site is easy, the user can just do
 
 ## Dev mode
 - boot dev
+- visit localhost:3000
 
 ## REPL
 - boot repl --client
@@ -41,6 +55,7 @@ a site is just a few kb of data. Backing up a site is easy, the user can just do
 
 ## Deploy
 - boot production build target
+- uglifyjs your.js -c -m -o your.min.js
 
 ## Testing 
 

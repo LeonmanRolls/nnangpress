@@ -5,6 +5,9 @@
     [om.dom :as dom :include-macros true]
     [nnangpress.monolith :as mn]))
 
+
+;(set! *warn-on-infer* true)
+
 (defn delete-button 
   "Add a delete button to the component, parent must be position relative. The 'parent' reference cursor vector 
   and details identifying the specific element in that vector that this component is appearing over should be 

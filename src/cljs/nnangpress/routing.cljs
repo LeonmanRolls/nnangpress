@@ -9,6 +9,8 @@
             [nnangpress.utils :as utls]
             [nnangpress.monolith :as mn]))
 
+(set! *warn-on-infer* true)
+
 (defn get-token []
   (str js/window.location.pathname js/window.location.search))
 

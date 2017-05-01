@@ -12,6 +12,8 @@
             [nnangpress.core :as cre]
             [nnangpress.routing :as rt]))
 
+;(set! *warn-on-infer* true)
+
 (defmulti navbar (fn [x] (:route-widget-id x)))
 (defmulti navbar-data (fn [x] x))
 

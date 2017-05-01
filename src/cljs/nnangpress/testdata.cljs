@@ -5,6 +5,8 @@
     [nnangpress.monolith :as mn]
     [nnangpress.widgetdata :as wd]))
 
+;(set! *warn-on-infer* true)
+
 (def admin-route-widgets {:homepage (mn/new-route-widget) 
                           :userhome (mn/new-route-widget)})
 

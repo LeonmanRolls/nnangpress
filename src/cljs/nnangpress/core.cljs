@@ -4,6 +4,8 @@
             [nnangpress.monolith :as mn]
             [nnangpress.utils :as u]))
 
+;(set! *warn-on-infer* true)
+
 (defn remove-element
   "Requires label to be passed in as state"
   [data owner]

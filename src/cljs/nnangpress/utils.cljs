@@ -4,6 +4,8 @@
     [cljs.core.async :refer [put! chan <! close!]]
     [clojure.string :as stg]))
 
+;(set! *warn-on-infer* true)
+
 (defn index-of
     "return the index of the supplied item, or nil"
     [v item]

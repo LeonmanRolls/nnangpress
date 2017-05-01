@@ -13,6 +13,8 @@
             [cljs.core.async :refer [put! chan <!]]
             [nnangpress.firebase :as fb]))
 
+;(set! *warn-on-infer* true)
+
 (declare update-site-state! site-state-decider site-transition)
 
 ;#Primitives

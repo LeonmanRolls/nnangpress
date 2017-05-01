@@ -5,6 +5,8 @@
     [clojure.walk :as wlk]
     [cljs.core.async :refer [put! chan <!]]))
 
+;(set! *warn-on-infer* true)
+
 (defn sign-in-ui-config-gen 
   "Configuration for firebase login flow. Callback will have access to user data."
   [cb]

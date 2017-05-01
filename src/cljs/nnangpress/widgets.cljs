@@ -23,6 +23,8 @@
 
 (enable-console-print!)
 
+;(set! *warn-on-infer* true)
+
 (declare widget-data-type admin-sidebar main-view)
 
 (s/def ::imgs vector?)
@@ -780,11 +782,11 @@
   (reify
     om/IDidMount
     (did-mount [_]
-      (FB.XFBML.parse))
+      (^js/FB.XFBML js/FB.XFBML.parse))
 
     om/IDidUpdate
     (did-update [_ _ _]
-      (FB.XFBML.parse))
+      (^js/FB.XFBML js/FB.XFBML.parse))
 
     om/IRender
     (render [_]

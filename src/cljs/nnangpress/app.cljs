@@ -11,19 +11,35 @@
   **User:** Show the user's sites and other settings, and allow the creation of new sites.
 
   **Site:** A specific site created with nangpress.
+
+  Foreign libs should all be required here to be added to compiled cljs code.
   "
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require 
-    [cljs.core.async :refer [put! chan <!]]
+    [cljs.core.async :refer [put! chan <! timeout]]
     [cljs.spec.test :as ts :include-macros true]
     [nnangpress.monolith :as mn]
     [nnangpress.testdata :as td]
     [nnangpress.firebase :as fb]
     [nnangpress.dom :as ndom]
     [nnangpress.widgets :as wgt]
-    [nnangpress.components.admin :as cadmin]))
+    [nnangpress.components.admin :as cadmin]
+    [cljsjs.firebase]
+    [firebase.ui]
+    [html.to.canvas] 
+    [accordi.on]
+    [rangy.core]
+    [rangy.classapplier]
+    [un.do]
+    [med.ium]
+    [tween.lite]
+    [cljsjs.jquery]
+    [megafolio.plugins]
+    [megafolio.pro]
+    [royal.slider]))
 
 (enable-console-print!)
+(set! *warn-on-infer* true)
 
 (defn dev-mode-helper<< 
   "Handle development mode query params e.g. turn on intrumentation." 
@@ -32,14 +48,24 @@
     (println "Instrumentation on.")      
     (println (ts/instrument))))
 
+(defn firebase-init 
+  "Init and fetch initial data" 
+  [c]
+  (.initializeApp js/firebase #js {:apiKey "AIzaSyA_LhuzpwrJT0_9aX3bT81dLq9gdDyqAcQ"
+                                   :authDomain "nnangpress.firebaseapp.com"
+                                   :databaseURL "https://nnangpress.firebaseio.com"
+                                   :storageBucket "nnangpress.appspot.com"
+                                   :messagingSenderId "660325527122"})
+  (fb/firebase-get "nangpress-data" c))
+
 (defn init 
   "Start here. Initialize the app. Run instrumentation if dev query paramater is set to true.
   Create monolith based on user auth state and init om." 
   []
-  (let [c (chan)
-        _ (fb/firebase-get "nangpress-data" c)]
-    
+  (let [c (chan)]
+    (println "init")
     (go 
+      (firebase-init c)
       (reset! mn/nangpress-data-cache (<! c))
       (dev-mode-helper<<)
       (mn/ref-cursor-init mn/monolith)
