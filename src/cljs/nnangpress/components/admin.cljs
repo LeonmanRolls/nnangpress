@@ -59,36 +59,38 @@
             site-state (:site-state @all-data-obs)
             site? (= "site" (:site-state @all-data-obs))]
 
-        (dom/div #js {:className "admin-toolbar"}
-                 (dom/b nil "Welcome to Nangpress alpha | ")
+        (dom/div nil 
+                 (when (> (:screen-size @all-data-obs) mn/mobile-threshold)
+                   (dom/div #js {:className "admin-toolbar"}
+                            (dom/b nil "Welcome to Nangpress alpha | ")
 
-                 (dom/b nil (str " Username:  " (if (empty? (first @user-email-obs)) 
-                                                  "Stranger" 
-                                                  (first @user-email-obs)) " | "))
+                            (dom/b nil (str " Username:  " (if (empty? (first @user-email-obs)) 
+                                                             "Stranger" 
+                                                             (first @user-email-obs)) " | "))
 
-                 (cond 
-                   (= "splash" site-state) (dom/span nil 
-                                                     (cc/standard-button  
-                                                       #(mn/site-transition @mn/nangpress-data-cache)
-                                                       "Sign in"))
-                   (= "user" site-state) (dom/span nil 
-                                                   (cc/standard-button 
-                                                     (fn [_] (fb/firebase-signout identity)) "Sign Out"))
-                   (= "site-owner" site-state) (dom/span nil 
-                                                         (cc/standard-button mn/new-site "Save New Site")
-                                                         (cc/standard-button mn/save-site-data "Save")
-                                                         (cc/standard-button mn/toggle-edit-mode "Toggle Edit Mode")
-                                                         (cc/standard-button 
-                                                           (fn [_] (fb/firebase-signout identity)) "Sign Out"))
-                   (= "site-visitor" site-state) (dom/span nil 
-                                                           (cc/standard-button mn/toggle-edit-mode "Toggle Edit Mode")
-                                                           (cc/standard-button 
-                                                             (fn [_] (fb/firebase-signout identity)) "Sign Out"))
-                   (= "site-stranger" site-state) (dom/span nil 
-                                                            (cc/standard-button  
-                                                              #(mn/site-transition @mn/nangpress-data-cache)
-                                                              "Sign in")
-                                                            (cc/standard-button mn/toggle-edit-mode "Toggle Edit Mode"))))))))
+                            (cond 
+                              (= "splash" site-state) (dom/span nil 
+                                                                (cc/standard-button  
+                                                                  #(mn/site-transition @mn/nangpress-data-cache)
+                                                                  "Sign in"))
+                              (= "user" site-state) (dom/span nil 
+                                                              (cc/standard-button 
+                                                                (fn [_] (fb/firebase-signout identity)) "Sign Out"))
+                              (= "site-owner" site-state) (dom/span nil 
+                                                                    (cc/standard-button mn/new-site "Save New Site")
+                                                                    (cc/standard-button mn/save-site-data "Save")
+                                                                    (cc/standard-button mn/toggle-edit-mode "Toggle Edit Mode")
+                                                                    (cc/standard-button 
+                                                                      (fn [_] (fb/firebase-signout identity)) "Sign Out"))
+                              (= "site-visitor" site-state) (dom/span nil 
+                                                                      (cc/standard-button mn/toggle-edit-mode "Toggle Edit Mode")
+                                                                      (cc/standard-button 
+                                                                        (fn [_] (fb/firebase-signout identity)) "Sign Out"))
+                              (= "site-stranger" site-state) (dom/span nil 
+                                                                       (cc/standard-button  
+                                                                         #(mn/site-transition @mn/nangpress-data-cache)
+                                                                         "Sign in")
+                                                                       (cc/standard-button mn/toggle-edit-mode "Toggle Edit Mode"))))))))))
 
 (defn select-widget-wrapper 
   "Primarily for edit mode. Allows the widget this wraps to be added to the current route." 
@@ -329,7 +331,7 @@
           #_(.dir js/console e) 
           ))
 
-      (.addEventListener 
+      #_(.addEventListener 
         js/document 
         "contextmenu" 
         (fn [e] 

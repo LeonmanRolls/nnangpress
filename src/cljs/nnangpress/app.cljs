@@ -16,6 +16,7 @@
   "
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require 
+    [om.core :as om :include-macros true]
     [cljs.core.async :refer [put! chan <! timeout]]
     [cljs.spec.test :as ts :include-macros true]
     [nnangpress.monolith :as mn]
@@ -39,7 +40,7 @@
     [royal.slider]))
 
 (enable-console-print!)
-(set! *warn-on-infer* true)
+;(set! *warn-on-infer* true)
 
 (defn dev-mode-helper<< 
   "Handle development mode query params e.g. turn on intrumentation." 
@@ -58,17 +59,25 @@
                                    :messagingSenderId "660325527122"})
   (fb/firebase-get "nangpress-data" c))
 
+(defn screen-size-watcher []
+  (om/update! (mn/all-data) :screen-size js/window.innerWidth)
+  (set! 
+    (.-onresize js/window) 
+    (fn [e]   
+      (println "window size: " (-> e .-target .-innerWidth))
+      (om/update! (mn/all-data) :screen-size (-> e .-target .-innerWidth)))))
+
 (defn init 
   "Start here. Initialize the app. Run instrumentation if dev query paramater is set to true.
   Create monolith based on user auth state and init om." 
   []
   (let [c (chan)]
-    (println "init")
     (go 
       (firebase-init c)
       (reset! mn/nangpress-data-cache (<! c))
       (dev-mode-helper<<)
       (mn/ref-cursor-init mn/monolith)
       ;(mn/monolith-watcher-init mn/monolith)
-      (mn/auth-state-load-site! cadmin/master "super-container"))))
+      (mn/auth-state-load-site! cadmin/master "super-container")
+      (screen-size-watcher))))
 

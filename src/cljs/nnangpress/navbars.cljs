@@ -178,6 +178,79 @@
                   (om/build wgt/widget route-name-editable {:state {:parent-cursor all
                                                                     :routes-map routes-map-obs}})))))))
 
+(defn mobile-nav-menu-logo
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (let [routes-map-obs (om/observe owner (mn/routes-map))]
+        (dom/p #js {:style #js {:fontSize "130%" :float "left" :fontWeight "700" :textTransform "uppercase" 
+                                :marginRight "15px" :marginLeft "5px"} 
+                     :onClick (partial rt/js-link @routes-map-obs "/")}
+                "Leon Talbert")))))
+
+(defn mobile-list-item [active? routes-map {:keys [route-name route-name-editable] :as all}]
+  (dom/li #js {:className (str "nav-li ")
+               :onClick (partial rt/js-link @routes-map route-name)}
+
+          (dom/div #js {:className (str (when active? "active-text"))}
+                   (om/build wgt/widget route-name-editable {:state {:parent-cursor all
+                                                                     :routes-map routes-map}}))))
+
+(defn mobile-nav-menu
+  [{:keys [:route-name :background :widgets :children :route-name-editable] :as all} owner]
+
+  (reify
+    om/IInitState
+    (init-state  [_]
+      {:depth 1
+       :advertise? false})
+
+    om/IRenderState
+    (render-state [_ {:keys [depth advertise?] :as state}]
+      (let [curr-route (first (om/observe owner (mn/current-route)))
+            active? (u/string-contains? curr-route route-name)
+            routes-map-obs (om/observe owner (mn/routes-map))
+            edit-mode-obs (om/observe owner (mn/edit-mode))]
+
+        (cond
+          (= "/" route-name)
+          (apply dom/ul #js {:style #js {:margin "0px"}} 
+                 (concat
+                   (om/build-all mobile-nav-menu children {:state {:depth (inc depth) :prev-children children }})
+                   (when (first @edit-mode-obs)
+                     [(dom/button #js {:onClick (fn [_]
+                                                  (om/transact!
+                                                    children
+                                                    (fn [children]
+                                                      (conj children (basic-route)))))} "Add route")
+                      (om/build cre/remove-element children
+                                {:state {:label "remove nth route"}})])))
+
+          (and (not (empty? children)) (> depth (if (first @edit-mode-obs) 2 2)))
+          (dom/div #js {:style #js {:position "relative" :float "left"}}
+
+                   (dom/li #js {:className (str (if (> depth 2) "sub-nav-li " "nav-li ") (when active? "active-text"))
+                                :style #js {:float "left"}
+                                :onClick (partial rt/js-link @routes-map-obs route-name)}
+
+                           (dom/div #js {:className (str (when active? "active-text"))}
+                                    (om/build wgt/widget route-name-editable {:state {:parent-cursor all 
+                                                                                      :routes-map routes-map-obs}}))))
+
+          (not (empty? children))
+          (dom/div #js {:style #js {:position "relative" :float "left"}}
+
+                   (mobile-list-item active? routes-map-obs all))
+
+          :else
+          (dom/li #js {:className (str (if (> depth 2) "sub-nav-li " "nav-li ") (when active? "active-text"))
+                       :style #js {:float "left"}
+                       :onClick (partial rt/js-link @routes-map-obs route-name)}
+
+                  (om/build wgt/widget route-name-editable {:state {:parent-cursor all
+                                                                    :routes-map routes-map-obs}})))))))
+
 ;A margin navbar. Css styling can be overwritten with local data.
 (defmethod navbar 1 [{:keys [routes-map logo-data nav-style main-view-style] :as data} owner]
   (reify
@@ -188,14 +261,30 @@
 
     om/IRenderState
     (render-state [_ {:keys [advertise?]}]
-      (dom/div #js {:id "the-nav" :className "main-nav"}
+      (let [all-data (om/observe owner (mn/all-data))
+            main-view-style-obs (om/observe owner (mn/main-view-style))]
+        (dom/div #js {:id "the-nav" :className "main-nav"}
 
-               #_(dom/div #js {:className "nav-aux"}
-                          (om/build nav-hint {}))
+                 #_(dom/div #js {:className "nav-aux"}
+                            (om/build nav-hint {}))
 
-               (dom/div #js {:className "nav-menu"
-                             :style (clj->js (merge (when advertise? {:position "relative"}) nav-style))}
+                 (cond 
+                   (> (:screen-size @all-data) 1000)
+                   (do 
+                     (om/update! (mn/main-view-style) {:style {:paddingLeft "320px" :paddingRight "170px"}})
+                     (dom/div #js {:className "nav-menu"
+                                   :style (clj->js (merge (when advertise? {:position "relative"}) nav-style))}
 
-                        (om/build nav-menu-logo logo-data)
-                        (om/build nav-menu routes-map))))))
+                              (om/build nav-menu-logo logo-data)
+                              (om/build nav-menu routes-map)))
+
+                   :else 
+                   (do 
+                     (om/update! (mn/main-view-style) {:style {:paddingLeft "0px" :paddingRight "0px"}})
+                     (dom/div #js {:style #js {:width "100%" :position "fixed" :backgroundColor "black" 
+                                               :top 0 :fontSize "1.5em"}} 
+                              (om/build mobile-nav-menu-logo logo-data)
+                              (om/build mobile-nav-menu routes-map)
+                              )
+                     )))))))
 

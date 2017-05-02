@@ -17,6 +17,8 @@
 
 (declare update-site-state! site-state-decider site-transition)
 
+(def mobile-threshold 1000)
+
 ;#Primitives
 
 (s/def ::all-widgets-data vector?)
@@ -513,7 +515,7 @@
         (<! (site-transition (<! c))))
       :else 
       (site-transition @nangpress-data-cache))
-
+    (om/update! (all-data) :screen-size js/window.innerWidth)
     (om/root root-component monolith {:target (. js/document (getElementById root-node-id))})
     (.addClass (js/$ "body") "loaded")))
 

@@ -77,7 +77,7 @@
   identity)
 
 (deftask development []
-  (task-options! cljs {:optimizations :advanced 
+  (task-options! cljs {:optimizations :none 
                        :source-map false 
                        :compiler-options 
                        {:infer-externs true
