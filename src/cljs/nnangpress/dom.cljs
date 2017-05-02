@@ -52,7 +52,6 @@
   (input-listener 
     id  
     (fn [x] 
-      (println "content-editable-updater type: " (type x))
       (om/update! data ikey (-> x .-target .-innerText)))))
 
 (defn left-click? [event-which] (= 1 event-which))
@@ -60,7 +59,6 @@
 (defn inside-element? 
   "Check if a click event happened within an identified element." 
   [e element-identifier]
-  (println "inside-element? type: " (type e))
   (if 
     (= 1 (-> 
            (js/$ (.-target e)) 

@@ -50,7 +50,6 @@
                                 :tags nil
                                 :pasteAsText false
                                 :modifiers #js {:b (fn [event element]
-                                                     (println "medium-init b")
                                                      ) 
                                                 :q (fn [event element]
                                                      (.log js/console (str "innerhtml: " (gdom/getElement uuid)))

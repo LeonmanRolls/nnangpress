@@ -60,11 +60,9 @@
   (fb/firebase-get "nangpress-data" c))
 
 (defn screen-size-watcher []
-  (om/update! (mn/all-data) :screen-size js/window.innerWidth)
   (set! 
     (.-onresize js/window) 
     (fn [e]   
-      (println "window size: " (-> e .-target .-innerWidth))
       (om/update! (mn/all-data) :screen-size (-> e .-target .-innerWidth)))))
 
 (defn init 
