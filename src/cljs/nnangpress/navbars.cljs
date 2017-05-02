@@ -265,9 +265,6 @@
             main-view-style-obs (om/observe owner (mn/main-view-style))]
         (dom/div #js {:id "the-nav" :className "main-nav"}
 
-                 #_(dom/div #js {:className "nav-aux"}
-                            (om/build nav-hint {}))
-
                  (cond 
                    (> (:screen-size @all-data) 1000)
                    (do 
@@ -282,9 +279,7 @@
                    (do 
                      (om/update! (mn/main-view-style) {:style {:paddingLeft "0px" :paddingRight "0px"}})
                      (dom/div #js {:style #js {:width "100%" :position "fixed" :backgroundColor "black" 
-                                               :top 0 :fontSize "1.5em"}} 
+                                               :top 0}} 
                               (om/build mobile-nav-menu-logo logo-data)
-                              (om/build mobile-nav-menu routes-map)
-                              )
-                     )))))))
+                              (om/build mobile-nav-menu routes-map)))))))))
 
