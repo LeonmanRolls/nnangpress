@@ -141,6 +141,17 @@
                                            (.-value (ndom/get-node-by-id uid2))))} 
                          "Submit"))))
 
+(defn simple-form-single 
+  "Inputs and submit, input values will be passed to callback." 
+  [cb label]
+  (let [uid1 (u/uid)]
+    (dom/div nil
+             (dom/p nil label)
+             (dom/input #js {:id uid1 :type "text"})
+             (dom/button #js {:onClick (fn [_]
+                                         (cb (.-value (ndom/get-node-by-id uid1))))} 
+                         "Submit"))))
+
 (def sidebar-header-p {:border "5px solid #7f8c8d", :padding "10px", :background "#95a5a6", :fontWeight "600"})
 (def sidebar-close-icon {:float "right", :margin-top "-5px", :cursor "pointer"})
 
@@ -317,13 +328,12 @@
       {:background-image {:relevant? true
                           :data {}}
        :delete-widget {:relevant? false
-                       :data {}}
-       })
+                       :data {}}})
 
     om/IWillMount
     (will-mount [_]
 
-      (.mousedown 
+      #_(.mousedown 
         (js/$ js/window) 
         (fn [e] 
           (when (and (ndom/left-click? (-> e .-which)) (not (ndom/inside-element? e "#context-menu"))

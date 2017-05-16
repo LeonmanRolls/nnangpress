@@ -119,9 +119,10 @@
       (.destroy medium)
       (ndom/remove-listener link-btn-id cb))))
 
+;or is for legacy rich-text-edit data
 (defn rich-text-edit 
   "Mediumjs rich text editor" 
-  [{uid :object-id inner-html :inner-html :as data} owner]
+  [{uid :medium-id inner-html :inner-html :or {uid (u/uid)} :as data} owner]
   (reify
     om/IInitState
     (init-state [_]
@@ -144,7 +145,7 @@
         (ndom/set-attr-by-id uid "contenteditable" (if (or edit-mode-obs edit) "true" "false"))))
 
     om/IRenderState
-    (render-state [_ {:keys [ advertise? edit-uid link-btn-id link-input-id style]}]
+    (render-state [_ {:keys [advertise? edit-uid link-btn-id link-input-id style]}]
       (let [edit-mode-obs (first (om/observe owner (mn/edit-mode)))]
         (dom/div #js {:style (clj->js style)} 
                  (dom/div #js {:id uid
@@ -153,6 +154,8 @@
 
                  (dom/div #js {:id edit-uid 
                                :style #js {:display (cc/edit-mode-display edit-mode-obs) :textAlign "left"}}
+
+                          (.log js/console "data: " (clj->js @data))
 
                           (dom/button #js {:className "header-one"} "H1")
                           (dom/button #js {:className "header-two"} "H2")
@@ -166,9 +169,14 @@
                                       (dom/i #js {:className "fa fa-align-justify"}))
                           (dom/button #js {:className "align-right" :onClick #(om/update! style :textAlign "right")} 
                                       (dom/i #js {:className "fa fa-align-right"}))
-                          (dom/button #js {:className "align-left" :onClick #(om/update! 
-                                                                               inner-html 
-                                                                               [(.-innerHTML (gdom/getElement uid))])} 
+                          (dom/button #js {:className "align-left" :onClick #(do 
+                                                                               (.log js/console 
+                                                                                     (.-innerHTML (gdom/getElement uid)))
+                                                                               (.log js/console "inner-html: " inner-html)
+                                                                               (.log js/console (type inner-html))
+                                                                               (om/update! 
+                                                                                 inner-html 
+                                                                                 [(.-innerHTML (gdom/getElement uid))]))} 
                                       (dom/i #js {:className "fa fa-save"}))
 
                           (dom/input #js {:id link-input-id})
@@ -390,8 +398,11 @@
 (defmethod widget-data-type 7 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::imgs]))
 
+;"<a href=\"http://google.com\" style=\"width:100%;height:100%;\">"
+;"</a>"
+
 ;Image and text grid  
-(defmethod widget 007 [{:keys [imgs] :as data} owner]
+(defmethod widget 007 [{:keys [imgs link] :as data} owner]
   (reify
     om/IInitState
     (init-state [_]
@@ -416,7 +427,8 @@
          :widget-img (fn [{:keys [id link className data-src data-width data-height title subtitle]
                            :as data}]
                        (str
-                         "<div"
+                         "<a"
+                         " href=\"http://www.google.com\""
                          " id=\"" id "\""
                          " class=\"" className  " norounded\""
                          " data-src=\"" data-src  "\""
@@ -432,7 +444,8 @@
                          "</div>"
                          "</div>"
                          "</div>"
-                         "</div>"))
+                         "</a>"
+                         ))
 
          :widget-text (fn [{:keys [id className data-width data-height title text] :as data}]
                         (str
@@ -479,9 +492,12 @@
         (->
           (js/$ ".megafolio-container")
           (.click (fn [event]
+                    (.log js/console "clicked")
+                    (.log js/console link)
+                    (.log js/console  "data: " (clj->js @data))
                     (rt/js-link
                       @routes-map-obs
-                      (first (clojure.string/split (-> event .-target .-id) #"--"))
+                      link 
                       event))))
         (->
           (js/$ ".megafolio-container")
@@ -515,9 +531,7 @@
                                                           (fn [x] (conj x (default-img)))))}
                                         "Add an image")
 
-                            (dom/button #js {:onClick (fn [_]
-                                                        (om/transact!
-                                                          imgs
+                            (dom/button #js {:onClick (fn [_] (om/transact!  imgs
                                                           (fn [x] (conj x (default-text)))))}
                                         "Add text")
 

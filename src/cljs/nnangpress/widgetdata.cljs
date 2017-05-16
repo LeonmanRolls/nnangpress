@@ -28,6 +28,7 @@
   [_]
   {:widget-uid 001
    :object-id (u/uid)
+   :medium-id (u/uid)
    :widget-name "Simple text"
    :inner-html ["Change me"]
    :style {:textAlign "left"}})
@@ -75,8 +76,11 @@
   {:widget-uid 007
    :object-id (u/uid)
    :widget-name "Grid"
+   :link "/for-you"
    :imgs [{:id "entry-1"
            :className "mega-entry"
+           :title "hello"
+           :subtitle "hi there"
            :data-src "http://solariarchitects.com/img/teampics/jsolari_everyday.jpg"
            :data-width "320"
            :data-height "400"}

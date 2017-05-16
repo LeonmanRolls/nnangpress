@@ -9,6 +9,7 @@
             [nnangpress.utils :as u]
             [nnangpress.widgets :as wgt]
             [nnangpress.components.common :as cc]
+            [nnangpress.components.admin :as adc]
             [nnangpress.core :as cre]
             [nnangpress.routing :as rt]))
 
@@ -262,7 +263,8 @@
     om/IRenderState
     (render-state [_ {:keys [advertise?]}]
       (let [all-data (om/observe owner (mn/all-data))
-            main-view-style-obs (om/observe owner (mn/main-view-style))]
+            main-view-style-obs (om/observe owner (mn/main-view-style))
+            edit-mode-obs (om/observe owner (mn/edit-mode))]
         (dom/div #js {:id "the-nav" :className "main-nav"}
 
                  (cond 
@@ -273,7 +275,11 @@
                                    :style (clj->js (merge (when advertise? {:position "relative"}) nav-style))}
 
                               (om/build nav-menu-logo logo-data)
-                              (om/build nav-menu routes-map)))
+                              (om/build nav-menu routes-map)
+                              (when (first @edit-mode-obs)
+                                (adc/simple-form-single 
+                                  #(om/update! nav-style :backgroundColor %) 
+                                  "Background color (hex)"))))
 
                    :else 
                    (do 
