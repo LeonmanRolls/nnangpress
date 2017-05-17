@@ -50,7 +50,7 @@
 
 (defn basic-route []
   {:route-name (str "/parent" (subs (u/uid) 0 3))
-   :bg-img "from_uss.jpg"
+   :bg-img "http://cdn.wallpapersafari.com/57/36/5MbQFu.png"
    :grey-bg? true
    :nav-hint ["nav hint"]
    :nav-hint-style {:color "white"}
@@ -60,7 +60,7 @@
               :widget-name "Standard text widget"
               :inner-html ["<p> Hi there </p>"]}]
    :children [{:route-name (str "/child" (subs (u/uid) 0 3))
-               :bg-img "from_uss.jpg"
+               :bg-img "http://cdn.wallpapersafari.com/57/36/5MbQFu.png"
                :grey-bg? true
                :nav-hint ["nav hint"]
                :nav-hint-style {:color "white"}
@@ -69,7 +69,17 @@
                           :object-id (u/uid)
                           :widget-name "Standard text widget"
                           :inner-html ["<p> Hi there </p>"]}]
-               :children []}]})
+               :children [{:route-name (str "/child" (subs (u/uid) 0 3))
+                           :bg-img "http://cdn.wallpapersafari.com/57/36/5MbQFu.png"
+                           :grey-bg? true
+                           :nav-hint ["nav hint"]
+                           :nav-hint-style {:color "white"}
+                           :route-name-editable (wd/widget-data 16) 
+                           :widgets [{:widget-uid 001
+                                      :object-id (u/uid)
+                                      :widget-name "Standard text widget"
+                                      :inner-html ["<p> Hi there </p>"]}]
+                           :children []}]}]})
 
 (defn nav-hint [data owner]
   (reify
@@ -139,9 +149,15 @@
                                                     (fn [children]
                                                       (conj children (basic-route)))))} "Add route")
                       (om/build cre/remove-element children
-                                {:state {:label "remove nth route"}})])))
+                                {:state {:label "remove nth route"}})
 
-          (and (not (empty? children)) (> depth (if (first @edit-mode-obs) 2 2)))
+                      (dom/div nil 
+                               (dom/u nil "Swap routes")
+                               (adc/simple-form (fn [x y] 
+                                                  (mn/ref-vec-swap 
+                                                    children (int x) (int y)))))])))
+
+          (and (not (empty? children)) (> depth (if (first @edit-mode-obs) 3 2)))
           (dom/div #js {:style #js {:position "relative"}}
 
                    #_(cc/delete-button prev-children :route-name route-name)
@@ -170,7 +186,12 @@
                                                                  (conj children (basic-route)))))}
                                              "Add route")
                                  (om/build cre/remove-element children
-                                           {:state {:label "remove nth route"}})])))))
+                                           {:state {:label "remove nth route"}})
+                                 (dom/div nil 
+                                          (dom/u nil "Swap routes")
+                                          (adc/simple-form (fn [x y] 
+                                                             (mn/ref-vec-swap 
+                                                               children (int x) (int y)))))])))))
 
           :else
           (dom/li #js {:className (str (if (> depth 2) "sub-nav-li " "nav-li ") (when active? "active-text"))

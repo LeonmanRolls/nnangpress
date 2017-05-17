@@ -12,6 +12,7 @@
   [cb]
   #js {:callbacks
        #js {:signInSuccess (fn [user credential redirectUrl]
+                             (.log js/console "user: " user)
                              (cb user)
                              false)}
        :signInFlow "popup"

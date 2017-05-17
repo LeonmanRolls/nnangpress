@@ -3,15 +3,6 @@
     (take 10 (repeatedly #(rand-int 42)))
     )   
     )
-(go 
- (run! 
-    (fn [x]
-(<! (nnangpress.utils/timeout 1000))
-       (set! (-> (ndom/get-node-by-id "body") .-style .-left) (str x "px"))
-      )  
-    (take 10 (repeatedly #(rand-int 42)))
-    )   
-    )
 (doall
     (map 
 (fn [x]
@@ -498,3 +489,12 @@ l
             [nnangpress.firebase :as fb]))
 monolith
 (:screen-size @monolith)
+(start-repl)
+(ns nnangpress.firebase
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require 
+    [nnangpress.utils :as u]
+    [clojure.walk :as wlk]
+    [cljs.core.async :refer [put! chan <!]]))
+(current-user)
+  (.log js/console (current-user))
