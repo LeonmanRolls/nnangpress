@@ -449,7 +449,7 @@ transition: transform 0.3s ease-in-out;
 .right-nav {
     top: 100px;
     width: 140px;
-    right: 15px;
+    right: 0px;
     position: fixed;
     list-style: none;
     padding: 0px;

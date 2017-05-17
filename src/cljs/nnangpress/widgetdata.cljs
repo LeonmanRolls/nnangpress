@@ -95,7 +95,8 @@
   {:widget-uid 8
    :object-id (u/uid)
    :widget-name "Right Nav"
-   :imgs []})
+   :lis [{:li-id (u/uid) :route "/for-you"} 
+         {:li-id (u/uid) :route "/for-architects"}]})
 
 (defmethod widget-data 9 [_]
   {:widget-uid 9

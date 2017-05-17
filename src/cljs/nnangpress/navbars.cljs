@@ -3,17 +3,46 @@
   as will as the shape of the data in the route tree."
   (:require [om.core :as om :include-macros true :refer [set-state! update-state!]]
             [om.dom :as dom :include-macros true]
+            [nnangpress.dom :as ndom]
             [cljs.spec :as s]
             [nnangpress.monolith :as mn]
             [nnangpress.widgetdata :as wd]
             [nnangpress.utils :as u]
             [nnangpress.widgets :as wgt]
             [nnangpress.components.common :as cc]
-            [nnangpress.components.admin :as adc]
             [nnangpress.core :as cre]
             [nnangpress.routing :as rt]))
 
 ;(set! *warn-on-infer* true)
+
+(defn simple-form 
+  "Inputs and submit, input values will be passed to callback." 
+  [cb]
+  (let [uid1 (u/uid) 
+        uid2 (u/uid)]
+    (dom/div nil
+             (dom/input #js {:id uid1 
+                             :type "text"})
+             (dom/input #js {:id uid2 
+                             :type "text"})
+
+             (dom/button #js {:onClick (fn [_]
+                                         (cb 
+                                           (.-value (ndom/get-node-by-id uid1))
+                                           (.-value (ndom/get-node-by-id uid2))))} 
+                         "Submit"))))
+
+(defn simple-form-single 
+  "Inputs and submit, input values will be passed to callback." 
+  [cb label]
+  (let [uid1 (u/uid)]
+    (dom/div nil
+             (dom/p nil label)
+             (dom/input #js {:id uid1 :type "text"})
+             (dom/button #js {:onClick (fn [_]
+                                         (cb (.-value (ndom/get-node-by-id uid1))))} 
+                         "Submit"))))
+
 
 (defmulti navbar (fn [x] (:route-widget-id x)))
 (defmulti navbar-data (fn [x] x))
@@ -153,7 +182,7 @@
 
                       (dom/div nil 
                                (dom/u nil "Swap routes")
-                               (adc/simple-form (fn [x y] 
+                               (simple-form (fn [x y] 
                                                   (mn/ref-vec-swap 
                                                     children (int x) (int y)))))])))
 
@@ -189,7 +218,7 @@
                                            {:state {:label "remove nth route"}})
                                  (dom/div nil 
                                           (dom/u nil "Swap routes")
-                                          (adc/simple-form (fn [x y] 
+                                          (simple-form (fn [x y] 
                                                              (mn/ref-vec-swap 
                                                                children (int x) (int y)))))])))))
 
@@ -298,7 +327,7 @@
                               (om/build nav-menu-logo logo-data)
                               (om/build nav-menu routes-map)
                               (when (first @edit-mode-obs)
-                                (adc/simple-form-single 
+                                (simple-form-single 
                                   #(om/update! nav-style :backgroundColor %) 
                                   "Background color (hex)"))))
 

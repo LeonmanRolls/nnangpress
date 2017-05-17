@@ -306,6 +306,23 @@
 (defmethod widget-data-type 4 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::text]))
 
+(comment 
+ (defn accordion-partial [data owner]
+  (reify
+    om/IRenderState
+    (render-state [this state]
+      (dom/div nil
+               (dom/dt nil
+                       (dom/a #js {:href "#accordion1" :aria-expanded "false" :aria-controls "accordion1"
+                                   :className "accordion-title accordionTitle js-accordionTrigger"}
+                              (first (:title data))))
+               (dom/dd #js {:className "accordion-content accordionItem is-collapsed" :id "accordion1"
+                            :aria-hidden "true"}
+                       (if (:admin state) (om/build input-partial (:title data)))
+                       (apply dom/div nil
+                              (om/build-all p-p-partial (:content data) {:state state}))))))) 
+  )
+
 ;Accordion
 (defmethod widget 004 [{:keys [text] :as data} owner]
   (reify
@@ -329,11 +346,14 @@
                         (dom/dd #js {:className "accordion-content accordionItem is-collapsed"
                                      :id "accordion1"
                                      :aria-hidden "true"}
-                                (om/build widget sub))))))}))
+                                (dom/div nil
+                                         (dom/p nil "This is some text")
+                                         )
+                                #_(om/build widget sub))))))}))
 
     om/IDidUpdate
     (did-update  [this prev-props prev-state]
-      (js/accordion (str "." (:uuid (om/get-state owner)))))
+      #_(js/accordion (str "." (:uuid (om/get-state owner)))))
 
     om/IDidMount
     (did-mount [_]
@@ -469,16 +489,18 @@
                           (widget-img data)))
 
          :edit-fn (fn [data owner]
-                                  (reify
-                                    om/IRender
-                                    (render [_]
-                                      (if (contains? data :text)
-                                        (dom/div nil
-                                                 (cre/simple-input-cursor! (:title data) data :title)
-                                                 (cre/simple-input-cursor! (:text data) data :text))
-                                        (dom/div nil 
-                                        (cre/simple-input-cursor! (:data-src data) data :data-src)
-                                        (cre/simple-input-cursor! (:link data) data :link))))))}))
+                    (reify
+                      om/IRender
+                      (render [_]
+                        (if (contains? data :text)
+                          (dom/div nil
+                                   (cre/simple-input-cursor! (:title data) data :title)
+                                   (cre/simple-input-cursor! (:text data) data :text))
+                          (dom/div nil 
+                                   (cre/simple-input-cursor! (:data-src data) data :data-src)
+                                   (cre/simple-input-cursor! (:link data) data :link)
+                                   (cre/simple-input-cursor! (:title data) data :title)
+                                   (cre/simple-input-cursor! (:subtitle data) data :subtitle))))))}))
 
     om/IDidUpdate
     (did-update  [this prev-props prev-state]
@@ -548,25 +570,29 @@
 (defmethod widget-data-type 8 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::imgs]))
 
+(defn li [{:keys [route active?] :as data} owner]
+  (reify
+    om/IRenderState
+    (render-state [_ {:keys [routes-map] :as state}]
+      (let [edit-mode-obs (om/observe owner (mn/edit-mode))]
+        (.log js/console "right nav: " data)
+        (dom/li #js {:className "right-nav-li"
+                     :onClick (if (first edit-mode-obs) identity (partial rt/js-link routes-map route))}
+                (dom/div #js {:className (if active? "active-text" "")}
+                         (.substr route 1)
+                         (when (first edit-mode-obs) (cre/simple-input-cursor! (:route data) data :route))))))))
+
 ;Small right nav
 (defmethod widget 8 [{:keys [lis] :as data} owner]
   (reify
     om/IInitState
     (init-state [_]
-      {:uuid (random-uuid)
-       :li (fn [{:keys [route label active?] :as data} owner]
-             (reify
-               om/IRenderState
-               (render-state [_ {:keys [routes-map] :as state}]
-                 (dom/li #js {:className "right-nav-li"
-                              :onClick (partial rt/js-link routes-map route) }
-                         (dom/div #js {:className (when active? "active-text")}
-                                  label)))))})
+      {:uuid (random-uuid)})
 
     om/IRenderState
-    (render-state [_ {:keys [uuid li] :as state}]
+    (render-state [_ {:keys [uuid advertise?] :as state}]
       (let [routes-map-obs (om/observe owner (mn/routes-map))]
-        (apply dom/ul #js {:className "right-nav"}
+        (apply dom/ul #js {:className (if advertise? "" "right-nav")}
                (om/build-all li lis {:state {:routes-map routes-map-obs}}))))))
 
 (defmethod widget-data-type 9 [_]
@@ -932,6 +958,7 @@
 
     om/IDidMount
     (did-mount [_]
+      ;might be why we sometimes can't edit the link
       #_(let [{:keys [uid advertise? link-btn-id link-input-id edit parent-cursor routes-map]} (om/get-state owner)
               edit-mode-obs (first (om/observe owner (mn/edit-mode)))]
           (medium-init-rt uid data link-btn-id link-input-id parent-cursor routes-map)
