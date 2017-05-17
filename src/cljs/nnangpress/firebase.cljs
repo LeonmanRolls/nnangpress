@@ -175,5 +175,7 @@
     "/nangpress-data/admin-route-widgets/userhome/" 
     "/nangpress-data/admin-sites/userhome/route-widget/")
 
+  (.log js/console (current-user))
+
   )
 

@@ -402,7 +402,7 @@
 ;"</a>"
 
 ;Image and text grid  
-(defmethod widget 007 [{:keys [imgs link] :as data} owner]
+(defmethod widget 007 [{:keys [imgs] :as data} owner]
   (reify
     om/IInitState
     (init-state [_]
@@ -427,8 +427,7 @@
          :widget-img (fn [{:keys [id link className data-src data-width data-height title subtitle]
                            :as data}]
                        (str
-                         "<a"
-                         " href=\"http://www.google.com\""
+                         "<div"
                          " id=\"" id "\""
                          " class=\"" className  " norounded\""
                          " data-src=\"" data-src  "\""
@@ -444,7 +443,7 @@
                          "</div>"
                          "</div>"
                          "</div>"
-                         "</a>"
+                         "</div>"
                          ))
 
          :widget-text (fn [{:keys [id className data-width data-height title text] :as data}]
@@ -477,28 +476,36 @@
                                         (dom/div nil
                                                  (cre/simple-input-cursor! (:title data) data :title)
                                                  (cre/simple-input-cursor! (:text data) data :text))
-                                        (cre/simple-input-cursor! (:data-src data) data :data-src)))))}))
+                                        (dom/div nil 
+                                        (cre/simple-input-cursor! (:data-src data) data :data-src)
+                                        (cre/simple-input-cursor! (:link data) data :link))))))}))
 
     om/IDidUpdate
     (did-update  [this prev-props prev-state]
+      (let [routes-map-obs (om/observe owner (mn/routes-map))]
+      (doseq [{:keys [id link]} imgs]
+        (->
+          (js/$ (str "#" id))
+          (.click (fn [event]
+                    (rt/js-link
+                      @routes-map-obs
+                      link 
+                      event))))))
       (->
         (js/$ ".megafolio-container")
         (.megafoliopro #js {})))
 
     om/IDidMount
     (did-mount [_]
-      (let [uuid (om/get-state owner :uuid)
-            routes-map-obs (om/observe owner (mn/routes-map))]
-        (->
-          (js/$ ".megafolio-container")
-          (.click (fn [event]
-                    (.log js/console "clicked")
-                    (.log js/console link)
-                    (.log js/console  "data: " (clj->js @data))
-                    (rt/js-link
-                      @routes-map-obs
-                      link 
-                      event))))
+      (let [routes-map-obs (om/observe owner (mn/routes-map))]
+        (doseq [{:keys [id link]} imgs]
+          (->
+            (js/$ (str "#" id))
+            (.click (fn [event]
+                      (rt/js-link
+                        @routes-map-obs
+                        link 
+                        event)))))
         (->
           (js/$ ".megafolio-container")
           (.megafoliopro #js {}))))
