@@ -23,6 +23,7 @@
 (def Spinner (js/React.createFactory js/ReactMDL.Spinner))
 (def Slider (js/React.createFactory js/ReactMDL.Slider))
 (def Chip (js/React.createFactory js/ReactMDL.Chip))
+(def ChipContact (js/React.createFactory js/ReactMDL.ChipContact))
 (def Button (js/React.createFactory js/ReactMDL.Button))
 (def Header (js/React.createFactory js/ReactMDL.Header))
 (def Navigation (js/React.createFactory js/ReactMDL.Navigation))
@@ -52,8 +53,19 @@
 
         (dom/div #js {:style #js {:textAlign "center"}}
                  (dom/div #js {:id "firebase"} "")
-                 (Button #js{:raised true :colored true} "Sign up / Sign in")
-                 (dom/button
+                 (Button #js{:raised true :colored true
+                             :style (clj->js (merge local-style))
+                             :onClick (fn [_]
+                                        (mn/update-local-style! owner :display "none")
+                                        (fb/fb-initiate-auth
+                                          "firebase"
+                                          (fn [user]
+                                            (go
+                                              (when (<! (fb/new-user? (.-uid user)))
+                                                (fb/register-new-user (.-uid user) (mn/new-site-template)))
+                                              (mn/auth-state-load-site! master "super-container")))))
+                             } "Sign up / Sign in")
+                 #_(dom/button
                    #js {:id "firebase-button"
                         :style (clj->js (merge style local-style))
                         :onClick (fn [_]
@@ -82,17 +94,25 @@
         (dom/div nil
                  (when (> (:screen-size @all-data-obs) mn/mobile-threshold)
                    (dom/div #js {:className "admin-toolbar"}
-                            (dom/b nil "Welcome to Nangpress alpha | ")
+                            (Chip #js {:style #js {:marginRight "5px" :marginLeft "10px"}}"Nangpress alpha")
 
-                            (dom/b nil (str " Username:  " (if (empty? (first @user-email-obs))
-                                                             "Stranger"
-                                                             (first @user-email-obs)) " | "))
+                            (Chip #js {:style #js {:marginRight "5px"}}
+                                  (ChipContact #js {:className "mdl-color--teal mdl-color-text--white"}
+                                               (Icon #js {:name "account_box" :style #js {:marginTop "4px"}}))
+                                  (if (empty? (first @user-email-obs))
+                                    "Stranger"
+                                    (first @user-email-obs)))
 
                             (cond
-                              (= "splash" site-state) (dom/span nil
-                                                                (cc/standard-button
-                                                                  #(mn/site-transition @mn/nangpress-data-cache)
-                                                                  "Sign in"))
+                              (= "splash" site-state) (Button #js{:style #js {:marginBottom "-8px" :float "right"
+                                                                              :marginRight "10px"}
+                                                                  :onClick #(.log js/console "hi there")
+                                                                  :raised true :colored true}
+                                                              "Sign in")
+                              #_(dom/span nil
+                                          (cc/standard-button
+                                            #(mn/site-transition @mn/nangpress-data-cache)
+                                            "Sign in"))
                               (= "user" site-state) (dom/span nil
                                                               (cc/standard-button
                                                                 (fn [_] (fb/firebase-signout identity)) "Sign Out"))
@@ -185,31 +205,28 @@
 
         (dom/div (clj->js (merge @main-view-style-obs {:className "main-view"}))
 
-                 (dom/div #js{:style #js {:height "300px" :position "relative"}}
+                 #_(dom/div #js{:style #js {:height "300px" :position "relative"}}
                           (Layout #js {}
-                                  (Header #js{:transparent false :title "Title"}
+                                  (Header #js{:transparent false :title "Title" :style #js {:height "20px"}}
                                           (Navigation #js {}
-                                                      (dom/a #js {:herf "#"} "Link")
-                                                      (dom/a #js {:herf "#"} "Link")
-                                                      (dom/a #js {:herf "#"} "Link")
+                                                      (dom/a #js {:href "#"}
+                                                             (Chip #js {} "Welcome to Nangpress alpha")
+                                                             )
+                                                      (dom/a #js {:href "#"} "Link")
+                                                      (dom/a #js {:href "#"} "Link")
+                                                      (Chip #js {} "Welcome to Nangpress alpha")
                                                       )
                                           )
 
-                                  (Drawer #js{:title "Title"}
-                                          (Navigation #js {}
-                                                      (dom/a #js {:herf "#"} "Link")
-                                                      (dom/a #js {:herf "#"} "Link")
-                                                      (dom/a #js {:herf "#"} "Link")
-                                                      )
-                                          )
-                                  (Content #js {})
+
+
                                   )
 
 
 
                           )
 
-                 (Card #js {:shadow 0 :style #js {:width "512px" :margin "auto"}}
+                 #_(Card #js {:shadow 0 :style #js {:width "512px" :margin "auto"}}
                        (CardTitle #js {:style #js {:color "#fff" :height "176px"
                                                    :background "url(http://www.getmdl.io/assets/demos/welcome_card.jpg) center / cover"}} "Welcome")
 
