@@ -12,13 +12,15 @@
                   [it.frbracch/boot-marginalia "0.1.3-1" :scope "test"]
                   [crisptrutski/boot-cljs-test "0.3.0" :scope "test"]
                   [org.clojure/clojurescript "1.9.521"]
-                  [org.omcljs/om "0.8.6"]
+                  [org.omcljs/om "1.0.0-alpha48"]
                   [org.clojure/core.async "0.2.395"]
                   [cljs-ajax "0.5.8"]
                   [replumb "0.2.4"]
                   [com.cemerick/url "0.1.1"]
                   [cljsjs/firebase "3.5.3-1"]
-                  [cljsjs/jquery "1.12.4-0"]])
+                  [cljsjs/jquery "1.12.4-0"]
+                  [cljsjs/react-mdl "1.10.1-1"]
+                  ])
 
 (require
   '[adzerk.boot-cljs      :refer [cljs]]
@@ -37,7 +39,7 @@
         (cljs)))
 
 (deftask run []
-  (comp 
+  (comp
     (serve)
     (watch)
     (cljs-repl)
@@ -46,7 +48,7 @@
 
 (deftask production []
   (task-options! cljs {:optimizations :advanced
-                       :compiler-options 
+                       :compiler-options
                        {:infer-externs true
                         :foreign-libs [{:file "resources/js/firebaseui.js"
                                         :provides ["firebase.ui"]}
@@ -77,9 +79,9 @@
   identity)
 
 (deftask development []
-  (task-options! cljs {:optimizations :none 
-                       :source-map false 
-                       :compiler-options 
+  (task-options! cljs {:optimizations :none
+                       :source-map false
+                       :compiler-options
                        {:infer-externs true
                       ;  :externs ["resources/externs.js"]
                         :foreign-libs [{:file "resources/js/firebaseui.js"
@@ -124,7 +126,7 @@
 
 (ns-unmap 'boot.user 'test)
 
-(deftask test [] 
+(deftask test []
   (comp (testing)
         (test-cljs :js-env :phantom
                    :exit? true)))
