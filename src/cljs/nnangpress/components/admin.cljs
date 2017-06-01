@@ -63,21 +63,8 @@
                                             (go
                                               (when (<! (fb/new-user? (.-uid user)))
                                                 (fb/register-new-user (.-uid user) (mn/new-site-template)))
-                                              (mn/auth-state-load-site! master "super-container")))))
-                             } "Sign up / Sign in")
-                 #_(dom/button
-                   #js {:id "firebase-button"
-                        :style (clj->js (merge style local-style))
-                        :onClick (fn [_]
-                                   (mn/update-local-style! owner :display "none")
-                                   (fb/fb-initiate-auth
-                                     "firebase"
-                                     (fn [user]
-                                       (go
-                                         (when (<! (fb/new-user? (.-uid user)))
-                                           (fb/register-new-user (.-uid user) (mn/new-site-template)))
-                                         (mn/auth-state-load-site! master "super-container")))))}
-                   "Sign up / Sign in"))))))
+                                              (mn/auth-state-load-site! master "super-container")))))}
+                         "Sign up / Sign in"))))))
 
 (defn admin-toolbar
   "Toolbar to aid in editing the site and provide information. Should not be visible when ordinarily visting the site."
@@ -106,16 +93,22 @@
                             (cond
                               (= "splash" site-state) (Button #js{:style #js {:marginBottom "-8px" :float "right"
                                                                               :marginRight "10px"}
-                                                                  :onClick #(.log js/console "hi there")
+                                                                  :onClick #(mn/site-transition @mn/nangpress-data-cache)
                                                                   :raised true :colored true}
                                                               "Sign in")
+
+                              (= "user" site-state) (Button #js{:style #js {:marginBottom "-8px"
+                                                                            :float "right"
+                                                                              :marginRight "10px"}
+                                                                  :onClick #(.log js/console "hi there")
+                                                                  :raised true :colored true}
+                                                              "Sign Out")
+
                               #_(dom/span nil
-                                          (cc/standard-button
-                                            #(mn/site-transition @mn/nangpress-data-cache)
-                                            "Sign in"))
-                              (= "user" site-state) (dom/span nil
                                                               (cc/standard-button
-                                                                (fn [_] (fb/firebase-signout identity)) "Sign Out"))
+                                                                (fn [_]
+                                                                  (fb/firebase-signout identity))
+                                                                "Sign Out"))
                               (= "site-owner" site-state) (dom/span nil
                                                                     (cc/standard-button mn/new-site "Save New Site")
                                                                     (cc/standard-button mn/save-site-data "Save")
@@ -162,6 +155,7 @@
                (cc/edit-mode-sense
                  owner
                  (cc/delete-button  (mn/current-widgets-builder<< owner) :object-id object-id))
+               (.log js/console "data:" (clj->js data))
                (om/build wgt/widget data)))))
 
 (defn simple-form
@@ -193,7 +187,7 @@
                          "Submit"))))
 
 (def sidebar-header-p {:border "5px solid #7f8c8d", :padding "10px", :background "#95a5a6", :fontWeight "600"})
-(def sidebar-close-icon {:float "right", :margin-top "-5px", :cursor "pointer"})
+(def sidebar-close-icon {:float "right", :marginTop "-5px", :cursor "pointer"})
 
 (defn main-view
   "The main view that builds the displayed widgets for the view as well as the admin panel."
@@ -204,40 +198,6 @@
       (let [main-view-style-obs (om/observe owner (mn/main-view-style))]
 
         (dom/div (clj->js (merge @main-view-style-obs {:className "main-view"}))
-
-                 #_(dom/div #js{:style #js {:height "300px" :position "relative"}}
-                          (Layout #js {}
-                                  (Header #js{:transparent false :title "Title" :style #js {:height "20px"}}
-                                          (Navigation #js {}
-                                                      (dom/a #js {:href "#"}
-                                                             (Chip #js {} "Welcome to Nangpress alpha")
-                                                             )
-                                                      (dom/a #js {:href "#"} "Link")
-                                                      (dom/a #js {:href "#"} "Link")
-                                                      (Chip #js {} "Welcome to Nangpress alpha")
-                                                      )
-                                          )
-
-
-
-                                  )
-
-
-
-                          )
-
-                 #_(Card #js {:shadow 0 :style #js {:width "512px" :margin "auto"}}
-                       (CardTitle #js {:style #js {:color "#fff" :height "176px"
-                                                   :background "url(http://www.getmdl.io/assets/demos/welcome_card.jpg) center / cover"}} "Welcome")
-
-                       (CardText #js {} "Here is some text bla de bal de bla")
-                       (CardActions #js {:border true}
-                                    (Button #js {:colored true} "Get Started"))
-                       (CardMenu #js {:style #js {:color "#fff"}}
-                                 (IconButton #js {:name "share"})
-                                 )
-                       )
-
 
                  (apply dom/div nil
                         (om/build-all all-widget-wrapper data)))))))
@@ -461,5 +421,5 @@
                  (om/build admin-sidebar data)
                  (om/build admin-toolbar data)
                  (om/build main-view widgets)
-                 (om/build nv/navbar route-widget))))))
+                 #_(om/build nv/navbar route-widget))))))
 

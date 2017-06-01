@@ -1,7 +1,7 @@
 (ns nnangpress.widgets
-  "Widgets are the main 'unit' of display in nnangpress. Widgets can be added and deleted by the user. A widget 
-  comprises a react component and its supporting data. These are both implemented as multimethods. So if the user 
-  selects a new widget, the widget's id is passed to a multimethod that returns the data for that widget. When a 
+  "Widgets are the main 'unit' of display in nnangpress. Widgets can be added and deleted by the user. A widget
+  comprises a react component and its supporting data. These are both implemented as multimethods. So if the user
+  selects a new widget, the widget's id is passed to a multimethod that returns the data for that widget. When a
   widget is rendered, the multimethod returns the corresponding react component."
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require
@@ -33,16 +33,16 @@
 (s/def ::user-sites vector?)
 (s/def ::widget-data (s/multi-spec widget-data-type :widget-uid))
 
-(defn medium-init 
-  "Helper for mediumjs components. Initializes a medium instance. Returns a function that can be used to destroy 
-  instance and related listeners. Listening to events that modify text, including saving the text is handled by 
-  functions attached to the container of the mediumjs object. Therefore buttons need to be on the top level of 
-  the contentEditable element's container." 
+(defn medium-init
+  "Helper for mediumjs components. Initializes a medium instance. Returns a function that can be used to destroy
+  instance and related listeners. Listening to events that modify text, including saving the text is handled by
+  functions attached to the container of the mediumjs object. Therefore buttons need to be on the top level of
+  the contentEditable element's container."
   [uuid data link-btn-id link-input-id edit-uid]
   (let [article (.getElementById js/document uuid)
         container (.-parentNode article)
         edit-container (.getElementById js/document edit-uid)
-        medium (js/Medium. #js {:element article 
+        medium (js/Medium. #js {:element article
                                 :mode js/Medium.richMode
                                 :placeholder "Your Text here"
                                 :autofocus false
@@ -50,7 +50,7 @@
                                 :tags nil
                                 :pasteAsText false
                                 :modifiers #js {:b (fn [event element]
-                                                     ) 
+                                                     )
                                                 :q (fn [event element]
                                                      (.log js/console (str "innerhtml: " (gdom/getElement uuid)))
                                                      #_(om/update!
@@ -60,58 +60,58 @@
 
         _ (set! (-> medium .-fontSize) 1)
 
-        cb (ndom/attach-click-listener-by-id 
-             link-btn-id 
+        cb (ndom/attach-click-listener-by-id
+             link-btn-id
              (fn []
-               (do 
+               (do
                  (.focus medium)
-                 (.invokeElement 
-                   medium 
-                   "a" 
+                 (.invokeElement
+                   medium
+                   "a"
                    #js {:title "I am a link"
                         :style "color: #66d9ef"
                         :target "_blank"
                         :href (.-value (ndom/get-node-by-id link-input-id))}))))]
 
-    (set! 
+    (set!
       (-> edit-container (.querySelector ".header-one") .-onmousedown)
-      (fn [] 
-        (do 
+      (fn []
+        (do
           (.focus medium)
           (.invokeElement medium "h1" #js {}))))
 
-    (set! 
+    (set!
       (-> edit-container (.querySelector ".header-two") .-onmousedown)
-      (fn [] 
-        (do 
+      (fn []
+        (do
           (.focus medium)
           (.invokeElement medium "h2" #js {}))))
 
-    (set! 
+    (set!
       (-> edit-container (.querySelector ".header-three") .-onmousedown)
-      (fn [] 
-        (do 
+      (fn []
+        (do
           (.focus medium)
           (.invokeElement medium "h3" #js {}))))
 
-    (set! 
+    (set!
       (-> edit-container (.querySelector ".header-four") .-onmousedown)
-      (fn [] 
-        (do 
+      (fn []
+        (do
           (.focus medium)
           (.invokeElement medium "h4" #js {}))))
 
-    (set! 
+    (set!
       (-> edit-container (.querySelector ".header-five") .-onmousedown)
-      (fn [] 
-        (do 
+      (fn []
+        (do
           (.focus medium)
           (.invokeElement medium "h5" #js {}))))
 
-    (set! 
+    (set!
       (-> edit-container (.querySelector ".header-six") .-onmousedown)
-      (fn [] 
-        (do 
+      (fn []
+        (do
           (.focus medium)
           (.invokeElement medium "h6" #js {}))))
 
@@ -120,42 +120,46 @@
       (ndom/remove-listener link-btn-id cb))))
 
 ;or is for legacy rich-text-edit data
-(defn rich-text-edit 
-  "Mediumjs rich text editor" 
+(defn rich-text-edit
+  "Mediumjs rich text editor"
   [{uid :medium-id inner-html :inner-html :or {uid (u/uid)} :as data} owner]
   (reify
     om/IInitState
     (init-state [_]
-      {:advertise? false
+      {:uid uid
+       :advertise? false
        :edit-uid (u/uid)
        :link-btn-id (u/uid)
        :link-input-id (u/uid)})
 
     om/IDidMount
     (did-mount [_]
-      (let [{:keys [advertise? edit-uid link-btn-id link-input-id edit]} (om/get-state owner)
+      (let [{:keys [uid advertise? edit-uid link-btn-id link-input-id edit]} (om/get-state owner)
             edit-mode-obs (first (om/observe owner (mn/edit-mode)))]
+        (.log js/console "uid: " uid)
         (medium-init uid data link-btn-id link-input-id edit-uid)
-        (ndom/set-attr-by-id uid "contenteditable" (if (or edit-mode-obs edit) "true" "false"))))
+        (ndom/set-attr-by-id uid "contenteditable" (if (or edit-mode-obs edit) "true" "false"))
+        ))
 
     om/IDidUpdate
     (did-update [_ _ _]
-      (let [{:keys [edit]} (om/get-state owner)
+      (let [{:keys [edit uid]} (om/get-state owner)
             edit-mode-obs (first (mn/edit-mode))]
         (ndom/set-attr-by-id uid "contenteditable" (if (or edit-mode-obs edit) "true" "false"))))
 
     om/IRenderState
-    (render-state [_ {:keys [advertise? edit-uid link-btn-id link-input-id style]}]
+    (render-state [_ {:keys [uid advertise? edit-uid link-btn-id link-input-id style]}]
       (let [edit-mode-obs (first (om/observe owner (mn/edit-mode)))]
-        (dom/div #js {:style (clj->js style)} 
+        (dom/div #js {:style (clj->js style)}
+                 (.log js/console "render uid: " uid)
                  (dom/div #js {:id uid
                                :style #js {:marginTop "-10px" :outline (if edit-mode-obs "1px solid blue" "")}
                                :dangerouslySetInnerHTML #js {:__html (first inner-html)}})
 
-                 (dom/div #js {:id edit-uid 
+                 (dom/div #js {:id edit-uid
                                :style #js {:display (cc/edit-mode-display edit-mode-obs) :textAlign "left"}}
 
-                          (.log js/console "data: " (clj->js @data))
+                          (.log js/console "data data: " (clj->js @data))
 
                           (dom/button #js {:className "header-one"} "H1")
                           (dom/button #js {:className "header-two"} "H2")
@@ -163,20 +167,20 @@
                           (dom/button #js {:className "header-four"} "H4")
                           (dom/button #js {:className "header-five"} "H5")
                           (dom/button #js {:className "header-six"} "H6")
-                          (dom/button #js {:className "align-left" :onClick #(om/update! style :textAlign "left")} 
-                                      (dom/i #js {:className "fa fa-align-left"}))
-                          (dom/button #js {:className "align-middle" :onClick #(om/update! style :textAlign "center")} 
-                                      (dom/i #js {:className "fa fa-align-justify"}))
-                          (dom/button #js {:className "align-right" :onClick #(om/update! style :textAlign "right")} 
-                                      (dom/i #js {:className "fa fa-align-right"}))
-                          (dom/button #js {:className "align-left" :onClick #(do 
-                                                                               (.log js/console 
+                          (dom/button #js {:className "align-left" :onClick #(om/update! style :textAlign "left")}
+                                    (dom/i #js {:className "fa fa-align-left"}))
+                          (dom/button #js {:className "align-middle" :onClick #(om/update! style :textAlign "center")}
+                                    (dom/i #js {:className "fa fa-align-justify"}))
+                          (dom/button #js {:className "align-right" :onClick #(om/update! style :textAlign "right")}
+                                    (dom/i #js {:className "fa fa-align-right"}))
+                          (dom/button #js {:className "align-left" :onClick #(do
+                                                                               (.log js/console
                                                                                      (.-innerHTML (gdom/getElement uid)))
                                                                                (.log js/console "inner-html: " inner-html)
                                                                                (.log js/console (type inner-html))
-                                                                               (om/update! 
-                                                                                 inner-html 
-                                                                                 [(.-innerHTML (gdom/getElement uid))]))} 
+                                                                               (om/update!
+                                                                                 inner-html
+                                                                                 [(.-innerHTML (gdom/getElement uid))]))}
                                       (dom/i #js {:className "fa fa-save"}))
 
                           (dom/input #js {:id link-input-id})
@@ -185,40 +189,42 @@
 (s/def ::textAlign (s/and string? #{"left" "center" "right"}))
 
 (s/fdef build-rich-text
-        :args (s/cat :data (s/and ::spcs/map-cursor #(and (contains? % :object-id) (contains? % :inner-html))) 
+        :args (s/cat :data (s/and ::spcs/map-cursor #(and (contains? % :object-id) (contains? % :inner-html)))
                      :style (s/and (s/keys :req-un [::textAlign]) ::spcs/map-cursor)))
 
-(defn build-rich-text 
-  "Gives us a chance to spec the buliding of the simple text component." 
+(defn build-rich-text
+  "Gives us a chance to spec the buliding of the simple text component."
   [data style]
     (om/build rich-text-edit data {:state {:style style}}))
 
-;##Widgets 
-;The main widget multimethods. 
-(defmulti widget-data-type 
-  "Spec multimethod." 
+;##Widgets
+;The main widget multimethods.
+(defmulti widget-data-type
+  "Spec multimethod."
   :widget-uid)
 
-(defmulti widget 
-  "Components for displaying widgets." 
-  (fn [data owner] (:widget-uid data)))
+(defmulti widget
+  "Components for displaying widgets."
+  (fn [data owner]
+
+    (:widget-uid data)))
 
 (defmethod widget-data-type 1 [_] ::basic-medium-js-widget)
 
 ;Basic mediumjs widget
-(defmethod widget 001  
+(defmethod widget 001
   [data owner]
   (reify
     om/IRenderState
     (render-state [_ {:keys [edit]}]
-      (dom/div nil 
+      (dom/div nil
                (om/build rich-text-edit data {:state {:edit edit :style (:style data)}})))))
 
 (defmethod widget-data-type 2 [_]
   (s/keys :req-un [::widget-uid ::object-id ::imgs]))
 
 ;Image slider widget.
-(defmethod widget 002 [{:keys [imgs] :as data} owner] 
+(defmethod widget 002 [{:keys [imgs] :as data} owner]
   (reify
     om/IInitState
     (init-state [_]
@@ -306,23 +312,6 @@
 (defmethod widget-data-type 4 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::text]))
 
-(comment 
- (defn accordion-partial [data owner]
-  (reify
-    om/IRenderState
-    (render-state [this state]
-      (dom/div nil
-               (dom/dt nil
-                       (dom/a #js {:href "#accordion1" :aria-expanded "false" :aria-controls "accordion1"
-                                   :className "accordion-title accordionTitle js-accordionTrigger"}
-                              (first (:title data))))
-               (dom/dd #js {:className "accordion-content accordionItem is-collapsed" :id "accordion1"
-                            :aria-hidden "true"}
-                       (if (:admin state) (om/build input-partial (:title data)))
-                       (apply dom/div nil
-                              (om/build-all p-p-partial (:content data) {:state state}))))))) 
-  )
-
 ;Accordion
 (defmethod widget 004 [{:keys [text] :as data} owner]
   (reify
@@ -347,8 +336,7 @@
                                      :id "accordion1"
                                      :aria-hidden "true"}
                                 (dom/div nil
-                                         (dom/p nil "This is some text")
-                                         )
+                                         (dom/p nil "This is some text"))
                                 #_(om/build widget sub))))))}))
 
     om/IDidUpdate
@@ -406,7 +394,7 @@
       (let [advertise? (om/get-state owner :advertise?)
             edit-mode-obs (om/observe owner (mn/edit-mode))]
 
-        (dom/div #js {:style #js {:textAlign "center"}} 
+        (dom/div #js {:style #js {:textAlign "center"}}
                  (dom/img #js {:style (clj->js style)
                                :src (:img data)})
                  (when (and (first @edit-mode-obs) (not advertise?))
@@ -421,7 +409,7 @@
 ;"<a href=\"http://google.com\" style=\"width:100%;height:100%;\">"
 ;"</a>"
 
-;Image and text grid  
+;Image and text grid
 (defmethod widget 007 [{:keys [imgs] :as data} owner]
   (reify
     om/IInitState
@@ -496,7 +484,7 @@
                           (dom/div nil
                                    (cre/simple-input-cursor! (:title data) data :title)
                                    (cre/simple-input-cursor! (:text data) data :text))
-                          (dom/div nil 
+                          (dom/div nil
                                    (cre/simple-input-cursor! (:data-src data) data :data-src)
                                    (cre/simple-input-cursor! (:link data) data :link)
                                    (cre/simple-input-cursor! (:title data) data :title)
@@ -511,7 +499,7 @@
           (.click (fn [event]
                     (rt/js-link
                       @routes-map-obs
-                      link 
+                      link
                       event))))))
       (->
         (js/$ ".megafolio-container")
@@ -526,7 +514,7 @@
             (.click (fn [event]
                       (rt/js-link
                         @routes-map-obs
-                        link 
+                        link
                         event)))))
         (->
           (js/$ ".megafolio-container")
@@ -602,35 +590,35 @@
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::user-sites]))
 
 (defn display-site
-  "" 
+  ""
   [{:keys [name description route-widget screenshot] :as all-data} owner]
   (reify
     om/IRenderState
     (render-state [_ {:keys [delete]}]
-      (dom/div #js {:style #js {:position "relative", :height "200px", :margin "10px", 
+      (dom/div #js {:style #js {:position "relative", :height "200px", :margin "10px",
                                 :fontWeight "900" :border "2px solid white" :padding "10px",
-                                :background "rgba(0,0,0,0.7)"}} 
+                                :background "rgba(0,0,0,0.7)"}}
 
                (dom/u nil (str "Site name: "))
                (om/build widget name {:state {:edit true}})
                (dom/u nil (str "Site description: "))
                (om/build widget description {:state {:edit true}})
 
-               (dom/img #js {:style #js {:float "right", :position "absolute", :top "10px", 
-                                         :right "10px"} 
+               (dom/img #js {:style #js {:float "right", :position "absolute", :top "10px",
+                                         :right "10px"}
                              :alt "Loading..." :src screenshot :width "300" :height "200"})
 
                (cc/standard-button #(mn/site-transition @all-data)
                  "Go to site")
 
-               (cc/standard-button 
-                 #(put! delete name)  
+               (cc/standard-button
+                 #(put! delete name)
                  "Delete site")))))
 
-;The user's sites as seen when on the user homepage. Not meant to be a user selectable widget. This widget 
-;is somewhat removed from the general monolith architecture. It loads its own data into the monolith 
-;based on the current user, and provides a channel for sub components to communicate back to it for saving 
-;updates to the user's site data. So this component and it's sub components are their own mini ecosystem. 
+;The user's sites as seen when on the user homepage. Not meant to be a user selectable widget. This widget
+;is somewhat removed from the general monolith architecture. It loads its own data into the monolith
+;based on the current user, and provides a channel for sub components to communicate back to it for saving
+;updates to the user's site data. So this component and it's sub components are their own mini ecosystem.
 (defmethod widget 10 [{:keys [user-sites] :as data} owner]
   (reify
     om/IInitState
@@ -646,7 +634,7 @@
             _ (fb/firebase-get "nangpress-data" nd-chan)
             c (chan)]
         (when (not advertise?)
-          (go 
+          (go
             (fb/firebase-get (str "users/" (first @uid-obs)  "/sites") c)
             (om/update! user-sites (vec (filter #(not (nil? %)) (<! c))))))
         (go (loop []
@@ -654,20 +642,20 @@
                 (om/transact! user-sites (fn [xs] (vec (remove #(= site-name (:name %)) xs)))))
               (recur)))))
 
-    om/IWillUpdate 
+    om/IWillUpdate
     (will-update [_ next-props _]
       (mn/update-sites!! @(:user-sites next-props) (first (om/observe owner (mn/uid)))))
 
     om/IRenderState
     (render-state [_ {:keys [delete]}]
-      (dom/div {:style #js {:fontWeight "900"}}
-               (dom/div #js {:style #js {:fontWeight "900", :fontSize "2em", :textDecoration "underline"}} 
+      (dom/div #js {:style #js {:fontWeight "900"}}
+               (dom/div #js {:style #js {:fontWeight "900", :fontSize "2em", :textDecoration "underline"}}
                         "Your Sites")
 
-               (cc/standard-button 
+               (cc/standard-button
                  (fn [] (om/transact! user-sites #(conj % (mn/new-site-template))))
-                 "+ Add New Site" 
-                 {:position "absolute", :top "0", :right "0", 
+                 "+ Add New Site"
+                 {:position "absolute", :top "0", :right "0",
                   :fontSize "1.5em" :marginTop "20px", :cursor "pointer"})
 
                (apply dom/div nil
@@ -676,83 +664,83 @@
 (defmethod widget-data-type 11 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::inner-html]))
 
-(defmulti tag 
+(defmulti tag
   "Project tags"
   (fn [data owner] (contains? data :tag)))
 
 (defmethod tag true
   [data owner]
-  (reify 
-    om/IInitState 
+  (reify
+    om/IInitState
     (init-state [_]
       {:uid (u/uid)})
 
-    om/IDidMount 
+    om/IDidMount
     (did-mount [_]
       (ndom/content-editable-updater (om/get-state owner :uid) data :tag))
 
-    om/IRenderState 
+    om/IRenderState
     (render-state [_ {:keys [uid tags] :as state}]
       (let [edit-mode-obs (om/observe owner (mn/edit-mode))]
-        (dom/li #js {:style #js {:float "left" :background "#CE4072" :paddingRight "10px" 
-                                 :paddingLeft "10px" :margin "0px" :position "relative"}} 
+        (dom/li #js {:style #js {:float "left" :background "#CE4072" :paddingRight "10px"
+                                 :paddingLeft "10px" :margin "0px" :position "relative"}}
                 (when (first edit-mode-obs) (cc/delete-button tags :tag (:tag data)))
 
                 (dom/p #js {:id uid :contentEditable (first edit-mode-obs)} (:tag data)))))))
 
 (defmethod tag false
   [data owner]
-  (reify 
+  (reify
     om/IRenderState
     (render-state [_ state]
-      (cc/edit-mode-sense 
+      (cc/edit-mode-sense
         owner
-        (dom/li #js {:onClick (fn [_] 
+        (dom/li #js {:onClick (fn [_]
                                 (mn/ref-vec-insert-second! (:tags state) {:tag "Change me"}))
-                     :style #js {:float "left" :background "#CE4072" :paddingRight "10px" 
-                                 :paddingLeft "10px" :marginRight "10px"}} 
+                     :style #js {:float "left" :background "#CE4072" :paddingRight "10px"
+                                 :paddingLeft "10px" :marginRight "10px"}}
                 "Add Tag +")))))
 
-(defn tag-intersect? 
-  "Check if a widget's tags intersect with tags chosen by a tag filter widget" 
+(defn tag-intersect?
+  "Check if a widget's tags intersect with tags chosen by a tag filter widget"
   [owner tags]
   (let [current-route-obs (om/observe owner (mn/current-route))
         routes-map-obs (om/observe owner (mn/routes-map))
         current-widgets (mn/current-widgets
                           (clojure.string/split (first @current-route-obs) #"/")
-                          routes-map-obs)   
+                          routes-map-obs)
         filter-widget? (filter (fn [x] (= 12 (get x :widget-uid)))  current-widgets)
-        selected-tags (set 
-                        (reduce 
-                          (fn [x {:keys [clicked tagz] :as y}]  
-                            (if clicked 
+        selected-tags (set
+                        (reduce
+                          (fn [x {:keys [clicked tagz] :as y}]
+                            (if clicked
                               (conj x tagz)
-                              x)) 
+                              x))
                           []
                           (:tags (first filter-widget?))))
         intersect? (not (empty? (st/intersection selected-tags (set (map :tag tags)))))]
     intersect?))
 
-;Text widget with tags, allows the widget's display to be turned on and off by a filter widget.  
+;Text widget with tags, allows the widget's display to be turned on and off by a filter widget.
 (defmethod widget 11 [{:keys [tags visible? more-info] :as data} owner]
   (reify
     om/IRender
     (render [_]
       (let [routes-map-obs (om/observe owner (mn/routes-map))
             edit-mode-obs (om/observe owner (mn/edit-mode))]
-        (dom/div #js {:style #js {:display (if (tag-intersect? owner tags) "inherit" "none")}} 
+        (dom/div #js {:style #js {:display (if (tag-intersect? owner tags) "inherit" "none")}}
 
-                 (apply dom/ul #js {:style #js {:display "inline-block" :margin "0px"}} 
+                 (apply dom/ul #js {:style #js {:display "inline-block" :margin "0px"}}
                         (om/build-all tag tags {:state {:tags tags}}))
 
                  (dom/div #js {:className "box-paragraph"}
                           (om/build rich-text-edit data)
-                          (dom/div #js {:style #js {:textAlign "center"}} 
+                          (dom/div #js {:style #js {:textAlign "center"}}
                                    (dom/button #js {:style #js {:padding "10px 20px"}
-                                                    :onClick (partial rt/js-link @routes-map-obs more-info) 
+                                                    :onClick (partial rt/js-link @routes-map-obs more-info)
                                                     :className "button-one"} "more info")
-                                   
-                                   (when (first @edit-mode-obs) 
+
+                                   (when (first @edit-mode-obs)
                                      (om/build cre/simple-input-comp! data {:state {:k :more-info}}))
                                    )))))))
 
@@ -761,51 +749,51 @@
 
 (def default-tag {:clicked true :tagz "Change me"})
 
-(defmulti select-tag 
+(defmulti select-tag
   "Allow selection of an individual tag"
   (fn [data owner] (contains? data :tagz)))
 
-(defmethod select-tag true 
+(defmethod select-tag true
   [{:keys [tagz clicked] :as data} owner]
-  (reify 
-    om/IInitState 
+  (reify
+    om/IInitState
     (init-state [_]
       {:uid (u/uid)})
 
-    om/IDidMount 
+    om/IDidMount
     (did-mount [_]
       (ndom/content-editable-updater (om/get-state owner :uid) data :tagz))
 
     om/IRenderState
     (render-state [_ {:keys [uid tags] :as state}]
       (let [edit-mode-obs (om/observe owner (mn/edit-mode))]
-        (dom/li #js {:onClick (fn [x] 
+        (dom/li #js {:onClick (fn [x]
                                 (when (not (first edit-mode-obs))
                                   (om/transact! data :clicked (fn [bool] (not bool)))))
                      :style #js {:float "left" :border "3px solid #CE4072" :position "relative"
                                  :padding "5px" :margin "5px" :cursor "pointer"
-                                 :background (if clicked "#CE4072" "inherit")}} 
+                                 :background (if clicked "#CE4072" "inherit")}}
 
                 (when (first edit-mode-obs)
                   (cc/delete-button tags :tagz tagz))
 
                 (dom/p #js {:id uid :contentEditable (first edit-mode-obs)} tagz))))))
 
-(defmethod select-tag false 
+(defmethod select-tag false
   [{:keys [tagz clicked] :as data} owner]
-  (reify 
+  (reify
     om/IRenderState
     (render-state [_ {:keys [tags] :as state}]
-      (cc/edit-mode-sense 
+      (cc/edit-mode-sense
         owner
-        (dom/li #js {:onClick (fn [_] 
+        (dom/li #js {:onClick (fn [_]
                                 (mn/ref-vec-insert-second! tags default-tag))
-                     :style #js {:float "left" :border "3px solid #CE4072" 
+                     :style #js {:float "left" :border "3px solid #CE4072"
                                  :padding "5px" :margin "5px" :cursor "pointer"
-                                 :background (if clicked "#CE4072" "inherit")}} 
+                                 :background (if clicked "#CE4072" "inherit")}}
                 "Add Tag +")))))
 
-;Tag filter. Will filter widget visibility for any widget that has tag data associated with it. 
+;Tag filter. Will filter widget visibility for any widget that has tag data associated with it.
 (defmethod widget 12 [{:keys [tags] :as data} owner]
   (reify
     om/IInitState
@@ -818,8 +806,8 @@
       (let [advertise? (om/get-state owner :advertise?)
             edit-mode-obs (om/observe owner (mn/edit-mode))]
 
-        (dom/div #js {:style #js {:marginBottom "10px"}} 
-                 (dom/p nil "Choose the tags you're interested in:") 
+        (dom/div #js {:style #js {:marginBottom "10px"}}
+                 (dom/p nil "Choose the tags you're interested in:")
                  (apply dom/ul #js {:style #js {:display "inline-block" :margin "0px"}}
                         (om/build-all select-tag tags {:state {:tags tags}})))))))
 
@@ -836,21 +824,21 @@
 
     om/IRender
     (render [_]
-      (dom/div nil 
+      (dom/div nil
                (dom/div #js {:style #js {:marginTop "-10px" :textAlign "center"}
-                             :dangerouslySetInnerHTML #js {:__html like-box-string}})         
-               (cc/edit-mode-sense 
-                 owner 
+                             :dangerouslySetInnerHTML #js {:__html like-box-string}})
+               (cc/edit-mode-sense
+                 owner
                  (cre/simple-input-cursor! like-box-string data :like-box-string))))))
 
-(defn youtube-string-gen 
-  "Given a youtube video url, return embedable string" 
+(defn youtube-string-gen
+  "Given a youtube video url, return embedable string"
   [youtube-video-id]
-  (str 
-    "<iframe id=\"ytplayer\" type=\"text/html\" width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/" 
-    youtube-video-id  
-    "?autoplay=0&mute=1&loop=1&playlist=" 
-    youtube-video-id  
+  (str
+    "<iframe id=\"ytplayer\" type=\"text/html\" width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/"
+    youtube-video-id
+    "?autoplay=0&mute=1&loop=1&playlist="
+    youtube-video-id
     "\" frameborder=\"0\" allowfullscreen=\"allowfullscreen\" volume=\"0\"></iframe>"))
 
 ;Youtube embed
@@ -858,62 +846,62 @@
   (reify
     om/IRender
     (render [_]
-      (dom/div nil 
+      (dom/div nil
                (dom/div #js {:className "aspect-ratio"
                              :style #js {:textAlign "center"}
-                             :dangerouslySetInnerHTML #js {:__html (youtube-string-gen youtube-video-id)}})         
-               (cc/edit-mode-sense 
-                 owner 
+                             :dangerouslySetInnerHTML #js {:__html (youtube-string-gen youtube-video-id)}})
+               (cc/edit-mode-sense
+                 owner
                  (cre/simple-input-cursor! youtube-video-id data :youtube-video-id))))))
 
-(def welcome-widget-style {:fontWeight "900", :textAlign "center", :background "rgba(0,0,0,0.95)", 
+(def welcome-widget-style {:fontWeight "900", :textAlign "center", :background "rgba(0,0,0,0.95)",
                            :padding "20px", :border "2px solid white"})
 
-;Welcome widget, the first widget the user will see on their new site. Should have basic instructions 
-;on what to do next.  
+;Welcome widget, the first widget the user will see on their new site. Should have basic instructions
+;on what to do next.
 (defmethod widget 15 [{:keys [youtube-video-id] :as data} owner]
   (reify
     om/IRender
     (render [_]
       (dom/div #js {:style (clj->js welcome-widget-style)
-                    :className "welcome-widget"} 
-               (dom/p #js {:style #js {:fontSize "1.5em"}} "Welcome to Nangpress! Here's how to get started.")         
-               (dom/p nil "1. Choose a navbar. 
+                    :className "welcome-widget"}
+               (dom/p #js {:style #js {:fontSize "1.5em"}} "Welcome to Nangpress! Here's how to get started.")
+               (dom/p nil "1. Choose a navbar.
                           This is optional but without it your site won't have any pages other than the homepage.
-                          You can do this by clicking 'Menu' in the admin navbar above and then 'Select a navbar' 
-                          from the menu that appears on the left.")         
+                          You can do this by clicking 'Menu' in the admin navbar above and then 'Select a navbar'
+                          from the menu that appears on the left.")
                (dom/img #js {:src "https://media.giphy.com/media/l0Iy9RHuSPfER4NEs/source.gif"})
-               (dom/p nil "2. Add some routes to your site. 
-                          Hit 'Toggle edit mode' at the top. This will make the navbar editable. If you click on 
-                          the links on the navbar they will go to the corresponding page.")         
+               (dom/p nil "2. Add some routes to your site.
+                          Hit 'Toggle edit mode' at the top. This will make the navbar editable. If you click on
+                          the links on the navbar they will go to the corresponding page.")
                (dom/img #js {:src "https://media.giphy.com/media/l0Iy7jckAeUOgt5Bu/source.gif"})
-               (dom/p nil "3. Add widgets to a page. 
-                          In the side menu click on the 'add a widget' section. Here you will see a selction of 
-                          widgets that you can add to the current page you are on by clicking 'Add widget'. You 
-                          can play around with the widgets in the side menu as they have been loaded with some 
+               (dom/p nil "3. Add widgets to a page.
+                          In the side menu click on the 'add a widget' section. Here you will see a selction of
+                          widgets that you can add to the current page you are on by clicking 'Add widget'. You
+                          can play around with the widgets in the side menu as they have been loaded with some
                           default data.")
                (dom/img #js {:src "https://media.giphy.com/media/3o7btTKSqMxrMW3G2k/source.gif"})
-               (dom/p nil "4. Edit the widgets you have just added. 
+               (dom/p nil "4. Edit the widgets you have just added.
                           Hit 'Toggle edit mode' at the top to edit the widgets you just added.")
                (dom/p nil "5. Happy site building! Delete this widget when you're finished with it.")))))
 
-(defn route-modifier 
+(defn route-modifier
   ""
   [data parent-cursor routes-map]
   (fn [event element]
     (let [uuid (-> event .-srcElement .-id)]
-      (do 
+      (do
         (.log js/console "meidum-init-rt")
         (om/update!
-          parent-cursor 
+          parent-cursor
           :route-name
-          (u/str-uglify (.-innerHTML (gdom/getElement uuid))))  
+          (u/str-uglify (.-innerHTML (gdom/getElement uuid))))
         (rt/nav! (u/str-uglify (.-innerHTML (gdom/getElement uuid))) @routes-map)
         (om/update! data [(.-innerHTML (gdom/getElement uuid))])))))
 
 (defn medium-init-rt
-  "Helper for mediumjs components. Initializes a medium instance. Returns a function that can be used to destroy 
-  instance and related listeners" 
+  "Helper for mediumjs components. Initializes a medium instance. Returns a function that can be used to destroy
+  instance and related listeners"
   [uuid data link-btn-id link-input-id parent-cursor routes-map]
   (let [medium (js/Medium. #js {:element (.getElementById js/document uuid)
                                 :mode js/Medium.richMode
@@ -922,22 +910,22 @@
                                 :attributes nil
                                 :tags nil
                                 :pasteAsText false
-                                :modifiers #js {:q 
+                                :modifiers #js {:q
                                                 (route-modifier data parent-cursor routes-map)
                                                 }})
 
-        cb (ndom/attach-click-listener-by-id 
-             link-btn-id 
+        cb (ndom/attach-click-listener-by-id
+             link-btn-id
              (fn []
-               (do 
+               (do
                  (.focus medium)
-                 (.invokeElement 
-                   medium 
-                   "a" 
+                 (.invokeElement
+                   medium
+                   "a"
                    #js {:title "I am a link"
                         :style "color: #66d9ef"
                         :target "_blank"
-                        :href (.-value 
+                        :href (.-value
                                 (ndom/get-node-by-id link-input-id))}))))]
 
     (fn []
@@ -946,7 +934,7 @@
 
 (defn rich-text-edit-rt
   "Mediumjs rich text editor for routing. The main difference between this and the ordinary mediumjs widget is the
-  way we want the cursor to be updated" 
+  way we want the cursor to be updated"
   [data owner]
   (reify
     om/IInitState
@@ -976,7 +964,7 @@
     om/IRenderState
     (render-state [_ {:keys [uid advertise? link-btn-id link-input-id]}]
       (let [edit-mode-obs (first (om/observe owner (mn/edit-mode)))]
-        (dom/div nil 
+        (dom/div nil
                  (dom/div #js {:id uid
                                :style #js {:outline (if edit-mode-obs "1px solid blue" "")}
                                :dangerouslySetInnerHTML #js {:__html (first data)}})
@@ -986,17 +974,17 @@
                           (dom/button #js{:id link-btn-id} "Link")))))))
 
 ;Editing route names requires special treatment as the routing system relies on the route names.
-(defmethod widget 16  
+(defmethod widget 16
   [data owner]
   (reify
     om/IRenderState
     (render-state [_ {:keys [edit parent-cursor routes-map]}]
-      (dom/div nil 
-               (om/build rich-text-edit-rt (:inner-html data) {:state {:edit false 
-                                                         :parent-cursor parent-cursor 
+      (dom/div nil
+               (om/build rich-text-edit-rt (:inner-html data) {:state {:edit false
+                                                         :parent-cursor parent-cursor
                                                          :routes-map routes-map}})))))
 
-(defmethod widget 17  
+(defmethod widget 17
   [data owner]
   (reify
     om/IRender
@@ -1004,20 +992,20 @@
       (dom/div nil "Hi there"))))
 
 ;Edit this site now.
-(defmethod widget 18  
+(defmethod widget 18
   [data owner]
   (reify
     om/IRender
     (render [_]
       (let [edit-mode-obs (first (om/observe owner (mn/edit-mode)))]
         (dom/div #js {:className "box-paragraph"
-                      :style #js {:textAlign "center" :fontSize "1.5em" :fontWeight "900" :padding "0px"}} 
+                      :style #js {:textAlign "center" :fontSize "1.5em" :fontWeight "900" :padding "0px"}}
 
-                 (dom/p #js {:style #js {:textDecoration "" :margin "-10px" :fontSize "2em" :fontWeight "900"}} 
+                 (dom/p #js {:style #js {:textDecoration "" :margin "-10px" :fontSize "2em" :fontWeight "900"}}
                         "EDIT THIS SITE NOW!")
 
-                 (dom/div #js {:style #js {:marginBottom "1em"}} 
-                          (dom/button #js {:onClick #(mn/toggle-edit-mode), :className "button-one"} 
+                 (dom/div #js {:style #js {:marginBottom "1em"}}
+                          (dom/button #js {:onClick #(mn/toggle-edit-mode), :className "button-one"}
                                       (if edit-mode-obs "EXIT EDIT MODE" "CLICK HERE!"))))))))
 
 ;Box text with youtube vid(s)
@@ -1036,6 +1024,6 @@
     (render [_]
       (dom/div #js {:className "box-paragraph"}
                (build-rich-text data style)
-               (apply dom/div #js {:style #js {:marginTop "10px"}} 
+               (apply dom/div #js {:style #js {:marginTop "10px"}}
                       (om/build-all widget like-boxes))))))
 

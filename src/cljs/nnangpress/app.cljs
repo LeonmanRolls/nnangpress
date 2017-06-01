@@ -72,9 +72,9 @@
   []
   (let [c (chan)]
     (go
+      (dev-mode-helper<<)
       (firebase-init c)
       (reset! mn/nangpress-data-cache (<! c))
-      (dev-mode-helper<<)
       (mn/ref-cursor-init mn/monolith)
       ;(mn/monolith-watcher-init mn/monolith)
       (mn/auth-state-load-site! cadmin/master "super-container")
