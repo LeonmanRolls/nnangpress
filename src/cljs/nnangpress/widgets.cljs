@@ -27,6 +27,19 @@
 
 (declare widget-data-type admin-sidebar main-view)
 
+(def Layout (js/React.createFactory js/ReactMDL.Layout))
+(def Header (js/React.createFactory js/ReactMDL.Header))
+(def Navigation (js/React.createFactory js/ReactMDL.Navigation))
+(def Content (js/React.createFactory js/ReactMDL.Content))
+(def Button (js/React.createFactory js/ReactMDL.Button))
+(def Card (js/React.createFactory js/ReactMDL.Card))
+(def CardText (js/React.createFactory js/ReactMDL.CardText))
+(def CardActions (js/React.createFactory js/ReactMDL.CardActions))
+(def CardTitle (js/React.createFactory js/ReactMDL.CardTitle))
+(def CardMenu (js/React.createFactory js/ReactMDL.CardMenu))
+(def Grid (js/React.createFactory js/ReactMDL.CardMenu))
+(def Cell (js/React.createFactory js/ReactMDL.CardMenu))
+
 (s/def ::imgs vector?)
 (s/def ::text vector?)
 (s/def ::img string?)
@@ -138,8 +151,7 @@
             edit-mode-obs (first (om/observe owner (mn/edit-mode)))]
         (.log js/console "uid: " uid)
         (medium-init uid data link-btn-id link-input-id edit-uid)
-        (ndom/set-attr-by-id uid "contenteditable" (if (or edit-mode-obs edit) "true" "false"))
-        ))
+        (ndom/set-attr-by-id uid "contenteditable" (if (or edit-mode-obs edit) "true" "false"))))
 
     om/IDidUpdate
     (did-update [_ _ _]
@@ -595,25 +607,18 @@
   (reify
     om/IRenderState
     (render-state [_ {:keys [delete]}]
-      (dom/div #js {:style #js {:position "relative", :height "200px", :margin "10px",
-                                :fontWeight "900" :border "2px solid white" :padding "10px",
-                                :background "rgba(0,0,0,0.7)"}}
-
-               (dom/u nil (str "Site name: "))
-               (om/build widget name {:state {:edit true}})
-               (dom/u nil (str "Site description: "))
-               (om/build widget description {:state {:edit true}})
-
-               (dom/img #js {:style #js {:float "right", :position "absolute", :top "10px",
-                                         :right "10px"}
-                             :alt "Loading..." :src screenshot :width "300" :height "200"})
-
-               (cc/standard-button #(mn/site-transition @all-data)
-                 "Go to site")
-
-               (cc/standard-button
-                 #(put! delete name)
-                 "Delete site")))))
+      (Card #js {:shadow 0 :style #js {:width "400px" :display "inline-block" :margin "10px"
+                                       :textAlign "left"}}
+            (CardTitle #js {:style #js {:color "#fff"
+                                        :height "176px"
+                                        :background (str "url(" screenshot ")" " center / cover")}}
+                       "Site name")
+            (CardText #js {} "Site description")
+            (CardActions #js {:border true}
+                         (Button #js {:colored true :onClick #(mn/site-transition @all-data)}
+                                 "Go to site")
+                         (Button #js {:colored true :onClick #(put! delete name)}
+                                 "Delete site"))))))
 
 ;The user's sites as seen when on the user homepage. Not meant to be a user selectable widget. This widget
 ;is somewhat removed from the general monolith architecture. It loads its own data into the monolith
@@ -648,18 +653,20 @@
 
     om/IRenderState
     (render-state [_ {:keys [delete]}]
-      (dom/div #js {:style #js {:fontWeight "900"}}
-               (dom/div #js {:style #js {:fontWeight "900", :fontSize "2em", :textDecoration "underline"}}
-                        "Your Sites")
 
-               (cc/standard-button
-                 (fn [] (om/transact! user-sites #(conj % (mn/new-site-template))))
-                 "+ Add New Site"
-                 {:position "absolute", :top "0", :right "0",
-                  :fontSize "1.5em" :marginTop "20px", :cursor "pointer"})
+      (dom/div nil
+               (Layout #js {:fixedHeader true :style #js {:background "whitesmoke" :height "100%"}}
+                       (Header #js {:title "Your Sites"}
+                               (Navigation #js {}
+                                           (Button #js {:style #js {:line-height "0px"}
+                                                        :onClick (fn [] (om/transact!
+                                                                          user-sites
+                                                                          #(conj % (mn/new-site-template))))
+                                                        :raised true}
+                                                   "+ Add New Site")))
 
-               (apply dom/div nil
-                      (om/build-all display-site user-sites {:init-state {:delete delete}}))))))
+                       (apply dom/div #js {:style #js {:textAlign "center"}}
+                              (om/build-all display-site user-sites {:init-state {:delete delete}})))))))
 
 (defmethod widget-data-type 11 [_]
   (s/keys :req-un [::widget-uid ::object-id ::widget-name ::inner-html]))
@@ -863,27 +870,56 @@
   (reify
     om/IRender
     (render [_]
-      (dom/div #js {:style (clj->js welcome-widget-style)
-                    :className "welcome-widget"}
-               (dom/p #js {:style #js {:fontSize "1.5em"}} "Welcome to Nangpress! Here's how to get started.")
-               (dom/p nil "1. Choose a navbar.
-                          This is optional but without it your site won't have any pages other than the homepage.
-                          You can do this by clicking 'Menu' in the admin navbar above and then 'Select a navbar'
-                          from the menu that appears on the left.")
-               (dom/img #js {:src "https://media.giphy.com/media/l0Iy9RHuSPfER4NEs/source.gif"})
-               (dom/p nil "2. Add some routes to your site.
-                          Hit 'Toggle edit mode' at the top. This will make the navbar editable. If you click on
-                          the links on the navbar they will go to the corresponding page.")
-               (dom/img #js {:src "https://media.giphy.com/media/l0Iy7jckAeUOgt5Bu/source.gif"})
-               (dom/p nil "3. Add widgets to a page.
-                          In the side menu click on the 'add a widget' section. Here you will see a selction of
-                          widgets that you can add to the current page you are on by clicking 'Add widget'. You
-                          can play around with the widgets in the side menu as they have been loaded with some
-                          default data.")
-               (dom/img #js {:src "https://media.giphy.com/media/3o7btTKSqMxrMW3G2k/source.gif"})
-               (dom/p nil "4. Edit the widgets you have just added.
-                          Hit 'Toggle edit mode' at the top to edit the widgets you just added.")
-               (dom/p nil "5. Happy site building! Delete this widget when you're finished with it.")))))
+      (dom/div nil
+               (Card #js {:shadow 0 :style #js {:width "100%" :display "inline-block" :margin "10px"
+                                                :textAlign "left" :background "#3E4EB8" :color "white"}}
+                     (CardTitle #js {:style #js {:color "white"}}
+                                "Welcome to Nangpress! Here's how to get started.")
+                     (CardText #js {} "Site description")
+                     )
+
+               (Card #js {:shadow 0 :style #js {:width "100%" :display "inline-block" :margin "10px"
+                                                :textAlign "left"}}
+                     (CardTitle #js {:style #js {:color "#fff"
+                                                 :height "176px"
+                                                 :background (str
+                                                               "url("
+                                                               "https://media.giphy.com/media/l0Iy9RHuSPfER4NEs/source.gif"
+                                                               ")" " center / cover")}}
+                                "Site name")
+                     (CardText #js {} "Site description")
+                     (CardActions #js {:border true}
+                                  (Button #js {:colored true}
+                                          "Go to site")
+                                  (Button #js {:colored true}
+                                          "Delete site")))
+
+               (dom/div #js {:style (clj->js welcome-widget-style)
+                             :className "welcome-widget"}
+
+                        (dom/p #js {:style #js {:fontSize "1.5em"}} "Welcome to Nangpress! Here's how to get started.")
+                        (dom/p nil "1. Choose a navbar.
+                                   This is optional but without it your site won't have any pages other than the homepage.
+                                   You can do this by clicking 'Menu' in the admin navbar above and then 'Select a navbar'
+                                   from the menu that appears on the left.")
+                        (dom/img #js {:src "https://media.giphy.com/media/l0Iy9RHuSPfER4NEs/source.gif"})
+                        (dom/p nil "2. Add some routes to your site.
+                                   Hit 'Toggle edit mode' at the top. This will make the navbar editable. If you click on
+                                   the links on the navbar they will go to the corresponding page.")
+                        (dom/img #js {:src "https://media.giphy.com/media/l0Iy7jckAeUOgt5Bu/source.gif"})
+                        (dom/p nil "3. Add widgets to a page.
+                                   In the side menu click on the 'add a widget' section. Here you will see a selction of
+                                   widgets that you can add to the current page you are on by clicking 'Add widget'. You
+                                   can play around with the widgets in the side menu as they have been loaded with some
+                                   default data.")
+                        (dom/img #js {:src "https://media.giphy.com/media/3o7btTKSqMxrMW3G2k/source.gif"})
+                        (dom/p nil "4. Edit the widgets you have just added.
+                                   Hit 'Toggle edit mode' at the top to edit the widgets you just added.")
+                        (dom/p nil "5. Happy site building! Delete this widget when you're finished with it."))
+
+
+               )
+      )))
 
 (defn route-modifier
   ""

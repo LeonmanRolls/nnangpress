@@ -1,22 +1,3 @@
-       (set! (-> (ndom/get-node-by-id "body") .-style .-left) (str x "px"))
-      )  
-    (take 10 (repeatedly #(rand-int 42)))
-    )   
-    )
-(doall
-    (map 
-(fn [x]
-      (go 
-       (<! (nnangpress.utils/timeout 1000))
-       (set! (-> (ndom/get-node-by-id "body") .-style .-left) (str x "px")))
-      )
-      (take 10 (repeatedly #(rand-int 42)))
-      )  
-    )
-l
-(doall
-    (map 
-(fn [x]
       (go 
        (<! (nnangpress.utils/timeout 1000))
        (set! (-> (ndom/get-node-by-id "body") .-style .-left) (str x "px")))
@@ -498,3 +479,22 @@ monolith
     [cljs.core.async :refer [put! chan <!]]))
 (current-user)
   (.log js/console (current-user))
+(fb-copy 
+    "/nangpress-data/admin-sites/userhome/route-widget/routes-map/widgets/1" 
+    "/nangpress-data/admin-sites/userhome/route-widget/routes-map/widgets/0")
+(ns nnangpress.firebase
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require 
+    [nnangpress.utils :as u]
+    [clojure.walk :as wlk]
+    [cljs.core.async :refer [put! chan <!]]))
+(start-repl)
+(ns nnangpress.firebase
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require 
+    [nnangpress.utils :as u]
+    [clojure.walk :as wlk]
+    [cljs.core.async :refer [put! chan <!]]))
+(fb-copy 
+    "/nangpress-data/admin-sites/userhome/route-widget/routes-map/widgets/1" 
+    "/nangpress-data/admin-sites/userhome/route-widget/routes-map/widgets/0")

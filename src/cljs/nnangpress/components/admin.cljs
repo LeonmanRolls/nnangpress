@@ -53,7 +53,7 @@
 
         (dom/div #js {:style #js {:textAlign "center"}}
                  (dom/div #js {:id "firebase"} "")
-                 (Button #js{:raised true :colored true
+                 (Button #js{:raised false :colored true
                              :style (clj->js (merge local-style))
                              :onClick (fn [_]
                                         (mn/update-local-style! owner :display "none")
@@ -94,14 +94,16 @@
                               (= "splash" site-state) (Button #js{:style #js {:marginBottom "-8px" :float "right"
                                                                               :marginRight "10px"}
                                                                   :onClick #(mn/site-transition @mn/nangpress-data-cache)
-                                                                  :raised true :colored true}
+                                                                  :raised true :colored true
+                                                                  }
                                                               "Sign in")
 
                               (= "user" site-state) (Button #js{:style #js {:marginBottom "-8px"
                                                                             :float "right"
                                                                               :marginRight "10px"}
                                                                   :onClick #(.log js/console "hi there")
-                                                                  :raised true :colored true}
+                                                                  :colored true
+                                                                }
                                                               "Sign Out")
 
                               #_(dom/span nil
@@ -151,11 +153,10 @@
     (render [_]
       (dom/div #js {:id object-id
                     :className "a-widget"
-                    :style #js {:margin "10px" :position "relative"}}
+                    :style #js {:position "relative"}}
                (cc/edit-mode-sense
                  owner
                  (cc/delete-button  (mn/current-widgets-builder<< owner) :object-id object-id))
-               (.log js/console "data:" (clj->js data))
                (om/build wgt/widget data)))))
 
 (defn simple-form
